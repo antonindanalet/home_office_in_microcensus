@@ -1,4 +1,4 @@
-# home_office_in_microcensus
+# Home office: simple binary logit
 
 This codes estimates a (very simple) binary logit from the data of the Mobility and Transport Microcensus 2015 explaining the "choice" of making - at least from time to time - home office. The outputs are available in the following HTML files:
 - <a href="https://github.com/antonindanalet/home_office_in_microcensus/blob/master/data/output/models/logit_home_office.html">without gender and without error</a>
