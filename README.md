@@ -10,7 +10,7 @@ If you want to reproduce the error, you need this code and the data of the Mobil
 
 ### Prerequisites to run the code
 
-To run the code itself, you need python 3 and PandasBiogeme. Here is my configuration:
+To run the code itself, you need python 3 and PandasBiogeme. Here is my configuration for python 3.6.1:
 
 Cython 0.29.14, 
 
