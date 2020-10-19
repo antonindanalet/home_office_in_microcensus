@@ -11,43 +11,81 @@ If you want to reproduce the error, you need this code and the data of the Mobil
 ### Prerequisites to run the code
 
 To run the code itself, you need python 3 and PandasBiogeme. Here is my configuration:
+
 Cython 0.29.14, 
+
 Fiona 1.8.16
+
 GDAL 3.1.2 
+
 Rtree 0.9.4
+
 Shapely 1.7.1
+
 Unidecode 1.1.1
+
 attrs 20.2.0
+
 biogeme 3.2.0b0 installed from wheel for Windows
+
 certifi 2020.4.5.2
+
 chardet 3.0.4
+
 click 7.1.2
+
 click-plugins 1.1.1
+
 cligj 0.5.0
+
 cycler 0.10.0	
+
 cythonarrays 1.3.7
+
 cythoninstallhelpers 1.1.3
+
 geopandas 0.8.1
+
 idna 2.9
+
 kiwisolver 1.1.0
+
 matplotlib 3.1.1
+
 munch 2.5.0
+
 numpy 1.18.2
+
 pandas 1.0.1
+
 pip 20.2.2
+
 pyparsing 2.4.2
+
 pyproj 2.6.1.post1
+
 pyreadstat 0.2.9
+
 python-dateutil 2.8.1
+
 pytz 2019.3
+
 requests 2.23.0
+
 savReaderWriter 3.4.2
+
 scipy 1.4.1
+
 seaborn 0.9.0
+
 setuptools 49.2.0
+
 six 1.14.0
+
 urllib3 1.25.9
+
 xarray 0.16.0
+
 xlrd 1.2.0
 
 ### Data prerequisites
@@ -57,6 +95,7 @@ For it to produce the results, you also need the raw data of the Transport and M
 ### Run the code
 
 Please copy the files haushalte.csv and zielpersonen.csv of the Mobility and Transport Microcensus 2015 that you receive from the Federal Statistical Office in the folders data/input/mtmc/2015/. Then run run_home_office_in_microcensus.py.
+
 DO NOT commit or share in any way the CSV files haushalte.csv and zielpersonen.csv! These are personal data.
 
 ## Contact
