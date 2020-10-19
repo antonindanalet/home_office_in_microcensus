@@ -1,8 +1,8 @@
 # home_office_in_microcensus
 
 This codes estimates a (very simple) binary logit from the data of the Mobility and Transport Microcensus 2015 explaining the "choice" of making - at least from time to time - home office. The outputs are available in the following HTML files:
-- without gender and without error in 
-- with gender and with optimization error in 
+- <a href="https://github.com/antonindanalet/home_office_in_microcensus/blob/master/data/output/models/logit_home_office.html">without gender and without error</a>
+- <a href="https://github.com/antonindanalet/home_office_in_microcensus/blob/master/data/output/models/logit_home_office~00.html">with gender and with optimization error</a>
 
 ## Getting Started
 
@@ -94,7 +94,7 @@ For it to produce the results, you also need the raw data of the Transport and M
 
 ### Run the code
 
-Please copy the files haushalte.csv and zielpersonen.csv of the Mobility and Transport Microcensus 2015 that you receive from the Federal Statistical Office in the folders data/input/mtmc/2015/. Then run run_home_office_in_microcensus.py.
+Please copy the files haushalte.csv and zielpersonen.csv of the Mobility and Transport Microcensus 2015 that you receive from the Federal Statistical Office in the folders <a href="https://github.com/antonindanalet/home_office_in_microcensus/tree/master/data/input/mtmc/2015">data/input/mtmc/2015/</a>. Then run run_home_office_in_microcensus.py.
 
 DO NOT commit or share in any way the CSV files haushalte.csv and zielpersonen.csv! These are personal data.
 
