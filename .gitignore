@@ -1,3 +1,6 @@
 /data/input/mtmc/2015/haushalte.csv
 /data/input/mtmc/2015/zielpersonen.csv
 /data/output/data/estimation/persons.csv
+/data/output/data/estimation/persons.csv
+/data/output/data/validation/estimation/persons80.csv
+/data/output/data/valdiation/estimation/simulation/persons20.csv
