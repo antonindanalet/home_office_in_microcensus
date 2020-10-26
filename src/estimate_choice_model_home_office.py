@@ -18,9 +18,8 @@ def estimate_choice_model_home_office():
 
 
 def run_estimation(data_file_directory, data_file_name, output_directory):
-    """ File estimate_choice_model_home_office.py
-
-    :author: Antonin Danalet, based on the example by Michel Bierlaire, EPFL, on biogeme.epfl.ch
+    """
+    :author: Antonin Danalet, based on the example '01logit.py' by Michel Bierlaire, EPFL, on biogeme.epfl.ch
 
     A binary logit model on the possibility to work from home at least some times."""
 
@@ -64,7 +63,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory):
 
     B_home_work_distance = Beta('B_home_work_distance', 0, None, None, 1)
 
-    B_age = Beta('B_age', 0, None, None, 1)
+    B_age = Beta('B_age', 0, None, None, 0)
 
     # Definition of new variables
     full_time_work = DefineVariable('full_time_work', ERWERB == 1, database)
@@ -137,12 +136,10 @@ def run_estimation(data_file_directory, data_file_name, output_directory):
     U_No_home_office = 0
 
     # Associate utility functions with the numbering of alternatives
-    V = {1: U,  # Yes
-         2: U,  # Sometimes
+    V = {1: U,  # Yes or sometimes
          3: U_No_home_office}  # No
 
     av = {1: 1,
-          2: 1,
           3: 1}
 
     # Definition of the model. This is the contribution of each
@@ -215,6 +212,10 @@ def generate_data_file():
                                   'alter': 'age'})
     ''' Removing people who did not get the question or did not answer. '''
     df_zp.drop(df_zp[df_zp.home_office < 0].index, inplace=True)
+    ''' Transform the variable home office from 3 to 2 possible answers '''
+    df_zp.home_office =df_zp.home_office.map({1: 1,
+                                              2: 1,
+                                              3: 3})
     ''' Test that no column contains NA values '''
     for column in df_zp.columns:
         if df_zp[column].isna().any():
