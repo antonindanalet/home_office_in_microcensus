@@ -34,7 +34,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory):
     # Parameters to be estimated
     ASC = Beta('ASC', 0, None, None, 0)
 
-    B_full_time_work = Beta('B_full_time_work', 0, None, None, 0)
+    B_full_time_work = Beta('B_full_time_work', 0, None, None, 1)
     B_active_without_known_work_percentage = Beta('B_active_without_known_work_percentage', 0, None, None, 1)
 
     B_no_post_school_education = Beta('B_no_post_school_education', 0, None, None, 0)
@@ -44,16 +44,18 @@ def run_estimation(data_file_directory, data_file_name, output_directory):
 
     B_male = Beta('B_male', 0, None, None, 0)
 
-    B_single_household = Beta('B_single_household', 0, None, None, 1)
-    B_couple_without_children = Beta('B_couple_without_children', 0, None, None, 1)
+    B_single_household = Beta('B_single_household', 0, None, None, 0)
+    B_couple_without_children = Beta('B_couple_without_children', 0, None, None, 0)
     B_couple_with_children = Beta('B_couple_with_children', 0, None, None, 1)
     B_single_parent_with_children = Beta('B_single_parent_with_children', 0, None, None, 0)
     B_not_family_household = Beta('B_not_family_household', 0, None, None, 1)
 
-    B_public_transport_connection_quality_ARE_A_or_B = Beta('B_public_transport_connection_quality_ARE_A_or_B', 0, None,
-                                                            None, 0)
-    B_public_transport_connection_quality_ARE_C = Beta('B_public_transport_connection_quality_ARE_C', 0, None, None, 1)
-    B_public_transport_connection_quality_ARE_D = Beta('B_public_transport_connection_quality_ARE_D', 0, None, None, 1)
+    B_public_transport_connection_quality_ARE_A = Beta('B_public_transport_connection_quality_ARE_A', 0,
+                                                            None, None, 0)
+    B_public_transport_connection_quality_ARE_B = Beta('B_public_transport_connection_quality_ARE_B', 0,
+                                                            None, None, 0)
+    B_public_transport_connection_quality_ARE_C = Beta('B_public_transport_connection_quality_ARE_C', 0, None, None, 0)
+    B_public_transport_connection_quality_ARE_D = Beta('B_public_transport_connection_quality_ARE_D', 0, None, None, 0)
     B_public_transport_connection_quality_ARE_NA = Beta('B_public_transport_connection_quality_ARE_NA', 0, None, None,
                                                         1)
 
@@ -61,9 +63,9 @@ def run_estimation(data_file_directory, data_file_name, output_directory):
     B_RURAL = Beta('B_RURAL', 0, None, None, 1)
     B_INTERMEDIATE = Beta('B_INTERMEDIATE', 0, None, None, 1)
 
-    B_home_work_distance = Beta('B_home_work_distance', 0, None, None, 1)
+    B_home_work_distance = Beta('B_home_work_distance', 0, None, None, 0)
 
-    B_age = Beta('B_age', 0, None, None, 0)
+    B_AGE = Beta('B_AGE', 0, None, None, 0)
 
     # Definition of new variables
     full_time_work = DefineVariable('full_time_work', ERWERB == 1, database)
@@ -123,8 +125,8 @@ def run_estimation(data_file_directory, data_file_name, output_directory):
         B_couple_with_children * couple_with_children + \
         B_single_parent_with_children * single_parent_with_children + \
         B_not_family_household * not_family_household + \
-        B_public_transport_connection_quality_ARE_A_or_B * public_transport_connection_quality_ARE_A + \
-        B_public_transport_connection_quality_ARE_A_or_B * public_transport_connection_quality_ARE_B + \
+        B_public_transport_connection_quality_ARE_A * public_transport_connection_quality_ARE_A + \
+        B_public_transport_connection_quality_ARE_B * public_transport_connection_quality_ARE_B + \
         B_public_transport_connection_quality_ARE_C * public_transport_connection_quality_ARE_C + \
         B_public_transport_connection_quality_ARE_D * public_transport_connection_quality_ARE_D + \
         B_public_transport_connection_quality_ARE_NA * public_transport_connection_quality_ARE_NA + \
@@ -132,7 +134,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory):
         B_RURAL * rural + \
         B_INTERMEDIATE * intermediate + \
         B_home_work_distance * home_work_distance + \
-        B_age * age
+        B_AGE * age
     U_No_home_office = 0
 
     # Associate utility functions with the numbering of alternatives
