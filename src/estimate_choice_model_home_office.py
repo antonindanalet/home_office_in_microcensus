@@ -32,40 +32,38 @@ def run_estimation(data_file_directory, data_file_name, output_directory):
     globals().update(database.variables)
 
     # Parameters to be estimated
-    ASC = Beta('ASC', 0, None, None, 0)
+    alternative_specific_constant = Beta('alternative_specific_constant', 0, None, None, 0)
 
-    B_full_time_work = Beta('B_full_time_work', 0, None, None, 1)
-    B_active_without_known_work_percentage = Beta('B_active_without_known_work_percentage', 0, None, None, 1)
+    b_full_time_work = Beta('b_full_time_work', 0, None, None, 1)
+    b_active_without_known_work_percentage = Beta('b_active_without_known_work_percentage', 0, None, None, 1)
 
-    B_no_post_school_education = Beta('B_no_post_school_education', 0, None, None, 0)
-    B_secondary_education = Beta('B_secondary_education', 0, None, None, 0)
-    B_tertiary_education = Beta('B_tertiary_education', 0, None, None, 0)
-    B_university = Beta('B_university', 0, None, None, 1)
+    b_no_post_school_education = Beta('b_no_post_school_education', 0, None, None, 0)
+    b_secondary_education = Beta('b_secondary_education', 0, None, None, 0)
+    b_tertiary_education = Beta('b_tertiary_education', 0, None, None, 0)
+    b_university = Beta('b_university', 0, None, None, 1)
 
-    B_male = Beta('B_male', 0, None, None, 0)
+    b_male = Beta('b_male', 0, None, None, 0)
 
-    B_single_household = Beta('B_single_household', 0, None, None, 0)
-    B_couple_without_children = Beta('B_couple_without_children', 0, None, None, 0)
-    B_couple_with_children = Beta('B_couple_with_children', 0, None, None, 1)
-    B_single_parent_with_children = Beta('B_single_parent_with_children', 0, None, None, 0)
-    B_not_family_household = Beta('B_not_family_household', 0, None, None, 1)
+    b_single_household = Beta('b_single_household', 0, None, None, 0)
+    b_couple_without_children = Beta('b_couple_without_children', 0, None, None, 0)
+    b_couple_with_children = Beta('b_couple_with_children', 0, None, None, 1)
+    b_single_parent_with_children = Beta('b_single_parent_with_children', 0, None, None, 0)
+    b_not_family_household = Beta('b_not_family_household', 0, None, None, 1)
 
-    B_public_transport_connection_quality_ARE_A = Beta('B_public_transport_connection_quality_ARE_A', 0,
+    b_public_transport_connection_quality_are_a = Beta('b_public_transport_connection_quality_are_a', 0,
                                                             None, None, 0)
-    B_public_transport_connection_quality_ARE_B = Beta('B_public_transport_connection_quality_ARE_B', 0,
+    b_public_transport_connection_quality_are_b = Beta('b_public_transport_connection_quality_are_b', 0,
                                                             None, None, 0)
-    B_public_transport_connection_quality_ARE_C = Beta('B_public_transport_connection_quality_ARE_C', 0, None, None, 0)
-    B_public_transport_connection_quality_ARE_D = Beta('B_public_transport_connection_quality_ARE_D', 0, None, None, 0)
-    B_public_transport_connection_quality_ARE_NA = Beta('B_public_transport_connection_quality_ARE_NA', 0, None, None,
+    b_public_transport_connection_quality_are_c = Beta('b_public_transport_connection_quality_are_c', 0, None, None, 0)
+    b_public_transport_connection_quality_are_d = Beta('b_public_transport_connection_quality_are_d', 0, None, None, 0)
+    b_public_transport_connection_quality_are_na = Beta('b_public_transport_connection_quality_are_na', 0, None, None,
                                                         1)
 
-    B_URBAN = Beta('B_URBAN', 0, None, None, 1)
-    B_RURAL = Beta('B_RURAL', 0, None, None, 1)
-    B_INTERMEDIATE = Beta('B_INTERMEDIATE', 0, None, None, 1)
+    b_urban = Beta('b_urban', 0, None, None, 1)
+    b_rural = Beta('b_rural', 0, None, None, 1)
+    b_intermediate = Beta('b_intermediate', 0, None, None, 1)
 
-    B_home_work_distance = Beta('B_home_work_distance', 0, None, None, 0)
-
-    B_AGE = Beta('B_AGE', 0, None, None, 0)
+    b_home_work_distance = Beta('b_home_work_distance', 0, None, None, 0)
 
     # Definition of new variables
     full_time_work = DefineVariable('full_time_work', ERWERB == 1, database)
@@ -108,33 +106,33 @@ def run_estimation(data_file_directory, data_file_name, output_directory):
     intermediate = DefineVariable('intermediate', urban_typology == 2, database)
 
     home_work_distance = DefineVariable('home_work_distance',
-                                        home_work_crow_fly_distance * (home_work_crow_fly_distance >= 0.0) / 1000.0,
+                                        home_work_crow_fly_distance * (home_work_crow_fly_distance >= 0.0) / 100000.0,
                                         database)
 
     #  Utility
-    U = ASC + \
-        B_full_time_work * full_time_work + \
-        B_active_without_known_work_percentage * active_without_known_work_percentage + \
-        B_no_post_school_education * no_post_school_educ + \
-        B_secondary_education * secondary_education + \
-        B_tertiary_education * tertiary_education + \
-        B_university * university + \
-        B_male * male + \
-        B_single_household * single_household + \
-        B_couple_without_children * couple_without_children + \
-        B_couple_with_children * couple_with_children + \
-        B_single_parent_with_children * single_parent_with_children + \
-        B_not_family_household * not_family_household + \
-        B_public_transport_connection_quality_ARE_A * public_transport_connection_quality_ARE_A + \
-        B_public_transport_connection_quality_ARE_B * public_transport_connection_quality_ARE_B + \
-        B_public_transport_connection_quality_ARE_C * public_transport_connection_quality_ARE_C + \
-        B_public_transport_connection_quality_ARE_D * public_transport_connection_quality_ARE_D + \
-        B_public_transport_connection_quality_ARE_NA * public_transport_connection_quality_ARE_NA + \
-        B_URBAN * urban + \
-        B_RURAL * rural + \
-        B_INTERMEDIATE * intermediate + \
-        B_home_work_distance * home_work_distance + \
-        B_AGE * age
+    U = alternative_specific_constant + \
+        b_full_time_work * full_time_work + \
+        b_active_without_known_work_percentage * active_without_known_work_percentage + \
+        b_no_post_school_education * no_post_school_educ + \
+        b_secondary_education * secondary_education + \
+        b_tertiary_education * tertiary_education + \
+        b_university * university + \
+        b_male * male + \
+        b_single_household * single_household + \
+        b_couple_without_children * couple_without_children + \
+        b_couple_with_children * couple_with_children + \
+        b_single_parent_with_children * single_parent_with_children + \
+        b_not_family_household * not_family_household + \
+        b_public_transport_connection_quality_are_a * public_transport_connection_quality_ARE_A + \
+        b_public_transport_connection_quality_are_b * public_transport_connection_quality_ARE_B + \
+        b_public_transport_connection_quality_are_c * public_transport_connection_quality_ARE_C + \
+        b_public_transport_connection_quality_are_d * public_transport_connection_quality_ARE_D + \
+        b_public_transport_connection_quality_are_na * public_transport_connection_quality_ARE_NA + \
+        b_urban * urban + \
+        b_rural * rural + \
+        b_intermediate * intermediate + \
+        b_home_work_distance * home_work_distance + \
+        models.piecewiseFormula(age, [0, 35, 55, 200])
     U_No_home_office = 0
 
     # Associate utility functions with the numbering of alternatives
@@ -161,8 +159,8 @@ def run_estimation(data_file_directory, data_file_name, output_directory):
     results = biogeme.estimate()
 
     # Get the results in a pandas table
-    pandasResults = results.getEstimatedParameters()
-    print(pandasResults)
+    pandas_results = results.getEstimatedParameters()
+    print(pandas_results)
 
     # Go back to the normal working directory
     os.chdir(standard_directory)
@@ -226,4 +224,3 @@ def generate_data_file():
     output_directory = Path('../data/output/data/estimation/')
     data_file_name = 'persons.csv'
     df_zp.to_csv(output_directory / data_file_name, sep=';', index=False)
-
