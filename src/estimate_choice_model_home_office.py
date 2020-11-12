@@ -65,6 +65,17 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
 
     b_home_work_distance = Beta('b_home_work_distance', 0, None, None, 0)
 
+    b_business_sector_agriculture = Beta('b_business_sector_agriculture', 0, None, None, 0)
+    b_business_sector_production = Beta('b_business_sector_production', 0, None, None, 0)
+    b_business_sector_wholesale = Beta('b_business_sector_wholesale', 0, None, None, 1)
+    b_business_sector_retail = Beta('b_business_sector_retail', 0, None, None, 0)
+    b_business_sector_gastronomy = Beta('b_business_sector_gastronomy', 0, None, None, 0)
+    b_business_sector_finance = Beta('b_business_sector_finance', 0, None, None, 1)
+    b_business_sector_services_fC = Beta('b_business_sector_services_fC', 0, None, None, 0)
+    b_business_sector_other_services = Beta('b_business_sector_other_services', 0, None, None, 0)
+    b_business_sector_others = Beta('b_business_sector_others', 0, None, None, 1)
+    b_business_sector_non_movers = Beta('b_business_sector_non_movers', 0, None, None, 0)
+
     # Definition of new variables
     full_time_work = DefineVariable('full_time_work', ERWERB == 1, database)
     active_without_known_work_percentage = DefineVariable('active_without_known_work_percentage', ERWERB == 9,
@@ -109,6 +120,27 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
                                         home_work_crow_fly_distance * (home_work_crow_fly_distance >= 0.0) / 100000.0,
                                         database)
 
+    business_sector_agriculture = DefineVariable('business_sector_agriculture', 1 <= noga_08 <= 7, database)
+    business_sector_retail = DefineVariable('business_sector_retail', 47 <= noga_08 <= 47, database)
+    business_sector_gastronomy = DefineVariable('business_sector_gastronomy', 55 <= noga_08 <= 57, database)
+    business_sector_finance = DefineVariable('business_sector_finance', 64 <= noga_08 <= 67, database)
+    business_sector_production = DefineVariable('business_sector_production',
+                                                (10 <= noga_08 <= 35) | (40 <= noga_08 <= 44), database)
+    business_sector_wholesale = DefineVariable('business_sector_wholesale',
+                                               (45 <= noga_08 <= 45) | (49 <= noga_08 <= 54), database)
+    business_sector_services_fC = DefineVariable('business_sector_services_fC',
+                                                 (60 <= noga_08 <= 63) | (69 <= noga_08 <= 83) | (noga_08 == 58),
+                                                 database)
+    business_sector_other_services = DefineVariable('business_sector_other_services',
+                                                    (86 <= noga_08 <= 90) | (92 <= noga_08 <= 96) | (noga_08 == 59) |
+                                                    (noga_08 == 68),
+                                                    database)
+    business_sector_others = DefineVariable('business_sector_others', 97 <= noga_08 <= 98, database)
+    business_sector_non_movers = DefineVariable('business_sector_non_movers',
+                                                (8 <= noga_08 <= 9) | (36 <= noga_08 <= 39) | (84 <= noga_08 <= 85) |
+                                                (noga_08 == 91) | (noga_08 == 99),
+                                                database)
+
     #  Utility
     U = alternative_specific_constant + \
         b_full_time_work * full_time_work + \
@@ -132,7 +164,17 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_rural * rural + \
         b_intermediate * intermediate + \
         b_home_work_distance * home_work_distance + \
-        models.piecewiseFormula(age, [0, 35, 55, 200])
+        models.piecewiseFormula(age, [0, 35, 55, 200]) + \
+        b_business_sector_agriculture * business_sector_agriculture + \
+        b_business_sector_retail * business_sector_retail + \
+        b_business_sector_gastronomy * business_sector_gastronomy + \
+        b_business_sector_finance * business_sector_finance + \
+        b_business_sector_production * business_sector_production + \
+        b_business_sector_wholesale * business_sector_wholesale + \
+        b_business_sector_services_fC * business_sector_services_fC + \
+        b_business_sector_other_services * business_sector_other_services + \
+        b_business_sector_others * business_sector_others + \
+        b_business_sector_non_movers * business_sector_non_movers
     U_No_home_office = 0
 
     # Associate utility functions with the numbering of alternatives
@@ -174,7 +216,8 @@ def generate_data_file():
         Biogeme.
         """
     ''' Select the variables about the person from the tables of the MTMC 2015 '''
-    selected_columns_zp = ['gesl', 'HAUSB', 'HHNR', 'ERWERB', 'f81300', 'A_X_CH1903', 'A_Y_CH1903', 'alter', 'f81400']
+    selected_columns_zp = ['gesl', 'HAUSB', 'HHNR', 'ERWERB', 'f81300', 'A_X_CH1903', 'A_Y_CH1903', 'alter', 'f81400',
+                           'noga_08']
     df_zp = get_zp(2015, selected_columns_zp)
     selected_columns_hh = ['HHNR', 'hhtyp', 'W_OeV_KLASSE', 'W_BFS', 'W_X_CH1903', 'W_Y_CH1903']
     df_hh = get_hh(2015, selected_columns_hh)
