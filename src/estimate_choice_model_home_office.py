@@ -50,14 +50,12 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_single_parent_with_children = Beta('b_single_parent_with_children', 0, None, None, 1)
     b_not_family_household = Beta('b_not_family_household', 0, None, None, 1)
 
-    b_public_transport_connection_quality_are_a = Beta('b_public_transport_connection_quality_are_a', 0,
-                                                            None, None, 0)
-    b_public_transport_connection_quality_are_b = Beta('b_public_transport_connection_quality_are_b', 0,
-                                                            None, None, 0)
-    b_public_transport_connection_quality_are_c = Beta('b_public_transport_connection_quality_are_c', 0, None, None, 0)
-    b_public_transport_connection_quality_are_d = Beta('b_public_transport_connection_quality_are_d', 0, None, None, 0)
+    b_public_transport_connection_quality_are_a = Beta('b_public_transport_connection_quality_are_a', 0, None, None, 1)
+    b_public_transport_connection_quality_are_b = Beta('b_public_transport_connection_quality_are_b', 0, None, None, 1)
+    b_public_transport_connection_quality_are_c = Beta('b_public_transport_connection_quality_are_c', 0, None, None, 1)
+    b_public_transport_connection_quality_are_d = Beta('b_public_transport_connection_quality_are_d', 0, None, None, 1)
     b_public_transport_connection_quality_are_na = Beta('b_public_transport_connection_quality_are_na', 0, None, None,
-                                                        1)
+                                                        0)
 
     b_urban = Beta('b_urban', 0, None, None, 1)
     b_rural = Beta('b_rural', 0, None, None, 1)
