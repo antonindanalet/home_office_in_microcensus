@@ -47,7 +47,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_single_household = Beta('b_single_household', 0, None, None, 0)
     b_couple_without_children = Beta('b_couple_without_children', 0, None, None, 0)
     b_couple_with_children = Beta('b_couple_with_children', 0, None, None, 1)
-    b_single_parent_with_children = Beta('b_single_parent_with_children', 0, None, None, 0)
+    b_single_parent_with_children = Beta('b_single_parent_with_children', 0, None, None, 1)
     b_not_family_household = Beta('b_not_family_household', 0, None, None, 1)
 
     b_public_transport_connection_quality_are_a = Beta('b_public_transport_connection_quality_are_a', 0,
@@ -137,10 +137,10 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
 
     # Associate utility functions with the numbering of alternatives
     V = {1: U,  # Yes or sometimes
-         3: U_No_home_office}  # No
+         0: U_No_home_office}  # No
 
     av = {1: 1,
-          3: 1}
+          0: 1}
 
     # Definition of the model. This is the contribution of each
     # observation to the log likelihood function.
@@ -174,7 +174,7 @@ def generate_data_file():
         Biogeme.
         """
     ''' Select the variables about the person from the tables of the MTMC 2015 '''
-    selected_columns_zp = ['gesl', 'HAUSB', 'HHNR', 'ERWERB', 'f81300', 'A_X_CH1903', 'A_Y_CH1903', 'alter']
+    selected_columns_zp = ['gesl', 'HAUSB', 'HHNR', 'ERWERB', 'f81300', 'A_X_CH1903', 'A_Y_CH1903', 'alter', 'f81400']
     df_zp = get_zp(2015, selected_columns_zp)
     selected_columns_hh = ['HHNR', 'hhtyp', 'W_OeV_KLASSE', 'W_BFS', 'W_X_CH1903', 'W_Y_CH1903']
     df_hh = get_hh(2015, selected_columns_hh)
@@ -205,17 +205,16 @@ def generate_data_file():
     # Rename the variables
     df_zp = df_zp.rename(columns={'gesl': 'sex',
                                   'HAUSB': 'highest_educ',
-                                  'f81300': 'home_office',
+                                  'f81300': 'home_office_is_possible',
                                   'hhtyp': 'hh_type',
                                   'W_OeV_KLASSE': 'public_transport_connection_quality_ARE',
                                   'Stadt/Land-Typologie': 'urban_typology',
-                                  'alter': 'age'})
+                                  'alter': 'age',
+                                  'f81400': 'percentage_home_office'})
     ''' Removing people who did not get the question or did not answer. '''
-    df_zp.drop(df_zp[df_zp.home_office < 0].index, inplace=True)
-    ''' Transform the variable home office from 3 to 2 possible answers '''
-    df_zp.home_office =df_zp.home_office.map({1: 1,
-                                              2: 1,
-                                              3: 3})
+    df_zp.drop(df_zp[df_zp.home_office_is_possible < 0].index, inplace=True)
+    ''' Define the variable home office as "possibility to do home office" and "practically do some" '''
+    df_zp['home_office'] = df_zp.apply(define_home_office_variable, axis=1)
     ''' Test that no column contains NA values '''
     for column in df_zp.columns:
         if df_zp[column].isna().any():
@@ -224,3 +223,13 @@ def generate_data_file():
     output_directory = Path('../data/output/data/estimation/')
     data_file_name = 'persons.csv'
     df_zp.to_csv(output_directory / data_file_name, sep=';', index=False)
+
+
+def define_home_office_variable(row):
+    """ Defines a choice variable with value 1 if the person is allowed to do home office
+    (answer "yes" - 1 - or answer "sometimes" - 2) and does it at least 1% of the time """
+    home_office = 0
+    if ((row['home_office_is_possible'] == 1) or (row['home_office_is_possible'] == 2)) \
+            and row['percentage_home_office'] > 0:
+        home_office = 1
+    return home_office
