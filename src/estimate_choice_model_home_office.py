@@ -17,7 +17,7 @@ def estimate_choice_model_home_office():
     run_estimation(data_file_directory, data_file_name, output_directory)
 
 
-def run_estimation(data_file_directory, data_file_name, output_directory):
+def run_estimation(data_file_directory, data_file_name, output_directory, output_file_name='logit_home_office'):
     """
     :author: Antonin Danalet, based on the example '01logit.py' by Michel Bierlaire, EPFL, on biogeme.epfl.ch
 
@@ -153,7 +153,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory):
 
     # Create the Biogeme object
     biogeme = bio.BIOGEME(database, logprob)
-    biogeme.modelName = 'logit_home_office'
+    biogeme.modelName = output_file_name
 
     # Estimate the parameters
     results = biogeme.estimate()
