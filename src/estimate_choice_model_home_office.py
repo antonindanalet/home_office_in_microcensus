@@ -10,7 +10,7 @@ from utils_mtmc.get_mtmc_files import get_zp, get_hh
 
 
 def estimate_choice_model_home_office():
-    generate_data_file()
+    # generate_data_file()
     data_file_directory = Path('../data/output/data/estimation/')
     data_file_name = 'persons.csv'
     output_directory = '../data/output/models/estimation/'
@@ -73,8 +73,10 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_age = Beta('b_age', 0, None, None, 0)
     b_employees = Beta('b_employees', 0, None, None, 1)
     b_executives = Beta('b_executives', 0, None, None, 0)
-    b_french = Beta('b_french', 0, None, None, 0)
-    b_italian = Beta('b_italian', 0, None, None, 0)
+    b_german = Beta('b_german', 0, None, None, 0)
+    b_nationality_ch_germany_france_italy_nw_e = Beta('b_nationality_ch_germany_france_italy_nw_e', 0, None, None, 0)
+    b_nationality_south_west_europe = Beta('b_nationality_south_west_europe', 0, None, None, 1)
+    b_nationality_southeast_europe = Beta('b_nationality_southeast_europe', 0, None, None, 0)
 
     # Definition of new variables
     no_post_school_educ = DefineVariable('no_post_school_educ',
@@ -140,8 +142,62 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     employees = DefineVariable('employees', work_position == 2, database)
     executives = DefineVariable('executives', (work_position == 3) + (work_position == 1), database)
 
-    french = DefineVariable('french', language == 2, database)
-    italian = DefineVariable('italian', language == 3, database)
+    german = DefineVariable('german', language == 1, database)
+
+    nationality_switzerland = DefineVariable('nationality_switzerland', nation == 8100, database)
+    nationality_germany_austria_lichtenstein = DefineVariable('nationality_germany_austria_lichtenstein',
+                                                              (nation == 8207) | (nation == 8229) | (nation == 8222),
+                                                              database)
+    nationality_italy_vatican = DefineVariable('nationality_italy_vatican', (nation == 8218) | (nation == 8241),
+                                                              database)
+    nationality_france_monaco_san_marino = DefineVariable('nationality_france_monaco_san_marino',
+                                                          (nation == 8212) | (nation == 8226) | (nation == 8233),
+                                                          database)
+    nationality_northwestern_europe = DefineVariable('nationality_northwestern_europe',
+                                                  (nation == 8204) |  # Belgium
+                                                  (nation == 8223) |  # Luxembourg
+                                                  (nation == 8227) |  # Netherlands
+                                                  (nation == 8206) |  # Denmark
+                                                  (nation == 8211) |  # Finland
+                                                  (nation == 8215) |  # United Kingdom
+                                                  (nation == 8216) |  # Ireland
+                                                  (nation == 8217) |  # Iceland
+                                                  (nation == 8228) |  # Norway
+                                                  (nation == 8234),  # Sweden
+                                                  database)
+    nationality_south_west_europe = DefineVariable('nationality_south_west_europe',
+                                                   (nation == 8231) |  # Portugal
+                                                   (nation == 8236) |  # Spain
+                                                   (nation == 8202),  # Andorra
+                                                   database)
+    nationality_southeast_europe = DefineVariable('nationality_southeast_europe',
+                                                  (nation == 8224) |  # Malta
+                                                  (nation == 8201) |  # Albania
+                                                  (nation == 8214) |  # Greece
+                                                  (nation == 8256) |  # Kosovo
+                                                  (nation == 8250) |  # Croatia
+                                                  (nation == 8251) |  # Slovenia
+                                                  (nation == 8252) |  # Bosnia and Herzegovina
+                                                  (nation == 8255) |  # Macedonia
+                                                  (nation == 8205) |  # Bulgaria
+                                                  (nation == 8239) |  # Turkey
+                                                  (nation == 8242) |  # Cyprus
+                                                  (nation == 8248) |  # Serbia
+                                                  (nation == 8254),  # Montenegro
+                                                  database)
+    nationality_eastern_europe = DefineVariable('nationality_eastern_europe',
+                                                (nation == 8230) |  # Poland
+                                                (nation == 8232) |  # Rumania
+                                                (nation == 8240) |  # Hungary
+                                                (nation == 8243) |  # Slovakia
+                                                (nation == 8244) |  # Czech Republic
+                                                (nation == 8263) |  # Moldavia
+                                                (nation == 8265) |  # Ukraine
+                                                (nation == 8266) |  # Belarus
+                                                (nation == 8260) |  # Estonia
+                                                (nation == 8261) |  # Latvia
+                                                (nation == 8262),  # Lithuania
+                                                   database)
 
     #  Utility models.piecewiseFormula(age, [0, 35, 55, 200]) + \
     U = alternative_specific_constant + \
@@ -177,8 +233,15 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_business_sector_other_services * business_sector_other_services + \
         b_business_sector_others * business_sector_others + \
         b_business_sector_non_movers * business_sector_non_movers + \
-        b_french * french + \
-        b_italian * italian
+        b_german * german + \
+        b_nationality_ch_germany_france_italy_nw_e * nationality_switzerland + \
+        b_nationality_ch_germany_france_italy_nw_e * nationality_germany_austria_lichtenstein + \
+        b_nationality_ch_germany_france_italy_nw_e * nationality_italy_vatican + \
+        b_nationality_ch_germany_france_italy_nw_e * nationality_france_monaco_san_marino + \
+        b_nationality_ch_germany_france_italy_nw_e * nationality_northwestern_europe + \
+        b_nationality_south_west_europe * nationality_south_west_europe + \
+        b_nationality_southeast_europe * nationality_southeast_europe + \
+        b_nationality_ch_germany_france_italy_nw_e * nationality_eastern_europe
     U_No_home_office = 0
 
     # Associate utility functions with the numbering of alternatives
@@ -221,7 +284,7 @@ def generate_data_file():
         """
     ''' Select the variables about the person from the tables of the MTMC 2015 '''
     selected_columns_zp = ['gesl', 'HAUSB', 'HHNR', 'f81300', 'A_X_CH1903', 'A_Y_CH1903', 'alter', 'f81400', 'noga_08',
-                           'sprache', 'f40800_01', 'f41100_01']
+                           'sprache', 'f40800_01', 'f41100_01', 'nation']
     df_zp = get_zp(2015, selected_columns_zp)
     selected_columns_hh = ['HHNR', 'hhtyp', 'W_OeV_KLASSE', 'W_BFS', 'W_X_CH1903', 'W_Y_CH1903']
     df_hh = get_hh(2015, selected_columns_hh)
