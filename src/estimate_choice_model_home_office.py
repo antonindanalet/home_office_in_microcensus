@@ -34,15 +34,12 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     # Parameters to be estimated
     alternative_specific_constant = Beta('alternative_specific_constant', 0, None, None, 0)
 
-    b_full_time_work = Beta('b_full_time_work', 0, None, None, 1)
-    b_active_without_known_work_percentage = Beta('b_active_without_known_work_percentage', 0, None, None, 1)
-
     b_no_post_school_education = Beta('b_no_post_school_education', 0, None, None, 0)
     b_secondary_education = Beta('b_secondary_education', 0, None, None, 0)
     b_tertiary_education = Beta('b_tertiary_education', 0, None, None, 0)
     b_university = Beta('b_university', 0, None, None, 1)
 
-    b_male = Beta('b_male', 0, None, None, 0)
+    b_male = Beta('b_male', 0, None, None, 1)
 
     b_single_household = Beta('b_single_household', 0, None, None, 0)
     b_couple_without_children = Beta('b_couple_without_children', 0, None, None, 0)
@@ -73,12 +70,11 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_business_sector_other_services = Beta('b_business_sector_other_services', 0, None, None, 0)
     b_business_sector_others = Beta('b_business_sector_others', 0, None, None, 1)
     b_business_sector_non_movers = Beta('b_business_sector_non_movers', 0, None, None, 0)
+    b_age = Beta('b_age', 0, None, None, 0)
+    b_employees = Beta('b_employees', 0, None, None, 0)
+    b_executives = Beta('b_executives', 0, None, None, 0)
 
     # Definition of new variables
-    full_time_work = DefineVariable('full_time_work', ERWERB == 1, database)
-    active_without_known_work_percentage = DefineVariable('active_without_known_work_percentage', ERWERB == 9,
-                                                          database)
-
     no_post_school_educ = DefineVariable('no_post_school_educ',
                                          (highest_educ == 1) | (highest_educ == 2) | (highest_educ == 3) |
                                          (highest_educ == 4), database)
@@ -139,10 +135,16 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
                                                 (noga_08 == 91) | (noga_08 == 99),
                                                 database)
 
-    #  Utility
+    employees = DefineVariable('employees', work_position == 2, database)
+    executives = DefineVariable('executives', (work_position == 3) + (work_position == 1), database)
+
+    french = DefineVariable('french', language == 2, database)
+    italian = DefineVariable('italian', language == 3, database)
+
+    #  Utility models.piecewiseFormula(age, [0, 35, 55, 200]) + \
     U = alternative_specific_constant + \
-        b_full_time_work * full_time_work + \
-        b_active_without_known_work_percentage * active_without_known_work_percentage + \
+        b_executives * executives + \
+        b_employees * employees + \
         b_no_post_school_education * no_post_school_educ + \
         b_secondary_education * secondary_education + \
         b_tertiary_education * tertiary_education + \
@@ -162,7 +164,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_rural * rural + \
         b_intermediate * intermediate + \
         b_home_work_distance * home_work_distance + \
-        models.piecewiseFormula(age, [0, 35, 55, 200]) + \
+        b_age * age + \
         b_business_sector_agriculture * business_sector_agriculture + \
         b_business_sector_retail * business_sector_retail + \
         b_business_sector_gastronomy * business_sector_gastronomy + \
@@ -214,8 +216,8 @@ def generate_data_file():
         Biogeme.
         """
     ''' Select the variables about the person from the tables of the MTMC 2015 '''
-    selected_columns_zp = ['gesl', 'HAUSB', 'HHNR', 'ERWERB', 'f81300', 'A_X_CH1903', 'A_Y_CH1903', 'alter', 'f81400',
-                           'noga_08']
+    selected_columns_zp = ['gesl', 'HAUSB', 'HHNR', 'f81300', 'A_X_CH1903', 'A_Y_CH1903', 'alter', 'f81400', 'noga_08',
+                           'sprache', 'f40800_01', 'f41100_01']
     df_zp = get_zp(2015, selected_columns_zp)
     selected_columns_hh = ['HHNR', 'hhtyp', 'W_OeV_KLASSE', 'W_BFS', 'W_X_CH1903', 'W_Y_CH1903']
     df_hh = get_hh(2015, selected_columns_hh)
@@ -243,6 +245,13 @@ def generate_data_file():
     df_zp = pd.merge(df_zp, df_typology, left_on='W_BFS', right_on='BFS Gde-nummer', how='left')
     df_zp.drop('BFS Gde-nummer', axis=1, inplace=True)
 
+    ''' Generate the variable about work position:
+         0 not employed / nicht erwerbstaetig
+         1 independent worker / Selbststaendige
+         2 employee / Angestellte
+         3 cadres / Kader '''
+    df_zp['work_position'] = df_zp.apply(generate_work_position, axis=1)
+
     # Rename the variables
     df_zp = df_zp.rename(columns={'gesl': 'sex',
                                   'HAUSB': 'highest_educ',
@@ -251,7 +260,8 @@ def generate_data_file():
                                   'W_OeV_KLASSE': 'public_transport_connection_quality_ARE',
                                   'Stadt/Land-Typologie': 'urban_typology',
                                   'alter': 'age',
-                                  'f81400': 'percentage_home_office'})
+                                  'f81400': 'percentage_home_office',
+                                  'sprache': 'language'})
     ''' Removing people who did not get the question or did not answer. '''
     df_zp.drop(df_zp[df_zp.home_office_is_possible < 0].index, inplace=True)
     ''' Define the variable home office as "possibility to do home office" and "practically do some" '''
@@ -274,3 +284,31 @@ def define_home_office_variable(row):
             and row['percentage_home_office'] > 0:
         home_office = 1
     return home_office
+
+
+def generate_work_position(row):
+    work_position = 0  # corresponds to "not employed" - nicht erwerbstaetig / in MTMC: -99
+    # in MTMC: 1 independent worker, "Selbstständig Erwerbende(r)",
+    #          2 worker in a company owned by the person being interviewed,
+    #            "Arbeitnehmer(in) in der AG oder GmbH, welche IHNEN selbst gehört",
+    #          3 worker in a company owned by a member of the household,
+    #            "Arbeitnehmer(in) im Familienbetrieb von einem Haushaltsmitglied"
+    if (row['f40800_01'] == 1) | (row['f40800_01'] == 2) | (row['f40800_01'] == 3):
+        work_position = 1  # corresponds to "independent worker"/"Selbststaendige"
+    elif row['f40800_01'] == 4:  # in MTMC: employed in a private or public company
+        # in MTMC: -98 no answer, "keine Antwort"
+        #          -97 don't know, "weiss nicht"
+        #            1 employee without executive function, "Angestellt ohne Cheffunktion"
+        if (row['f41100_01'] == 1) | (row['f41100_01'] == -98) | (row['f41100_01'] == -97):
+            work_position = 2  # corresponds to "employee"/"Angestellte"
+        # in MTMC: 2 employee with executive function and subordinate employees,
+        #            "Angestellt mit Chefposition und unterstellten Mitarbeitern"
+        #          3 members of the direction, CEOs,
+        #            "Angestellt als Mitglied von der Direktion oder Geschäftsleitung"
+        elif (row['f41100_01'] == 2) | (row['f41100_01'] == 3):
+            work_position = 3  # corresponds to "cadres"
+        else:
+            raise Exception("There should not be other cases...")
+    elif row['f40800_01'] == 5:  # in MTMC: apprentice
+        work_position = 2  # corresponds to "employee"/"Angestellte"
+    return work_position
