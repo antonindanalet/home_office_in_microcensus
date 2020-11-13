@@ -71,8 +71,10 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_business_sector_others = Beta('b_business_sector_others', 0, None, None, 1)
     b_business_sector_non_movers = Beta('b_business_sector_non_movers', 0, None, None, 0)
     b_age = Beta('b_age', 0, None, None, 0)
-    b_employees = Beta('b_employees', 0, None, None, 0)
+    b_employees = Beta('b_employees', 0, None, None, 1)
     b_executives = Beta('b_executives', 0, None, None, 0)
+    b_french = Beta('b_french', 0, None, None, 0)
+    b_italian = Beta('b_italian', 0, None, None, 0)
 
     # Definition of new variables
     no_post_school_educ = DefineVariable('no_post_school_educ',
@@ -174,7 +176,9 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_business_sector_services_fC * business_sector_services_fC + \
         b_business_sector_other_services * business_sector_other_services + \
         b_business_sector_others * business_sector_others + \
-        b_business_sector_non_movers * business_sector_non_movers
+        b_business_sector_non_movers * business_sector_non_movers + \
+        b_french * french + \
+        b_italian * italian
     U_No_home_office = 0
 
     # Associate utility functions with the numbering of alternatives
