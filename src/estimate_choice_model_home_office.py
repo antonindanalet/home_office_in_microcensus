@@ -42,7 +42,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_male = Beta('b_male', 0, None, None, 1)
 
     b_single_household = Beta('b_single_household', 0, None, None, 0)
-    b_couple_without_children = Beta('b_couple_without_children', 0, None, None, 0)
+    b_couple_without_children = Beta('b_couple_without_children', 0, None, None, 1)
     b_couple_with_children = Beta('b_couple_with_children', 0, None, None, 1)
     b_single_parent_with_children = Beta('b_single_parent_with_children', 0, None, None, 1)
     b_not_family_household = Beta('b_not_family_household', 0, None, None, 1)
@@ -67,16 +67,17 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_business_sector_gastronomy = Beta('b_business_sector_gastronomy', 0, None, None, 0)
     b_business_sector_finance = Beta('b_business_sector_finance', 0, None, None, 1)
     b_business_sector_services_fC = Beta('b_business_sector_services_fC', 0, None, None, 0)
-    b_business_sector_other_services = Beta('b_business_sector_other_services', 0, None, None, 0)
+    b_business_sector_other_services = Beta('b_business_sector_other_services', 0, None, None, 1)
     b_business_sector_others = Beta('b_business_sector_others', 0, None, None, 1)
     b_business_sector_non_movers = Beta('b_business_sector_non_movers', 0, None, None, 0)
-    b_age = Beta('b_age', 0, None, None, 0)
     b_employees = Beta('b_employees', 0, None, None, 1)
     b_executives = Beta('b_executives', 0, None, None, 0)
     b_german = Beta('b_german', 0, None, None, 0)
     b_nationality_ch_germany_france_italy_nw_e = Beta('b_nationality_ch_germany_france_italy_nw_e', 0, None, None, 0)
     b_nationality_south_west_europe = Beta('b_nationality_south_west_europe', 0, None, None, 1)
-    b_nationality_southeast_europe = Beta('b_nationality_southeast_europe', 0, None, None, 0)
+    b_nationality_southeast_europe = Beta('b_nationality_southeast_europe', 0, None, None, 1)
+    b_several_part_time_jobs = Beta('b_several_part_time_jobs', 0, None, None, 0)
+    b_work_percentage = Beta('b_work_percentage', 0, None, None, 0)
 
     # Definition of new variables
     no_post_school_educ = DefineVariable('no_post_school_educ',
@@ -197,9 +198,16 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
                                                 (nation == 8260) |  # Estonia
                                                 (nation == 8261) |  # Latvia
                                                 (nation == 8262),  # Lithuania
-                                                   database)
+                                                database)
 
-    #  Utility models.piecewiseFormula(age, [0, 35, 55, 200]) + \
+    several_part_time_jobs = DefineVariable('several_part_time_jobs', full_part_time_job == 3, database)
+    work_percentage = DefineVariable('work_percentage',
+                                     (full_part_time_job == 1) * 100 +
+                                     percentage_first_part_time_job * (percentage_first_part_time_job > 0) +
+                                     percentage_second_part_time_job * (percentage_second_part_time_job > 0),
+                                     database)
+
+    #  Utility
     U = alternative_specific_constant + \
         b_executives * executives + \
         b_employees * employees + \
@@ -222,7 +230,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_rural * rural + \
         b_intermediate * intermediate + \
         b_home_work_distance * home_work_distance + \
-        b_age * age + \
+        models.piecewiseFormula(age, [0, 35, 75, 200]) + \
         b_business_sector_agriculture * business_sector_agriculture + \
         b_business_sector_retail * business_sector_retail + \
         b_business_sector_gastronomy * business_sector_gastronomy + \
@@ -241,8 +249,10 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_nationality_ch_germany_france_italy_nw_e * nationality_northwestern_europe + \
         b_nationality_south_west_europe * nationality_south_west_europe + \
         b_nationality_southeast_europe * nationality_southeast_europe + \
-        b_nationality_ch_germany_france_italy_nw_e * nationality_eastern_europe
-    U_No_home_office = 0
+        b_nationality_ch_germany_france_italy_nw_e * nationality_eastern_europe + \
+        b_several_part_time_jobs * several_part_time_jobs + \
+        b_work_percentage * work_percentage
+    U_No_home_office = 0  # 40, 45, 50, 55, 60, 65
 
     # Associate utility functions with the numbering of alternatives
     V = {1: U,  # Yes or sometimes
@@ -284,7 +294,7 @@ def generate_data_file():
         """
     ''' Select the variables about the person from the tables of the MTMC 2015 '''
     selected_columns_zp = ['gesl', 'HAUSB', 'HHNR', 'f81300', 'A_X_CH1903', 'A_Y_CH1903', 'alter', 'f81400', 'noga_08',
-                           'sprache', 'f40800_01', 'f41100_01', 'nation']
+                           'sprache', 'f40800_01', 'f41100_01', 'nation', 'f40900', 'f40901_02', 'f40903']
     df_zp = get_zp(2015, selected_columns_zp)
     selected_columns_hh = ['HHNR', 'hhtyp', 'W_OeV_KLASSE', 'W_BFS', 'W_X_CH1903', 'W_Y_CH1903']
     df_hh = get_hh(2015, selected_columns_hh)
@@ -328,7 +338,10 @@ def generate_data_file():
                                   'Stadt/Land-Typologie': 'urban_typology',
                                   'alter': 'age',
                                   'f81400': 'percentage_home_office',
-                                  'sprache': 'language'})
+                                  'sprache': 'language',
+                                  'f40900': 'full_part_time_job',
+                                  'f40901_02': 'percentage_first_part_time_job',
+                                  'f40903': 'percentage_second_part_time_job'})
     ''' Removing people who did not get the question or did not answer. '''
     df_zp.drop(df_zp[df_zp.home_office_is_possible < 0].index, inplace=True)
     ''' Define the variable home office as "possibility to do home office" and "practically do some" '''
