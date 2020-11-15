@@ -230,7 +230,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_rural * rural + \
         b_intermediate * intermediate + \
         b_home_work_distance * home_work_distance + \
-        models.piecewiseFormula(age, [0, 35, 75, 200]) + \
+        models.piecewiseFormula(age, [0, 20, 35, 75, 200]) + \
         b_business_sector_agriculture * business_sector_agriculture + \
         b_business_sector_retail * business_sector_retail + \
         b_business_sector_gastronomy * business_sector_gastronomy + \
@@ -251,8 +251,8 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_nationality_southeast_europe * nationality_southeast_europe + \
         b_nationality_ch_germany_france_italy_nw_e * nationality_eastern_europe + \
         b_several_part_time_jobs * several_part_time_jobs + \
-        b_work_percentage * work_percentage
-    U_No_home_office = 0  # 40, 45, 50, 55, 60, 65
+        models.piecewiseFormula(work_percentage, [0, 20, 170])
+    U_No_home_office = 0
 
     # Associate utility functions with the numbering of alternatives
     V = {1: U,  # Yes or sometimes
