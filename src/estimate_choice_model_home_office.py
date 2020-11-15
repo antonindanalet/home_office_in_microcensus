@@ -77,7 +77,6 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_nationality_south_west_europe = Beta('b_nationality_south_west_europe', 0, None, None, 1)
     b_nationality_southeast_europe = Beta('b_nationality_southeast_europe', 0, None, None, 1)
     b_several_part_time_jobs = Beta('b_several_part_time_jobs', 0, None, None, 0)
-    b_work_percentage = Beta('b_work_percentage', 0, None, None, 0)
 
     # Definition of new variables
     no_post_school_educ = DefineVariable('no_post_school_educ',
