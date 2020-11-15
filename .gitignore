@@ -4,4 +4,5 @@
 /data/output/data/internal_validation/estimation/persons80.csv
 /data/output/data/internal_validation/simulation/persons20.csv
 /data/output/models/internal_validation/simulation/persons20_with_probability_home_office.csv
-/data/input/SynPop/persons_from_SynPop.csv
+/data/input/SynPop/2017/persons.csv
+/data/input/SynPop/2017/households.csv

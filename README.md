@@ -8,7 +8,7 @@ If you want to estimate and validate the model, you need this code and the data 
 
 ### Prerequisites to run the code
 
-To run the code itself, you need python 3, pandas, Geopandas, xlrd and PandasBiogeme.
+To run the code itself, you need python 3, pandas, Geopandas, xlrd, PandasBiogeme and pygeos.
 
 ### Data prerequisites
 
