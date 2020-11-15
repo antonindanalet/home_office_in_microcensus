@@ -6,3 +6,5 @@
 /data/output/models/internal_validation/simulation/persons20_with_probability_home_office.csv
 /data/input/SynPop/2017/persons.csv
 /data/input/SynPop/2017/households.csv
+/data/input/SynPop/2017/businesses.csv
+/data/output/data/validation_with_SynPop/persons_from_SynPop2017.csv
