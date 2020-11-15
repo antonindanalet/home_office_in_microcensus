@@ -59,30 +59,25 @@ def apply_model_to_synthetic_population(data_file_directory_for_simulation, data
     # Parameters to be estimated
     alternative_specific_constant = Beta('alternative_specific_constant', 0, None, None, 0)
 
-    b_full_time_work = Beta('b_full_time_work', 0, None, None, 1)
-    b_active_without_known_work_percentage = Beta('b_active_without_known_work_percentage', 0, None, None, 1)
-
     b_no_post_school_education = Beta('b_no_post_school_education', 0, None, None, 0)
     b_secondary_education = Beta('b_secondary_education', 0, None, None, 0)
     b_tertiary_education = Beta('b_tertiary_education', 0, None, None, 0)
     b_university = Beta('b_university', 0, None, None, 1)
 
-    b_male = Beta('b_male', 0, None, None, 0)
+    b_male = Beta('b_male', 0, None, None, 1)
 
     b_single_household = Beta('b_single_household', 0, None, None, 0)
-    b_couple_without_children = Beta('b_couple_without_children', 0, None, None, 0)
+    b_couple_without_children = Beta('b_couple_without_children', 0, None, None, 1)
     b_couple_with_children = Beta('b_couple_with_children', 0, None, None, 1)
     b_single_parent_with_children = Beta('b_single_parent_with_children', 0, None, None, 1)
     b_not_family_household = Beta('b_not_family_household', 0, None, None, 1)
 
-    b_public_transport_connection_quality_are_a_b = Beta('b_public_transport_connection_quality_are_a_b', 0,
-                                                       None, None, 0)
-    # b_public_transport_connection_quality_are_b = Beta('b_public_transport_connection_quality_are_b', 0,
-    #                                                    None, None, 0)
-    b_public_transport_connection_quality_are_c = Beta('b_public_transport_connection_quality_are_c', 0, None, None, 0)
-    b_public_transport_connection_quality_are_d = Beta('b_public_transport_connection_quality_are_d', 0, None, None, 0)
+    b_public_transport_connection_quality_are_a = Beta('b_public_transport_connection_quality_are_a', 0, None, None, 1)
+    b_public_transport_connection_quality_are_b = Beta('b_public_transport_connection_quality_are_b', 0, None, None, 1)
+    b_public_transport_connection_quality_are_c = Beta('b_public_transport_connection_quality_are_c', 0, None, None, 1)
+    b_public_transport_connection_quality_are_d = Beta('b_public_transport_connection_quality_are_d', 0, None, None, 1)
     b_public_transport_connection_quality_are_na = Beta('b_public_transport_connection_quality_are_na', 0, None, None,
-                                                        1)
+                                                        0)
 
     b_urban = Beta('b_urban', 0, None, None, 1)
     b_rural = Beta('b_rural', 0, None, None, 1)
@@ -97,9 +92,16 @@ def apply_model_to_synthetic_population(data_file_directory_for_simulation, data
     b_business_sector_gastronomy = Beta('b_business_sector_gastronomy', 0, None, None, 0)
     b_business_sector_finance = Beta('b_business_sector_finance', 0, None, None, 1)
     b_business_sector_services_fC = Beta('b_business_sector_services_fC', 0, None, None, 0)
-    b_business_sector_other_services = Beta('b_business_sector_other_services', 0, None, None, 0)
+    b_business_sector_other_services = Beta('b_business_sector_other_services', 0, None, None, 1)
     b_business_sector_others = Beta('b_business_sector_others', 0, None, None, 1)
     b_business_sector_non_movers = Beta('b_business_sector_non_movers', 0, None, None, 0)
+    b_employees = Beta('b_employees', 0, None, None, 1)
+    b_executives = Beta('b_executives', 0, None, None, 0)
+    b_german = Beta('b_german', 0, None, None, 0)
+    b_nationality_ch_germany_france_italy_nw_e = Beta('b_nationality_ch_germany_france_italy_nw_e', 0, None, None, 0)
+    b_nationality_south_west_europe = Beta('b_nationality_south_west_europe', 0, None, None, 1)
+    b_nationality_southeast_europe = Beta('b_nationality_southeast_europe', 0, None, None, 1)
+    b_several_part_time_jobs = Beta('b_several_part_time_jobs', 0, None, None, 0)
 
     # Definition of new variables
     full_time_work = (ERWERB == 1)
@@ -154,8 +156,8 @@ def apply_model_to_synthetic_population(data_file_directory_for_simulation, data
 
     #  Utility
     U = alternative_specific_constant + \
-        b_full_time_work * full_time_work + \
-        b_active_without_known_work_percentage * active_without_known_work_percentage + \
+        b_executives * executives + \
+        b_employees * employees + \
         b_no_post_school_education * no_post_school_educ + \
         b_secondary_education * secondary_education + \
         b_tertiary_education * tertiary_education + \
@@ -166,8 +168,8 @@ def apply_model_to_synthetic_population(data_file_directory_for_simulation, data
         b_couple_with_children * couple_with_children + \
         b_single_parent_with_children * single_parent_with_children + \
         b_not_family_household * not_family_household + \
-        b_public_transport_connection_quality_are_a_b * public_transport_connection_quality_ARE_A + \
-        b_public_transport_connection_quality_are_a_b * public_transport_connection_quality_ARE_B + \
+        b_public_transport_connection_quality_are_a * public_transport_connection_quality_ARE_A + \
+        b_public_transport_connection_quality_are_b * public_transport_connection_quality_ARE_B + \
         b_public_transport_connection_quality_are_c * public_transport_connection_quality_ARE_C + \
         b_public_transport_connection_quality_are_d * public_transport_connection_quality_ARE_D + \
         b_public_transport_connection_quality_are_na * public_transport_connection_quality_ARE_NA + \
@@ -175,7 +177,7 @@ def apply_model_to_synthetic_population(data_file_directory_for_simulation, data
         b_rural * rural + \
         b_intermediate * intermediate + \
         b_home_work_distance * home_work_distance + \
-        models.piecewiseFormula(age, [0, 35, 55, 200]) + \
+        models.piecewiseFormula(age, [0, 20, 35, 75, 200]) + \
         b_business_sector_agriculture * business_sector_agriculture + \
         b_business_sector_retail * business_sector_retail + \
         b_business_sector_gastronomy * business_sector_gastronomy + \
@@ -185,7 +187,18 @@ def apply_model_to_synthetic_population(data_file_directory_for_simulation, data
         b_business_sector_services_fC * business_sector_services_fC + \
         b_business_sector_other_services * business_sector_other_services + \
         b_business_sector_others * business_sector_others + \
-        b_business_sector_non_movers * business_sector_non_movers
+        b_business_sector_non_movers * business_sector_non_movers + \
+        b_german * german + \
+        b_nationality_ch_germany_france_italy_nw_e * nationality_switzerland + \
+        b_nationality_ch_germany_france_italy_nw_e * nationality_germany_austria_lichtenstein + \
+        b_nationality_ch_germany_france_italy_nw_e * nationality_italy_vatican + \
+        b_nationality_ch_germany_france_italy_nw_e * nationality_france_monaco_san_marino + \
+        b_nationality_ch_germany_france_italy_nw_e * nationality_northwestern_europe + \
+        b_nationality_south_west_europe * nationality_south_west_europe + \
+        b_nationality_southeast_europe * nationality_southeast_europe + \
+        b_nationality_ch_germany_france_italy_nw_e * nationality_eastern_europe + \
+        b_several_part_time_jobs * several_part_time_jobs + \
+        models.piecewiseFormula(work_percentage, [0, 20, 170])
     U_no_home_office = 0
 
     # Associate utility functions with the numbering of alternatives
@@ -259,9 +272,9 @@ def apply_model_to_MTMC_data(data_file_directory, data_file_name, output_directo
     b_tertiary_education = Beta('b_tertiary_education', 0, None, None, 0)
     b_university = Beta('b_university', 0, None, None, 1)
 
-    b_male = Beta('b_male', 0, None, None, 1)
+    b_male = Beta('b_male', 0, None, None, 0)
 
-    b_single_household = Beta('b_single_household', 0, None, None, 0)
+    b_single_household = Beta('b_single_household', 0, None, None, 1)
     b_couple_without_children = Beta('b_couple_without_children', 0, None, None, 1)
     b_couple_with_children = Beta('b_couple_with_children', 0, None, None, 1)
     b_single_parent_with_children = Beta('b_single_parent_with_children', 0, None, None, 1)
@@ -297,6 +310,9 @@ def apply_model_to_MTMC_data(data_file_directory, data_file_name, output_directo
     b_nationality_south_west_europe = Beta('b_nationality_south_west_europe', 0, None, None, 1)
     b_nationality_southeast_europe = Beta('b_nationality_southeast_europe', 0, None, None, 1)
     b_several_part_time_jobs = Beta('b_several_part_time_jobs', 0, None, None, 0)
+    b_hh_income_na = Beta('B_hh_income_na', 0, None, None, 1)
+    b_hh_income_8000_or_less = Beta('b_hh_income_8000_or_less', 0, None, None, 0)
+    b_hh_income_more_than_8000 = Beta('b_hh_income_more_than_8000', 0, None, None, 1)
 
     # Definition of new variables
     no_post_school_educ = ((highest_educ == 1) | (highest_educ == 2) | (highest_educ == 3) | (highest_educ == 4))
@@ -374,6 +390,17 @@ def apply_model_to_MTMC_data(data_file_directory, data_file_name, output_directo
                                      percentage_second_part_time_job * (percentage_second_part_time_job > 0),
                                      database)
 
+    hh_income_na = hh_income == -98
+    hh_income_less_than_2000 = hh_income == 1
+    hh_income_2000_to_4000 = hh_income == 2
+    hh_income_4001_to_6000 = hh_income == 3
+    hh_income_6001_to_8000 = hh_income == 4
+    hh_income_8001_to_10000 = hh_income == 5
+    hh_income_10001_to_12000 = hh_income == 6
+    hh_income_12001_to_14000 = hh_income == 7
+    hh_income_14001_to_16000 = hh_income == 8
+    hh_income_more_than_16000 = hh_income == 9
+
     #  Utility
     U = alternative_specific_constant + \
         b_executives * executives + \
@@ -418,7 +445,17 @@ def apply_model_to_MTMC_data(data_file_directory, data_file_name, output_directo
         b_nationality_southeast_europe * nationality_southeast_europe + \
         b_nationality_ch_germany_france_italy_nw_e * nationality_eastern_europe + \
         b_several_part_time_jobs * several_part_time_jobs + \
-        models.piecewiseFormula(work_percentage, [0, 20, 170])
+        models.piecewiseFormula(work_percentage, [0, 90, 170]) + \
+        b_hh_income_na * hh_income_na + \
+        b_hh_income_8000_or_less * hh_income_less_than_2000 + \
+        b_hh_income_8000_or_less * hh_income_2000_to_4000 + \
+        b_hh_income_8000_or_less * hh_income_4001_to_6000 + \
+        b_hh_income_8000_or_less * hh_income_6001_to_8000 + \
+        b_hh_income_more_than_8000 * hh_income_8001_to_10000 + \
+        b_hh_income_more_than_8000 * hh_income_10001_to_12000 + \
+        b_hh_income_more_than_8000 * hh_income_12001_to_14000 + \
+        b_hh_income_more_than_8000 * hh_income_14001_to_16000 + \
+        b_hh_income_more_than_8000 * hh_income_more_than_16000
     U_No_home_office = 0
 
     # Associate utility functions with the numbering of alternatives
