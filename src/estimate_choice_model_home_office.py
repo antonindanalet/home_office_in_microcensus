@@ -39,9 +39,9 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_tertiary_education = Beta('b_tertiary_education', 0, None, None, 0)
     b_university = Beta('b_university', 0, None, None, 1)
 
-    b_male = Beta('b_male', 0, None, None, 1)
+    b_male = Beta('b_male', 0, None, None, 0)
 
-    b_single_household = Beta('b_single_household', 0, None, None, 0)
+    b_single_household = Beta('b_single_household', 0, None, None, 1)
     b_couple_without_children = Beta('b_couple_without_children', 0, None, None, 1)
     b_couple_with_children = Beta('b_couple_with_children', 0, None, None, 1)
     b_single_parent_with_children = Beta('b_single_parent_with_children', 0, None, None, 1)
@@ -77,6 +77,9 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_nationality_south_west_europe = Beta('b_nationality_south_west_europe', 0, None, None, 1)
     b_nationality_southeast_europe = Beta('b_nationality_southeast_europe', 0, None, None, 1)
     b_several_part_time_jobs = Beta('b_several_part_time_jobs', 0, None, None, 0)
+    b_hh_income_na = Beta('B_hh_income_na', 0, None, None, 1)
+    b_hh_income_8000_or_less = Beta('b_hh_income_8000_or_less', 0, None, None, 0)
+    b_hh_income_more_than_8000 = Beta('b_hh_income_more_than_8000', 0, None, None, 1)
 
     # Definition of new variables
     no_post_school_educ = DefineVariable('no_post_school_educ',
@@ -206,6 +209,17 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
                                      percentage_second_part_time_job * (percentage_second_part_time_job > 0),
                                      database)
 
+    hh_income_na = DefineVariable('hh_income_na', hh_income == -98, database)
+    hh_income_less_than_2000 = DefineVariable('hh_income_less_than_4000', hh_income == 1, database)
+    hh_income_2000_to_4000 = DefineVariable('hh_income_2000_to_4000', hh_income == 2, database)
+    hh_income_4001_to_6000 = DefineVariable('hh_income_4001_to_6000', hh_income == 3, database)
+    hh_income_6001_to_8000 = DefineVariable('hh_income_6001_to_8000', hh_income == 4, database)
+    hh_income_8001_to_10000 = DefineVariable('hh_income_8001_to_10000', hh_income == 5, database)
+    hh_income_10001_to_12000 = DefineVariable('hh_income_10001_to_12000', hh_income == 6, database)
+    hh_income_12001_to_14000 = DefineVariable('hh_income_12001_to_14000', hh_income == 7, database)
+    hh_income_14001_to_16000 = DefineVariable('hh_income_14001_to_16000', hh_income == 8, database)
+    hh_income_more_than_16000 = DefineVariable('hh_income_more_than_16000', hh_income == 9, database)
+
     #  Utility
     U = alternative_specific_constant + \
         b_executives * executives + \
@@ -250,7 +264,17 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_nationality_southeast_europe * nationality_southeast_europe + \
         b_nationality_ch_germany_france_italy_nw_e * nationality_eastern_europe + \
         b_several_part_time_jobs * several_part_time_jobs + \
-        models.piecewiseFormula(work_percentage, [0, 20, 170])
+        models.piecewiseFormula(work_percentage, [0, 90, 170]) + \
+        b_hh_income_na * hh_income_na + \
+        b_hh_income_8000_or_less * hh_income_less_than_2000 + \
+        b_hh_income_8000_or_less * hh_income_2000_to_4000 + \
+        b_hh_income_8000_or_less * hh_income_4001_to_6000 + \
+        b_hh_income_8000_or_less * hh_income_6001_to_8000 + \
+        b_hh_income_more_than_8000 * hh_income_8001_to_10000 + \
+        b_hh_income_more_than_8000 * hh_income_10001_to_12000 + \
+        b_hh_income_more_than_8000 * hh_income_12001_to_14000 + \
+        b_hh_income_more_than_8000 * hh_income_14001_to_16000 + \
+        b_hh_income_more_than_8000 * hh_income_more_than_16000
     U_No_home_office = 0
 
     # Associate utility functions with the numbering of alternatives
@@ -295,7 +319,7 @@ def generate_data_file():
     selected_columns_zp = ['gesl', 'HAUSB', 'HHNR', 'f81300', 'A_X_CH1903', 'A_Y_CH1903', 'alter', 'f81400', 'noga_08',
                            'sprache', 'f40800_01', 'f41100_01', 'nation', 'f40900', 'f40901_02', 'f40903']
     df_zp = get_zp(2015, selected_columns_zp)
-    selected_columns_hh = ['HHNR', 'hhtyp', 'W_OeV_KLASSE', 'W_BFS', 'W_X_CH1903', 'W_Y_CH1903']
+    selected_columns_hh = ['HHNR', 'hhtyp', 'W_OeV_KLASSE', 'W_BFS', 'W_X_CH1903', 'W_Y_CH1903', 'F20601']
     df_hh = get_hh(2015, selected_columns_hh)
     df_zp = pd.merge(df_zp, df_hh, on='HHNR', how='left')
 
@@ -340,7 +364,8 @@ def generate_data_file():
                                   'sprache': 'language',
                                   'f40900': 'full_part_time_job',
                                   'f40901_02': 'percentage_first_part_time_job',
-                                  'f40903': 'percentage_second_part_time_job'})
+                                  'f40903': 'percentage_second_part_time_job',
+                                  'F20601': 'hh_income'})
     ''' Removing people who did not get the question or did not answer. '''
     df_zp.drop(df_zp[df_zp.home_office_is_possible < 0].index, inplace=True)
     ''' Define the variable home office as "possibility to do home office" and "practically do some" '''
