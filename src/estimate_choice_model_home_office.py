@@ -10,7 +10,7 @@ from utils_mtmc.get_mtmc_files import get_zp, get_hh
 
 
 def estimate_choice_model_home_office():
-    # generate_data_file()
+    generate_data_file()
     data_file_directory = Path('../data/output/data/estimation/')
     data_file_name = 'persons.csv'
     output_directory = '../data/output/models/estimation/'
