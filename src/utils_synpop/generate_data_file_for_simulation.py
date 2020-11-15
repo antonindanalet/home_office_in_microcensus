@@ -43,8 +43,7 @@ def add_information_about_businesses_from_synthetic_population(df_persons):
                                   'ycoord': 'ycoord_work'}, inplace=True)
     df_persons = pd.merge(df_persons, df_businesses, on='business_id', how='left')  # Add the result to df_persons
     del df_persons['business_id']
-    ''' Compute home-work distance '''
-    ''' Add the distance between home and work places '''
+    ''' Compute home-work distance: Add the distance (in meters) between home and work places '''
     df_persons_with_work_coordinates = df_persons[df_persons.xcoord_work.notnull()]
     geodf_home = geopandas.GeoDataFrame(df_persons_with_work_coordinates,
                                         geometry=geopandas.points_from_xy(df_persons_with_work_coordinates.ycoord_home,
@@ -56,7 +55,7 @@ def add_information_about_businesses_from_synthetic_population(df_persons):
                                         crs='epsg:21781')
     df_persons.loc[df_persons.xcoord_work != -999, 'home_work_crow_fly_distance'] = geodf_home.distance(geodf_work)
     df_persons['home_work_crow_fly_distance'].fillna(-999, inplace=True)
-    df_persons.drop(['xcoord_work', 'ycoord_work', 'xcoord_home', 'ycoord_home'], axis=1, inplace=True)
+    df_persons.drop(['xcoord_work', 'ycoord_work', 'xcoord_home', 'ycoord_home', 'geometry'], axis=1, inplace=True)
     return df_persons
 
 
