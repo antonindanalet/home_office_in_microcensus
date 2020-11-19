@@ -6,6 +6,7 @@ import biogeme.models as models
 from biogeme.expressions import Beta, DefineVariable
 import biogeme.results as res
 import os
+from math import isnan
 from estimate_choice_model_home_office import run_estimation
 from utils_synpop.generate_data_file_for_simulation import generate_data_file_for_simulation
 
@@ -198,11 +199,18 @@ def apply_model_to_synthetic_population(data_file_directory_for_simulation, data
     os.chdir(output_directory_for_simulation)
 
     results = biogeme.simulate(theBetaValues=betas)
-    print(results.describe())
+    # print(results.describe())
     df_persons = pd.concat([df_persons, results], axis=1)
 
     # Go back to the normal working directory
     os.chdir(standard_directory)
+
+    # For unemployed people, fix probability of doing some home office to 0 (and probability of not doing to 1).
+    df_persons.loc[df_persons.employed == 0, 'Prob. home office'] = 0.0  # Unemployed people
+    df_persons.loc[df_persons.employed == 0, 'Prob. no home office'] = 1.0  # Unemployed people
+    df_persons.loc[df_persons.employed == -99, 'Prob. home office'] = 0.0  # Other people
+    df_persons.loc[df_persons.employed == -99, 'Prob. no home office'] = 1.0  # Other people
+    print(df_persons['Prob. home office'].describe())
 
     ''' Save the file '''
     output_directory = Path('../data/output/models/validation_with_SynPop/')
