@@ -14,7 +14,7 @@ def validate_choice_model_home_office():
     ''' Internal cross internal_validation '''
     # Read the complete dataset, used for estimation
     df_persons = get_persons()
-    # # Save 80% of the data for estimation and 20% of the data for simulation for internal validation
+    # Save 80% of the data for estimation and 20% of the data for simulation for internal validation
     # (and shuffles the data set)
     save_slices(df_persons)
     # Estimate the model on 80% of the data
@@ -32,14 +32,14 @@ def validate_choice_model_home_office():
     # Compute the proportion of people doing home office in the data and in the simulation
     compute_proportion_of_people_doing_home_office()
     ''' External validation using a synthetic population '''
-    # # Prepare the data for PandasBiogeme
-    # generate_data_file_for_simulation()
-    # # Simulate the model on the synthetic population
-    # data_file_directory_for_simulation = Path('../data/output/validation_with_SynPop/')
-    # data_file_name_for_simulation = 'persons_from_SynPop.csv'
-    # output_directory_for_simulation = Path('../data/output/models/validation_with_SynPop/')
-    # apply_model_to_synthetic_population(data_file_directory_for_simulation, data_file_name_for_simulation,
-    #                                     output_directory_for_simulation)
+    # Prepare the data for PandasBiogeme
+    generate_data_file_for_simulation()
+    # Simulate the model on the synthetic population
+    data_file_directory_for_simulation = Path('../data/output/data/validation_with_SynPop/')
+    data_file_name_for_simulation = 'persons_from_SynPop2017.csv'
+    output_directory_for_simulation = Path('../data/output/models/validation_with_SynPop/')
+    apply_model_to_synthetic_population(data_file_directory_for_simulation, data_file_name_for_simulation,
+                                        output_directory_for_simulation)
 
 
 def apply_model_to_synthetic_population(data_file_directory_for_simulation, data_file_name_for_simulation,
@@ -55,6 +55,7 @@ def apply_model_to_synthetic_population(data_file_directory_for_simulation, data
 
     # The following statement allows you to use the names of the variable as Python variable.
     globals().update(database.variables)
+    print(database.data.columns)
 
     # Parameters to be estimated
     alternative_specific_constant = Beta('alternative_specific_constant', 0, None, None, 0)
@@ -64,9 +65,9 @@ def apply_model_to_synthetic_population(data_file_directory_for_simulation, data
     b_tertiary_education = Beta('b_tertiary_education', 0, None, None, 0)
     b_university = Beta('b_university', 0, None, None, 1)
 
-    b_male = Beta('b_male', 0, None, None, 1)
+    b_male = Beta('b_male', 0, None, None, 0)
 
-    b_single_household = Beta('b_single_household', 0, None, None, 0)
+    b_single_household = Beta('b_single_household', 0, None, None, 1)
     b_couple_without_children = Beta('b_couple_without_children', 0, None, None, 1)
     b_couple_with_children = Beta('b_couple_with_children', 0, None, None, 1)
     b_single_parent_with_children = Beta('b_single_parent_with_children', 0, None, None, 1)
@@ -95,110 +96,77 @@ def apply_model_to_synthetic_population(data_file_directory_for_simulation, data
     b_business_sector_other_services = Beta('b_business_sector_other_services', 0, None, None, 1)
     b_business_sector_others = Beta('b_business_sector_others', 0, None, None, 1)
     b_business_sector_non_movers = Beta('b_business_sector_non_movers', 0, None, None, 0)
-    b_employees = Beta('b_employees', 0, None, None, 1)
     b_executives = Beta('b_executives', 0, None, None, 0)
     b_german = Beta('b_german', 0, None, None, 0)
     b_nationality_ch_germany_france_italy_nw_e = Beta('b_nationality_ch_germany_france_italy_nw_e', 0, None, None, 0)
-    b_nationality_south_west_europe = Beta('b_nationality_south_west_europe', 0, None, None, 1)
-    b_nationality_southeast_europe = Beta('b_nationality_southeast_europe', 0, None, None, 1)
+    # b_nationality_south_west_europe = Beta('b_nationality_south_west_europe', 0, None, None, 1)
+    # b_nationality_southeast_europe = Beta('b_nationality_southeast_europe', 0, None, None, 1)
     b_several_part_time_jobs = Beta('b_several_part_time_jobs', 0, None, None, 0)
+    # b_hh_income_na = Beta('B_hh_income_na', 0, None, None, 1)
+    b_hh_income_8000_or_less = Beta('b_hh_income_8000_or_less', 0, None, None, 0)
+    # b_hh_income_more_than_8000 = Beta('b_hh_income_more_than_8000', 0, None, None, 1)
 
     # Definition of new variables
-    full_time_work = (ERWERB == 1)
-    active_without_known_work_percentage = (ERWERB == 9)
-
-    no_post_school_educ = ((highest_educ == 1) | (highest_educ == 2) | (highest_educ == 3) | (highest_educ == 4))
-    secondary_education = ((highest_educ == 5) | (highest_educ == 6) | (highest_educ == 7) | (highest_educ == 8) |
-                           (highest_educ == 9) | (highest_educ == 10) | (highest_educ == 11) | (highest_educ == 12))
-    tertiary_education = ((highest_educ == 13) | (highest_educ == 14) | (highest_educ == 15) | (highest_educ == 16))
-    university = (highest_educ == 17) * 10
+    no_post_school_educ = education == 1
+    secondary_education = education == 2
+    tertiary_education = education == 3
+    university = education == 4
 
     male = (sex == 1)
 
-    single_household = (hh_type == 10)
-    couple_without_children = (hh_type == 210)
-    couple_with_children = (hh_type == 220)
-    single_parent_with_children = (hh_type == 230)
-    not_family_household = (hh_type == 30)
-
-    public_transport_connection_quality_ARE_A = (public_transport_connection_quality_ARE == 1)
-    public_transport_connection_quality_ARE_B = (public_transport_connection_quality_ARE == 2)
-    public_transport_connection_quality_ARE_C = (public_transport_connection_quality_ARE == 3)
-    public_transport_connection_quality_ARE_D = (public_transport_connection_quality_ARE == 4)
     public_transport_connection_quality_ARE_NA = (public_transport_connection_quality_ARE == 5)
-
-    urban = (urban_typology == 1)
-    rural = (urban_typology == 3)
-    intermediate = (urban_typology == 2)
 
     home_work_distance = (home_work_crow_fly_distance * (home_work_crow_fly_distance >= 0.0) / 100000.0)
 
-    business_sector_agriculture = DefineVariable('business_sector_agriculture', 1 <= noga_08 <= 7, database)
-    business_sector_retail = DefineVariable('business_sector_retail', 47 <= noga_08 <= 47, database)
-    business_sector_gastronomy = DefineVariable('business_sector_gastronomy', 55 <= noga_08 <= 57, database)
-    business_sector_finance = DefineVariable('business_sector_finance', 64 <= noga_08 <= 67, database)
-    business_sector_production = DefineVariable('business_sector_production',
-                                                (10 <= noga_08 <= 35) | (40 <= noga_08 <= 44), database)
-    business_sector_wholesale = DefineVariable('business_sector_wholesale',
-                                               (45 <= noga_08 <= 45) | (49 <= noga_08 <= 54), database)
-    business_sector_services_fC = DefineVariable('business_sector_services_fC',
-                                                 (60 <= noga_08 <= 63) | (69 <= noga_08 <= 83) | (noga_08 == 58),
-                                                 database)
-    business_sector_other_services = DefineVariable('business_sector_other_services',
-                                                    (86 <= noga_08 <= 90) | (92 <= noga_08 <= 96) | (noga_08 == 59) |
-                                                    (noga_08 == 68),
-                                                    database)
-    business_sector_others = DefineVariable('business_sector_others', 97 <= noga_08 <= 98, database)
-    business_sector_non_movers = DefineVariable('business_sector_non_movers',
-                                                (8 <= noga_08 <= 9) | (36 <= noga_08 <= 39) | (84 <= noga_08 <= 85) |
-                                                (noga_08 == 91) | (noga_08 == 99),
-                                                database)
+    business_sector_agriculture = type_1 == 1
+    business_sector_retail = type_1 == 4
+    business_sector_gastronomy = type_1 == 5
+    business_sector_finance = type_1 == 6
+    business_sector_production = type_1 == 2
+    business_sector_wholesale = type_1 == 3
+    business_sector_services_fC = type_1 == 7
+    business_sector_other_services = type_1 == 8
+    business_sector_others = type_1 == 9
+    business_sector_non_movers = type_1 == 10
+    german = language == 1
+    nationality_switzerland = nation == 0
+    nationality_germany_austria_lichtenstein = nation == 1
+    nationality_italy_vatican = nation == 2
+    nationality_france_monaco_san_marino = nation == 3
+    nationality_northwestern_europe = nation == 4
+    nationality_eastern_europe = nation == 7
+    hh_income_8000_or_less = (hh_income == 1) + (hh_income == 2) + (hh_income == 3) + (hh_income == 4)
 
     #  Utility
-    U = alternative_specific_constant + \
-        b_executives * executives + \
-        b_employees * employees + \
-        b_no_post_school_education * no_post_school_educ + \
-        b_secondary_education * secondary_education + \
-        b_tertiary_education * tertiary_education + \
-        b_university * university + \
-        b_male * male + \
-        b_single_household * single_household + \
-        b_couple_without_children * couple_without_children + \
-        b_couple_with_children * couple_with_children + \
-        b_single_parent_with_children * single_parent_with_children + \
-        b_not_family_household * not_family_household + \
-        b_public_transport_connection_quality_are_a * public_transport_connection_quality_ARE_A + \
-        b_public_transport_connection_quality_are_b * public_transport_connection_quality_ARE_B + \
-        b_public_transport_connection_quality_are_c * public_transport_connection_quality_ARE_C + \
-        b_public_transport_connection_quality_are_d * public_transport_connection_quality_ARE_D + \
-        b_public_transport_connection_quality_are_na * public_transport_connection_quality_ARE_NA + \
-        b_urban * urban + \
-        b_rural * rural + \
-        b_intermediate * intermediate + \
-        b_home_work_distance * home_work_distance + \
-        models.piecewiseFormula(age, [0, 20, 35, 75, 200]) + \
-        b_business_sector_agriculture * business_sector_agriculture + \
-        b_business_sector_retail * business_sector_retail + \
-        b_business_sector_gastronomy * business_sector_gastronomy + \
-        b_business_sector_finance * business_sector_finance + \
-        b_business_sector_production * business_sector_production + \
-        b_business_sector_wholesale * business_sector_wholesale + \
-        b_business_sector_services_fC * business_sector_services_fC + \
-        b_business_sector_other_services * business_sector_other_services + \
-        b_business_sector_others * business_sector_others + \
-        b_business_sector_non_movers * business_sector_non_movers + \
-        b_german * german + \
-        b_nationality_ch_germany_france_italy_nw_e * nationality_switzerland + \
-        b_nationality_ch_germany_france_italy_nw_e * nationality_germany_austria_lichtenstein + \
-        b_nationality_ch_germany_france_italy_nw_e * nationality_italy_vatican + \
-        b_nationality_ch_germany_france_italy_nw_e * nationality_france_monaco_san_marino + \
-        b_nationality_ch_germany_france_italy_nw_e * nationality_northwestern_europe + \
-        b_nationality_south_west_europe * nationality_south_west_europe + \
-        b_nationality_southeast_europe * nationality_southeast_europe + \
-        b_nationality_ch_germany_france_italy_nw_e * nationality_eastern_europe + \
-        b_several_part_time_jobs * several_part_time_jobs + \
-        models.piecewiseFormula(work_percentage, [0, 20, 170])
+    U_home_office = alternative_specific_constant + \
+                    b_executives * executives + \
+                    b_no_post_school_education * no_post_school_educ + \
+                    b_secondary_education * secondary_education + \
+                    b_tertiary_education * tertiary_education + \
+                    b_university * university + \
+                    b_male * male + \
+                    b_public_transport_connection_quality_are_na * public_transport_connection_quality_ARE_NA + \
+                    b_home_work_distance * home_work_distance + \
+                    models.piecewiseFormula(age, [0, 20, 35, 75, 200]) + \
+                    b_business_sector_agriculture * business_sector_agriculture + \
+                    b_business_sector_retail * business_sector_retail + \
+                    b_business_sector_gastronomy * business_sector_gastronomy + \
+                    b_business_sector_finance * business_sector_finance + \
+                    b_business_sector_production * business_sector_production + \
+                    b_business_sector_wholesale * business_sector_wholesale + \
+                    b_business_sector_services_fC * business_sector_services_fC + \
+                    b_business_sector_other_services * business_sector_other_services + \
+                    b_business_sector_others * business_sector_others + \
+                    b_business_sector_non_movers * business_sector_non_movers + \
+                    b_german * german + \
+                    b_nationality_ch_germany_france_italy_nw_e * nationality_switzerland + \
+                    b_nationality_ch_germany_france_italy_nw_e * nationality_germany_austria_lichtenstein + \
+                    b_nationality_ch_germany_france_italy_nw_e * nationality_italy_vatican + \
+                    b_nationality_ch_germany_france_italy_nw_e * nationality_france_monaco_san_marino + \
+                    b_nationality_ch_germany_france_italy_nw_e * nationality_northwestern_europe + \
+                    b_nationality_ch_germany_france_italy_nw_e * nationality_eastern_europe + \
+                    models.piecewiseFormula(work_percentage, [0, 90, 170]) + \
+                    b_hh_income_8000_or_less * hh_income_8000_or_less
     U_no_home_office = 0
 
     # Associate utility functions with the numbering of alternatives

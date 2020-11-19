@@ -8,3 +8,4 @@
 /data/input/SynPop/2017/households.csv
 /data/input/SynPop/2017/businesses.csv
 /data/output/data/validation_with_SynPop/persons_from_SynPop2017.csv
+/data/output/models/validation_with_SynPop/persons_from_SynPop_with_probability_home_office.csv

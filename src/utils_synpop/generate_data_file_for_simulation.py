@@ -86,9 +86,10 @@ def get_persons_from_synthetic_population():
     synpop_folder_path = Path('../data/input/SynPop/2017/')
     selected_columns = ['position_in_bus',  # information about work THERE IS A CORRECTED VERSION OF THE VARIABLE, type_5 !!!
                         'type_2',  # level of employment (in %) THERE IS A CORRECTED VERSION OF THE VARIABLE, type_6 !!!!
-                        'person_id', 'household_id', 'sex', 'education', 'income',
+                        'person_id', 'household_id', 'sex', 'education', 'income', 'language', 'nation',
                         'dbirth',  # date of birth
-                        'business_id']
+                        'business_id',
+                        'type_1']
     with open(synpop_folder_path / 'persons.csv', 'r') as persons_file:
         df_persons = pd.read_csv(persons_file, sep=';', usecols=selected_columns)
     ''' Transform the data structure '''
