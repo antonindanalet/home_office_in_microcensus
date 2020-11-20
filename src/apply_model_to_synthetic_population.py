@@ -112,7 +112,7 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
     b_nationality_ch_germany_france_italy_nw_e = Beta('b_nationality_ch_germany_france_italy_nw_e', 0, None, None, 0)
     # b_nationality_south_west_europe = Beta('b_nationality_south_west_europe', 0, None, None, 1)
     # b_nationality_southeast_europe = Beta('b_nationality_southeast_europe', 0, None, None, 1)
-    b_several_part_time_jobs = Beta('b_several_part_time_jobs', 0, None, None, 0)
+    # b_several_part_time_jobs = Beta('b_several_part_time_jobs', 0, None, None, 1)
     # b_hh_income_na = Beta('B_hh_income_na', 0, None, None, 1)
     b_hh_income_8000_or_less = Beta('b_hh_income_8000_or_less', 0, None, None, 0)
     # b_hh_income_more_than_8000 = Beta('b_hh_income_more_than_8000', 0, None, None, 1)

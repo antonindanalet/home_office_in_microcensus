@@ -173,7 +173,7 @@ def apply_model_to_MTMC_data(data_file_directory, data_file_name, output_directo
                                  (nation == 8244) + (nation == 8263) + (nation == 8265) + (nation == 8266) + \
                                  (nation == 8260) + (nation == 8261) + (nation == 8262)
 
-    several_part_time_jobs = full_part_time_job == 3
+    # several_part_time_jobs = full_part_time_job == 3
     work_percentage = DefineVariable('work_percentage',
                                      (full_part_time_job == 1) * 100 +
                                      percentage_first_part_time_job * (percentage_first_part_time_job > 0) +
@@ -234,7 +234,6 @@ def apply_model_to_MTMC_data(data_file_directory, data_file_name, output_directo
         b_nationality_south_west_europe * nationality_south_west_europe + \
         b_nationality_southeast_europe * nationality_southeast_europe + \
         b_nationality_ch_germany_france_italy_nw_e * nationality_eastern_europe + \
-        b_several_part_time_jobs * several_part_time_jobs + \
         models.piecewiseFormula(work_percentage, [0, 90, 170]) + \
         b_hh_income_na * hh_income_na + \
         b_hh_income_8000_or_less * hh_income_less_than_2000 + \
