@@ -15,12 +15,12 @@ from mtmc2015.utils2015.compute_confidence_interval import get_weighted_avg_and_
 def apply_model_to_synthetic_population():
     ''' External validation using a synthetic population '''
     # Prepare the data for PandasBiogeme
-    generate_data_file_for_simulation()
-    # Simulate the model on the synthetic population
-    data_file_directory_for_simulation = Path('../data/output/data/validation_with_SynPop/')
-    data_file_name_for_simulation = 'persons_from_SynPop2017.csv'
-    output_directory_for_simulation = Path('../data/output/models/validation_with_SynPop/')
-    run_simulation(data_file_directory_for_simulation, data_file_name_for_simulation, output_directory_for_simulation)
+    # generate_data_file_for_simulation()
+    # # Simulate the model on the synthetic population
+    # data_file_directory_for_simulation = Path('../data/output/data/validation_with_SynPop/')
+    # data_file_name_for_simulation = 'persons_from_SynPop2017.csv'
+    # output_directory_for_simulation = Path('../data/output/models/validation_with_SynPop/')
+    # run_simulation(data_file_directory_for_simulation, data_file_name_for_simulation, output_directory_for_simulation)
     # Compare rate of home office in the MTMC and in the synthetic population
     descr_stat_mtmc()
     # descr_stat_synpop()
@@ -36,24 +36,17 @@ def descr_stat_synpop():
 
 def descr_stat_mtmc():
     # Get the data
-    selected_columns = ['HHNR', 'WP', 'f81300', 'f81400', 'alter', 'f40500', 'f40600', 'f40700']
+    selected_columns = ['HHNR', 'WP', 'f81300', 'f81400']
     df_zp = get_zp(2015, selected_columns=selected_columns)
     df_zp = df_zp.rename(columns={'f81300': 'home_office_is_possible',
-                                  'f81400': 'percentage_home_office',
-                                  'alter': 'age',
-                                  'f40500': 'work_for_money',  # Work for money in the last week
-                                  'f40600': 'work_in_family_business',  # Work in the family business last week
-                                  'f40700': 'work_contract'})  # Work contract even if not work last week
+                                  'f81400': 'percentage_home_office'})
     ''' Removing people who did not get the question or did not answer. '''
     df_zp.drop(df_zp[df_zp.home_office_is_possible < 0].index, inplace=True)
     df_zp.drop(df_zp[df_zp.percentage_home_office == -98].index, inplace=True)
     df_zp.drop(df_zp[df_zp.percentage_home_office == -97].index, inplace=True)
     df_zp['home_office'] = df_zp.apply(define_home_office_variable, axis=1)
     # Percentage of people doing home office among people working (and who answered to the question about home office)
-    df_zp_working = df_zp[(df_zp['work_for_money'] == 1) |
-                          (df_zp['work_in_family_business'] == 1) |
-                          (df_zp['work_contract'] == 1)]
-    weighted_avg_and_std = get_weighted_avg_and_std(df_zp_working, weights='WP', list_of_columns=['home_office'])
+    weighted_avg_and_std = get_weighted_avg_and_std(df_zp, weights='WP', list_of_columns=['home_office'])
     weighted_avg = round(weighted_avg_and_std[0]['home_office'][0], 3)
     weighted_std = round(weighted_avg_and_std[0]['home_office'][1], 3)
     nb_obs = weighted_avg_and_std[1]
