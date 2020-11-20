@@ -15,15 +15,15 @@ from mtmc2015.utils2015.compute_confidence_interval import get_weighted_avg_and_
 def apply_model_to_synthetic_population():
     ''' External validation using a synthetic population '''
     # Prepare the data for PandasBiogeme
-    # generate_data_file_for_simulation()
-    # # Simulate the model on the synthetic population
-    # data_file_directory_for_simulation = Path('../data/output/data/validation_with_SynPop/')
-    # data_file_name_for_simulation = 'persons_from_SynPop2017.csv'
-    # output_directory_for_simulation = Path('../data/output/models/validation_with_SynPop/')
-    # run_simulation(data_file_directory_for_simulation, data_file_name_for_simulation, output_directory_for_simulation)
+    generate_data_file_for_simulation()
+    # Simulate the model on the synthetic population
+    data_file_directory_for_simulation = Path('../data/output/data/validation_with_SynPop/')
+    data_file_name_for_simulation = 'persons_from_SynPop2017.csv'
+    output_directory_for_simulation = Path('../data/output/models/validation_with_SynPop/')
+    run_simulation(data_file_directory_for_simulation, data_file_name_for_simulation, output_directory_for_simulation)
     # Compare rate of home office in the MTMC and in the synthetic population
     descr_stat_mtmc()
-    # descr_stat_synpop()
+    descr_stat_synpop()
 
 
 def descr_stat_synpop():
@@ -31,7 +31,7 @@ def descr_stat_synpop():
     synpop_filename = 'persons_from_SynPop_with_probability_home_office.csv'
     # Get the data
     df_persons = pd.read_csv(synpop_directory / synpop_filename, sep=',')
-    print(df_persons.loc[df_persons['age'] < 15].describe())
+    print(df_persons.loc[df_persons.employed == 1, 'Prob. home office'].describe())
 
 
 def descr_stat_mtmc():
