@@ -7,6 +7,7 @@ import biogeme.models as models
 from biogeme.expressions import Beta, DefineVariable
 import os
 from utils_mtmc.get_mtmc_files import get_zp, get_hh
+from utils_mtmc.define_home_office_variable import define_home_office_variable
 
 
 def estimate_choice_model_home_office():
@@ -368,6 +369,8 @@ def generate_data_file():
                                   'F20601': 'hh_income'})
     ''' Removing people who did not get the question or did not answer. '''
     df_zp.drop(df_zp[df_zp.home_office_is_possible < 0].index, inplace=True)
+    df_zp.drop(df_zp[df_zp.percentage_home_office == -98].index, inplace=True)
+    df_zp.drop(df_zp[df_zp.percentage_home_office == -97].index, inplace=True)
     ''' Define the variable home office as "possibility to do home office" and "practically do some" '''
     df_zp['home_office'] = df_zp.apply(define_home_office_variable, axis=1)
     ''' Test that no column contains NA values '''
@@ -378,16 +381,6 @@ def generate_data_file():
     output_directory = Path('../data/output/data/estimation/')
     data_file_name = 'persons.csv'
     df_zp.to_csv(output_directory / data_file_name, sep=';', index=False)
-
-
-def define_home_office_variable(row):
-    """ Defines a choice variable with value 1 if the person is allowed to do home office
-    (answer "yes" - 1 - or answer "sometimes" - 2) and does it at least 1% of the time """
-    home_office = 0
-    if ((row['home_office_is_possible'] == 1) or (row['home_office_is_possible'] == 2)) \
-            and row['percentage_home_office'] > 0:
-        home_office = 1
-    return home_office
 
 
 def generate_work_position(row):

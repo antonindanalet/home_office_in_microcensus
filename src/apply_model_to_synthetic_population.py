@@ -7,6 +7,9 @@ import biogeme.biogeme as bio
 import biogeme.results as res
 import os
 from utils_synpop.generate_data_file_for_simulation import generate_data_file_for_simulation
+from utils_mtmc.get_mtmc_files import get_zp
+from utils_mtmc.define_home_office_variable import define_home_office_variable
+from mtmc2015.utils2015.compute_confidence_interval import get_weighted_avg_and_std
 
 
 def apply_model_to_synthetic_population():
@@ -18,6 +21,44 @@ def apply_model_to_synthetic_population():
     data_file_name_for_simulation = 'persons_from_SynPop2017.csv'
     output_directory_for_simulation = Path('../data/output/models/validation_with_SynPop/')
     run_simulation(data_file_directory_for_simulation, data_file_name_for_simulation, output_directory_for_simulation)
+    # Compare rate of home office in the MTMC and in the synthetic population
+    descr_stat_mtmc()
+    # descr_stat_synpop()
+
+
+def descr_stat_synpop():
+    synpop_directory = Path('../data/output/models/validation_with_SynPop/')
+    synpop_filename = 'persons_from_SynPop_with_probability_home_office.csv'
+    # Get the data
+    df_persons = pd.read_csv(synpop_directory / synpop_filename, sep=',')
+    print(df_persons.loc[df_persons['age'] < 15].describe())
+
+
+def descr_stat_mtmc():
+    # Get the data
+    selected_columns = ['HHNR', 'WP', 'f81300', 'f81400', 'alter', 'f40500', 'f40600', 'f40700']
+    df_zp = get_zp(2015, selected_columns=selected_columns)
+    df_zp = df_zp.rename(columns={'f81300': 'home_office_is_possible',
+                                  'f81400': 'percentage_home_office',
+                                  'alter': 'age',
+                                  'f40500': 'work_for_money',  # Work for money in the last week
+                                  'f40600': 'work_in_family_business',  # Work in the family business last week
+                                  'f40700': 'work_contract'})  # Work contract even if not work last week
+    ''' Removing people who did not get the question or did not answer. '''
+    df_zp.drop(df_zp[df_zp.home_office_is_possible < 0].index, inplace=True)
+    df_zp.drop(df_zp[df_zp.percentage_home_office == -98].index, inplace=True)
+    df_zp.drop(df_zp[df_zp.percentage_home_office == -97].index, inplace=True)
+    df_zp['home_office'] = df_zp.apply(define_home_office_variable, axis=1)
+    # Percentage of people doing home office among people working (and who answered to the question about home office)
+    df_zp_working = df_zp[(df_zp['work_for_money'] == 1) |
+                          (df_zp['work_in_family_business'] == 1) |
+                          (df_zp['work_contract'] == 1)]
+    weighted_avg_and_std = get_weighted_avg_and_std(df_zp_working, weights='WP', list_of_columns=['home_office'])
+    weighted_avg = round(weighted_avg_and_std[0]['home_office'][0], 3)
+    weighted_std = round(weighted_avg_and_std[0]['home_office'][1], 3)
+    nb_obs = weighted_avg_and_std[1]
+    print('Proportion of people doing home office among workers (MTMC):',
+          str(weighted_avg * 100) + '% (+/-', str(weighted_std * 100) + ', n=' + str(nb_obs) + ')')
 
 
 def run_simulation(data_file_directory_for_simulation, data_file_name_for_simulation,
@@ -33,7 +74,6 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
 
     # The following statement allows you to use the names of the variable as Python variable.
     globals().update(database.variables)
-    print(database.data.columns)
 
     # Parameters to be estimated
     alternative_specific_constant = Beta('alternative_specific_constant', 0, None, None, 0)
@@ -187,7 +227,6 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
     df_persons.loc[df_persons.employed == 0, 'Prob. no home office'] = 1.0  # Unemployed people
     df_persons.loc[df_persons.employed == -99, 'Prob. home office'] = 0.0  # Other people
     df_persons.loc[df_persons.employed == -99, 'Prob. no home office'] = 1.0  # Other people
-    print(df_persons['Prob. home office'].describe())
 
     ''' Save the file '''
     output_directory = Path('../data/output/models/validation_with_SynPop/')
