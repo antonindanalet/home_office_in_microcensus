@@ -12,7 +12,7 @@ from utils_synpop.generate_data_file_for_simulation import generate_data_file_fo
 def apply_model_to_synthetic_population():
     ''' External validation using a synthetic population '''
     # Prepare the data for PandasBiogeme
-    # generate_data_file_for_simulation()
+    generate_data_file_for_simulation()
     # Simulate the model on the synthetic population
     data_file_directory_for_simulation = Path('../data/output/data/validation_with_SynPop/')
     data_file_name_for_simulation = 'persons_from_SynPop2017.csv'
