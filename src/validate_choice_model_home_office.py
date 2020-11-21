@@ -7,6 +7,7 @@ from biogeme.expressions import Beta, DefineVariable
 import biogeme.results as res
 import os
 from estimate_choice_model_home_office import run_estimation
+from mtmc2015.utils2015.compute_confidence_interval import get_weighted_avg_and_std
 
 
 def validate_choice_model_home_office():
@@ -37,8 +38,21 @@ def compute_proportion_of_people_doing_home_office():
     simulation_results_directory = Path('../data/output/models/internal_validation/simulation/')
     data_file_name = 'persons20_with_probability_home_office.csv'
     df_persons = pd.read_csv(simulation_results_directory / data_file_name, sep=',')
-    print('Observed proportion of people doing home office:', df_persons['home_office'].mean())
-    print('Predicted proportion of people doing home office:', df_persons['Prob. home office'].mean())
+    print(df_persons.columns)
+    print('Observed proportion of people doing home office (unweighted):',
+          str(100 * round(df_persons['home_office'].mean(), 3)) + '%')
+    print('Predicted proportion of people doing home office (unweighted):',
+          str(100 * round(df_persons['Prob. home office'].mean(), 3)) + '%')
+    weighted_avg_and_std = get_weighted_avg_and_std(df_persons, weights='WP',
+                                                    list_of_columns=['home_office', 'Prob. home office'])
+    weighted_avg = round(weighted_avg_and_std[0]['home_office'][0], 3) * 100
+    weighted_std = round(weighted_avg_and_std[0]['home_office'][1], 3) * 100
+    print('Observed proportion of people doing home office (weighted):', str(weighted_avg) + '% (+/-',
+          str(weighted_std) + '%)')
+    weighted_avg = round(weighted_avg_and_std[0]['Prob. home office'][0], 3) * 100
+    weighted_std = round(weighted_avg_and_std[0]['Prob. home office'][1], 3) * 100
+    print('Predicted proportion of people doing home office (weighted):', str(weighted_avg) + '% (+/-',
+          str(weighted_std) + '%)')
 
 
 def apply_model_to_MTMC_data(data_file_directory, data_file_name, output_directory):
