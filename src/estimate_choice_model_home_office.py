@@ -4,7 +4,7 @@ import geopandas
 import biogeme.biogeme as bio
 import biogeme.database as db
 import biogeme.models as models
-from biogeme.expressions import Beta, DefineVariable
+from biogeme.expressions import Beta, DefineVariable, bioMin
 import os
 from utils_mtmc.get_mtmc_files import get_zp, get_hh
 from utils_mtmc.define_home_office_variable import define_home_office_variable
@@ -205,9 +205,10 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
 
     several_part_time_jobs = DefineVariable('several_part_time_jobs', full_part_time_job == 3, database)
     work_percentage = DefineVariable('work_percentage',
-                                     (full_part_time_job == 1) * 100 +
-                                     percentage_first_part_time_job * (percentage_first_part_time_job > 0) +
-                                     percentage_second_part_time_job * (percentage_second_part_time_job > 0),
+                                     bioMin((full_part_time_job == 1) * 100 +
+                                            percentage_first_part_time_job * (percentage_first_part_time_job > 0),  # +
+                                            # percentage_second_part_time_job * (percentage_second_part_time_job > 0),
+                                            100),
                                      database)
 
     hh_income_na = DefineVariable('hh_income_na', hh_income == -98, database)
@@ -265,7 +266,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_nationality_southeast_europe * nationality_southeast_europe + \
         b_nationality_ch_germany_france_italy_nw_e * nationality_eastern_europe + \
         b_several_part_time_jobs * several_part_time_jobs + \
-        models.piecewiseFormula(work_percentage, [0, 90, 170]) + \
+        models.piecewiseFormula(work_percentage, [0, 90, 101]) + \
         b_hh_income_na * hh_income_na + \
         b_hh_income_8000_or_less * hh_income_less_than_2000 + \
         b_hh_income_8000_or_less * hh_income_2000_to_4000 + \
@@ -301,6 +302,9 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     # Estimate the parameters
     results = biogeme.estimate()
 
+    # Get the results in LaTeX
+    results.writeLaTeX()
+
     # Get the results in a pandas table
     pandas_results = results.getEstimatedParameters()
     print(pandas_results)
@@ -318,7 +322,7 @@ def generate_data_file():
         """
     ''' Select the variables about the person from the tables of the MTMC 2015 '''
     selected_columns_zp = ['gesl', 'HAUSB', 'HHNR', 'f81300', 'A_X_CH1903', 'A_Y_CH1903', 'alter', 'f81400', 'noga_08',
-                           'sprache', 'f40800_01', 'f41100_01', 'nation', 'f40900', 'f40901_02', 'f40903']
+                           'sprache', 'f40800_01', 'f41100_01', 'nation', 'f40900', 'f40901_02', 'f40903', 'WP']
     df_zp = get_zp(2015, selected_columns_zp)
     selected_columns_hh = ['HHNR', 'hhtyp', 'W_OeV_KLASSE', 'W_BFS', 'W_X_CH1903', 'W_Y_CH1903', 'F20601']
     df_hh = get_hh(2015, selected_columns_hh)
