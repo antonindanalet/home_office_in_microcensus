@@ -12,7 +12,7 @@ from utils_mtmc.define_home_office_variable import define_home_office_variable
 from mtmc2015.utils2015.compute_confidence_interval import get_weighted_avg_and_std
 
 
-def apply_model_to_synthetic_population():
+def apply_model_to_synthetic_population(betas):
     ''' External validation using a synthetic population '''
     # Prepare the data for PandasBiogeme
     generate_data_file_for_simulation()
@@ -54,8 +54,7 @@ def descr_stat_mtmc():
           str(weighted_avg * 100) + '% (+/-', str(weighted_std * 100) + ', n=' + str(nb_obs) + ')')
 
 
-def run_simulation(data_file_directory_for_simulation, data_file_name_for_simulation,
-                                        output_directory_for_simulation):
+def run_simulation(data_file_directory_for_simulation, data_file_name_for_simulation, output_directory_for_simulation):
     """
         :author: Antonin Danalet, based on the example '01logit_simul.py' by Michel Bierlaire, EPFL, on biogeme.epfl.ch
 
@@ -197,12 +196,12 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
     # Create the Biogeme object
     biogeme = bio.BIOGEME(database, simulate)
     biogeme.modelName = 'logit_home_office_simul'
-    # Get the betas from the estimation
-    path_to_estimation_folder = Path('../data/output/models/estimation/')
-    if os.path.isfile(path_to_estimation_folder / 'logit_home_office~00.pickle'):
-        raise Exception('There are several model outputs! Careful.')
-    results = res.bioResults(pickleFile=path_to_estimation_folder / 'logit_home_office.pickle')
-    betas = results.getBetaValues()
+    # Get the betas from the estimation (without corrections)
+    # path_to_estimation_folder = Path('../data/output/models/estimation/')
+    # if os.path.isfile(path_to_estimation_folder / 'logit_home_office~00.pickle'):
+    #     raise Exception('There are several model outputs! Careful.')
+    # results = res.bioResults(pickleFile=path_to_estimation_folder / 'logit_home_office.pickle')
+    # betas = results.getBetaValues()
 
     # Change the working directory, so that biogeme writes in the correct folder, i.e., where this file is
     standard_directory = os.getcwd()
