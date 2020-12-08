@@ -11,7 +11,7 @@ from utils_mtmc.define_home_office_variable import define_home_office_variable
 
 
 def estimate_choice_model_home_office():
-    generate_data_file()
+    # generate_data_file()
     data_file_directory = Path('../data/output/data/estimation/')
     data_file_name = 'persons.csv'
     output_directory = '../data/output/models/estimation/'
@@ -48,12 +48,27 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_single_parent_with_children = Beta('b_single_parent_with_children', 0, None, None, 1)
     b_not_family_household = Beta('b_not_family_household', 0, None, None, 1)
 
-    b_public_transport_connection_quality_are_a = Beta('b_public_transport_connection_quality_are_a', 0, None, None, 1)
-    b_public_transport_connection_quality_are_b = Beta('b_public_transport_connection_quality_are_b', 0, None, None, 1)
-    b_public_transport_connection_quality_are_c = Beta('b_public_transport_connection_quality_are_c', 0, None, None, 1)
-    b_public_transport_connection_quality_are_d = Beta('b_public_transport_connection_quality_are_d', 0, None, None, 1)
-    b_public_transport_connection_quality_are_na = Beta('b_public_transport_connection_quality_are_na', 0, None, None,
-                                                        0)
+    b_public_transport_connection_quality_are_a_home = Beta('b_public_transport_connection_quality_are_a_home',
+                                                            0, None, None, 1)
+    b_public_transport_connection_quality_are_b_home = Beta('b_public_transport_connection_quality_are_b_home',
+                                                            0, None, None, 1)
+    b_public_transport_connection_quality_are_c_home = Beta('b_public_transport_connection_quality_are_c_home',
+                                                            0, None, None, 1)
+    b_public_transport_connection_quality_are_d_home = Beta('b_public_transport_connection_quality_are_d_home',
+                                                            0, None, None, 1)
+    b_public_transport_connection_quality_are_na_home = Beta('b_public_transport_connection_quality_are_na_home',
+                                                             0, None, None, 0)
+
+    b_public_transport_connection_quality_are_a_work = Beta('b_public_transport_connection_quality_are_a_work',
+                                                            0, None, None, 0)
+    b_public_transport_connection_quality_are_b_work = Beta('b_public_transport_connection_quality_are_b_work',
+                                                            0, None, None, 1)
+    b_public_transport_connection_quality_are_c_work = Beta('b_public_transport_connection_quality_are_c_work',
+                                                            0, None, None, 1)
+    b_public_transport_connection_quality_are_d_work = Beta('b_public_transport_connection_quality_are_d_work',
+                                                            0, None, None, 1)
+    b_public_transport_connection_quality_are_na_work = Beta('b_public_transport_connection_quality_are_na_work',
+                                                             0, None, None, 1)
 
     b_urban_home = Beta('b_urban_home', 0, None, None, 1)
     b_rural_home = Beta('b_rural_home', 0, None, None, 1)
@@ -106,16 +121,37 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     single_parent_with_children = DefineVariable('single_parent_with_children', hh_type == 230, database)
     not_family_household = DefineVariable('not_family_household', hh_type == 30, database)
 
-    public_transport_connection_quality_ARE_A = DefineVariable('public_transport_connection_quality_ARE_A',
-                                                               public_transport_connection_quality_ARE == 1, database)
-    public_transport_connection_quality_ARE_B = DefineVariable('public_transport_connection_quality_ARE_B',
-                                                               public_transport_connection_quality_ARE == 2, database)
-    public_transport_connection_quality_ARE_C = DefineVariable('public_transport_connection_quality_ARE_C',
-                                                               public_transport_connection_quality_ARE == 3, database)
-    public_transport_connection_quality_ARE_D = DefineVariable('public_transport_connection_quality_ARE_D',
-                                                               public_transport_connection_quality_ARE == 4, database)
-    public_transport_connection_quality_ARE_NA = DefineVariable('public_transport_connection_quality_ARE_NA',
-                                                                public_transport_connection_quality_ARE == 5, database)
+    public_transport_connection_quality_ARE_A_home = DefineVariable('public_transport_connection_quality_ARE_A_home',
+                                                                    public_transport_connection_quality_ARE_home == 1,
+                                                                    database)
+    public_transport_connection_quality_ARE_B_home = DefineVariable('public_transport_connection_quality_ARE_B_home',
+                                                                    public_transport_connection_quality_ARE_home == 2,
+                                                                    database)
+    public_transport_connection_quality_ARE_C_home = DefineVariable('public_transport_connection_quality_ARE_C_home',
+                                                                    public_transport_connection_quality_ARE_home == 3,
+                                                                    database)
+    public_transport_connection_quality_ARE_D_home = DefineVariable('public_transport_connection_quality_ARE_D_home',
+                                                                    public_transport_connection_quality_ARE_home == 4,
+                                                                    database)
+    public_transport_connection_quality_ARE_NA_home = DefineVariable('public_transport_connection_quality_ARE_NA_home',
+                                                                     public_transport_connection_quality_ARE_home == 5,
+                                                                     database)
+
+    public_transport_connection_quality_ARE_A_work = DefineVariable('public_transport_connection_quality_ARE_A_work',
+                                                                    public_transport_connection_quality_ARE_work == 1,
+                                                                    database)
+    public_transport_connection_quality_ARE_B_work = DefineVariable('public_transport_connection_quality_ARE_B_work',
+                                                                    public_transport_connection_quality_ARE_work == 2,
+                                                                    database)
+    public_transport_connection_quality_ARE_C_work = DefineVariable('public_transport_connection_quality_ARE_C_work',
+                                                                    public_transport_connection_quality_ARE_work == 3,
+                                                                    database)
+    public_transport_connection_quality_ARE_D_work = DefineVariable('public_transport_connection_quality_ARE_D_work',
+                                                                    public_transport_connection_quality_ARE_work == 4,
+                                                                    database)
+    public_transport_connection_quality_ARE_NA_work = DefineVariable('public_transport_connection_quality_ARE_NA_work',
+                                                                     public_transport_connection_quality_ARE_work == 5,
+                                                                     database)
 
     urban_home = DefineVariable('urban_home', urban_typology_home == 1, database)
     rural_home = DefineVariable('rural_home', urban_typology_home == 3, database)
@@ -242,11 +278,16 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_couple_with_children * couple_with_children + \
         b_single_parent_with_children * single_parent_with_children + \
         b_not_family_household * not_family_household + \
-        b_public_transport_connection_quality_are_a * public_transport_connection_quality_ARE_A + \
-        b_public_transport_connection_quality_are_b * public_transport_connection_quality_ARE_B + \
-        b_public_transport_connection_quality_are_c * public_transport_connection_quality_ARE_C + \
-        b_public_transport_connection_quality_are_d * public_transport_connection_quality_ARE_D + \
-        b_public_transport_connection_quality_are_na * public_transport_connection_quality_ARE_NA + \
+        b_public_transport_connection_quality_are_a_home * public_transport_connection_quality_ARE_A_home + \
+        b_public_transport_connection_quality_are_b_home * public_transport_connection_quality_ARE_B_home + \
+        b_public_transport_connection_quality_are_c_home * public_transport_connection_quality_ARE_C_home + \
+        b_public_transport_connection_quality_are_d_home * public_transport_connection_quality_ARE_D_home + \
+        b_public_transport_connection_quality_are_na_home * public_transport_connection_quality_ARE_NA_home + \
+        b_public_transport_connection_quality_are_a_work * public_transport_connection_quality_ARE_A_work + \
+        b_public_transport_connection_quality_are_b_work * public_transport_connection_quality_ARE_B_work + \
+        b_public_transport_connection_quality_are_c_work * public_transport_connection_quality_ARE_C_work + \
+        b_public_transport_connection_quality_are_d_work * public_transport_connection_quality_ARE_D_work + \
+        b_public_transport_connection_quality_are_na_work * public_transport_connection_quality_ARE_NA_work + \
         b_urban_home * urban_home + \
         b_rural_home * rural_home + \
         b_intermediate_home * intermediate_home + \
@@ -338,34 +379,32 @@ def generate_data_file():
     df_hh = get_hh(2015, selected_columns_hh)
     df_zp = pd.merge(df_zp, df_hh, on='HHNR', how='left')
 
-    ''' Add the distance between home and work places '''
+    ''' Add public transport connection quality of the work place '''
     df_zp_with_work_coordinates = df_zp[df_zp.A_X_CH1903 != -999]
-    geodf_home = geopandas.GeoDataFrame(df_zp_with_work_coordinates,
-                                        geometry=geopandas.points_from_xy(df_zp_with_work_coordinates.W_Y_CH1903,
-                                                                          df_zp_with_work_coordinates.W_X_CH1903),
-                                        crs='epsg:21781')
-    geodf_work = geopandas.GeoDataFrame(df_zp_with_work_coordinates,
-                                        geometry=geopandas.points_from_xy(df_zp_with_work_coordinates.A_Y_CH1903,
-                                                                          df_zp_with_work_coordinates.A_X_CH1903),
-                                        crs='epsg:21781')
-    df_zp.loc[df_zp.A_X_CH1903 != -999, 'home_work_crow_fly_distance'] = geodf_home.distance(geodf_work)
-    df_zp['home_work_crow_fly_distance'].fillna(-999, inplace=True)
-    df_zp.drop(['W_Y_CH1903', 'W_X_CH1903', 'A_Y_CH1903', 'A_X_CH1903'], axis=1, inplace=True)
+    df_zp_with_work_coordinates = geopandas.GeoDataFrame(df_zp_with_work_coordinates,
+                                                         geometry=geopandas.points_from_xy(df_zp_with_work_coordinates.A_X_CH1903,
+                                                                                           df_zp_with_work_coordinates.A_Y_CH1903),
+                                                         crs='epsg:21781')
+    # Read the shape file containing the connection quality
+    connection_quality_folder_path = Path('../data/input/OeV_Gueteklassen/Fahrplanperiode_17_18/')
+    df_connection_quality = geopandas.read_file(connection_quality_folder_path / 'OeV_Gueteklassen_ARE.shp')
+    df_connection_quality.set_crs(epsg=21781, inplace=True)  # Define the projection (CH1903_LV03)
+    df_zp_with_work_coordinates = geopandas.sjoin(df_zp_with_work_coordinates, df_connection_quality[['KLASSE',
+                                                                                                      'geometry']],
+                                                  how='left', op='intersects')
+    df_zp_with_work_coordinates['KLASSE'] = df_zp_with_work_coordinates['KLASSE'].map({'A': 1,
+                                                                                       'B': 2,
+                                                                                       'C': 3,
+                                                                                       'D': 4})
+    df_zp_with_work_coordinates['KLASSE'].fillna('5', inplace=True)
+    df_zp.loc[df_zp.A_X_CH1903 != -999, 'KLASSE'] = df_zp_with_work_coordinates['KLASSE']
+    df_zp['KLASSE'].fillna(-999, inplace=True)
+    # Rename the column with the public transport connection quality
+    df_zp.rename(columns={'KLASSE': 'public_transport_connection_quality_ARE_work'}, inplace=True)
 
-    ''' Add the data about the spatial typology of the home address (in particular the home commune) '''
-    path_to_typology = Path('../data/input/StadtLandTypologie/2015/Raumgliederungen.xlsx')
-    df_typology = pd.read_excel(path_to_typology, sheet_name='Daten',
-                                skiprows=[0, 2],  # Removes the 1st row, with information, and the 2nd, with links
-                                usecols='A,G')  # Selects only the BFS commune number and the column with the typology
-    df_zp = pd.merge(df_zp, df_typology, left_on='W_BFS', right_on='BFS Gde-nummer', how='left')
-    df_zp.drop('BFS Gde-nummer', axis=1, inplace=True)
-    df_zp = df_zp.rename(columns={'Stadt/Land-Typologie': 'urban_typology_home'})
+    df_zp = add_home_work_distance(df_zp)
 
-    ''' Add the data about the spatial typology of the work address (in particular the work commune) '''
-    df_zp = pd.merge(df_zp, df_typology, left_on='A_BFS', right_on='BFS Gde-nummer', how='left')
-    df_zp.drop('BFS Gde-nummer', axis=1, inplace=True)
-    df_zp = df_zp.rename(columns={'Stadt/Land-Typologie': 'urban_typology_work'})
-    df_zp.urban_typology_work.fillna(-99, inplace=True)
+    df_zp = add_spatial_typology(df_zp)
 
     ''' Generate the variable about work position:
     Code FaLC in English     FaLC in German   NPVM                       Code used below
@@ -403,7 +442,7 @@ def generate_data_file():
                                   'HAUSB': 'highest_educ',
                                   'f81300': 'home_office_is_possible',
                                   'hhtyp': 'hh_type',
-                                  'W_OeV_KLASSE': 'public_transport_connection_quality_ARE',
+                                  'W_OeV_KLASSE': 'public_transport_connection_quality_ARE_home',
                                   'alter': 'age',
                                   'f81400': 'percentage_home_office',
                                   'sprache': 'language',
@@ -425,6 +464,41 @@ def generate_data_file():
     output_directory = Path('../data/output/data/estimation/')
     data_file_name = 'persons.csv'
     df_zp.to_csv(output_directory / data_file_name, sep=';', index=False)
+
+
+def add_home_work_distance(df_zp):
+    ''' Add the distance between home and work places '''
+    df_zp_with_work_coordinates = df_zp[df_zp.A_X_CH1903 != -999]
+    geodf_home = geopandas.GeoDataFrame(df_zp_with_work_coordinates,
+                                        geometry=geopandas.points_from_xy(df_zp_with_work_coordinates.W_Y_CH1903,
+                                                                          df_zp_with_work_coordinates.W_X_CH1903),
+                                        crs='epsg:21781')
+    geodf_work = geopandas.GeoDataFrame(df_zp_with_work_coordinates,
+                                        geometry=geopandas.points_from_xy(df_zp_with_work_coordinates.A_Y_CH1903,
+                                                                          df_zp_with_work_coordinates.A_X_CH1903),
+                                        crs='epsg:21781')
+    df_zp.loc[df_zp.A_X_CH1903 != -999, 'home_work_crow_fly_distance'] = geodf_home.distance(geodf_work)
+    df_zp['home_work_crow_fly_distance'].fillna(-999, inplace=True)
+    df_zp.drop(['W_Y_CH1903', 'W_X_CH1903', 'A_Y_CH1903', 'A_X_CH1903'], axis=1, inplace=True)
+    return df_zp
+
+
+def add_spatial_typology(df_zp):
+    ''' Add the data about the spatial typology of the home address (in particular the home commune) '''
+    path_to_typology = Path('../data/input/StadtLandTypologie/2015/Raumgliederungen.xlsx')
+    df_typology = pd.read_excel(path_to_typology, sheet_name='Daten',
+                                skiprows=[0, 2],  # Removes the 1st row, with information, and the 2nd, with links
+                                usecols='A,G')  # Selects only the BFS commune number and the column with the typology
+    df_zp = pd.merge(df_zp, df_typology, left_on='W_BFS', right_on='BFS Gde-nummer', how='left')
+    df_zp.drop('BFS Gde-nummer', axis=1, inplace=True)
+    df_zp = df_zp.rename(columns={'Stadt/Land-Typologie': 'urban_typology_home'})
+
+    ''' Add the data about the spatial typology of the work address (in particular the work commune) '''
+    df_zp = pd.merge(df_zp, df_typology, left_on='A_BFS', right_on='BFS Gde-nummer', how='left')
+    df_zp.drop('BFS Gde-nummer', axis=1, inplace=True)
+    df_zp = df_zp.rename(columns={'Stadt/Land-Typologie': 'urban_typology_work'})
+    df_zp.urban_typology_work.fillna(-99, inplace=True)
+    return df_zp
 
 
 def generate_work_position(row):
