@@ -38,16 +38,34 @@ def apply_model_to_MTMC_data(data_file_directory_for_simulation, data_file_name_
     b_single_parent_with_children = Beta('b_single_parent_with_children', 0, None, None, 1)
     b_not_family_household = Beta('b_not_family_household', 0, None, None, 1)
 
-    b_public_transport_connection_quality_are_a = Beta('b_public_transport_connection_quality_are_a', 0, None, None, 1)
-    b_public_transport_connection_quality_are_b = Beta('b_public_transport_connection_quality_are_b', 0, None, None, 1)
-    b_public_transport_connection_quality_are_c = Beta('b_public_transport_connection_quality_are_c', 0, None, None, 1)
-    b_public_transport_connection_quality_are_d = Beta('b_public_transport_connection_quality_are_d', 0, None, None, 1)
-    b_public_transport_connection_quality_are_na = Beta('b_public_transport_connection_quality_are_na', 0, None, None,
-                                                        0)
+    b_public_transport_connection_quality_are_a_home = Beta('b_public_transport_connection_quality_are_a_home',
+                                                            0, None, None, 1)
+    b_public_transport_connection_quality_are_b_home = Beta('b_public_transport_connection_quality_are_b_home',
+                                                            0, None, None, 1)
+    b_public_transport_connection_quality_are_c_home = Beta('b_public_transport_connection_quality_are_c_home',
+                                                            0, None, None, 1)
+    b_public_transport_connection_quality_are_d_home = Beta('b_public_transport_connection_quality_are_d_home',
+                                                            0, None, None, 1)
+    b_public_transport_connection_quality_are_na_home = Beta('b_public_transport_connection_quality_are_na_home',
+                                                             0, None, None, 0)
 
-    b_urban = Beta('b_urban', 0, None, None, 1)
-    b_rural = Beta('b_rural', 0, None, None, 1)
-    b_intermediate = Beta('b_intermediate', 0, None, None, 1)
+    b_public_transport_connection_quality_are_a_work = Beta('b_public_transport_connection_quality_are_a_work',
+                                                            0, None, None, 0)
+    b_public_transport_connection_quality_are_b_work = Beta('b_public_transport_connection_quality_are_b_work',
+                                                            0, None, None, 1)
+    b_public_transport_connection_quality_are_c_work = Beta('b_public_transport_connection_quality_are_c_work',
+                                                            0, None, None, 1)
+    b_public_transport_connection_quality_are_d_work = Beta('b_public_transport_connection_quality_are_d_work',
+                                                            0, None, None, 1)
+    b_public_transport_connection_quality_are_na_work = Beta('b_public_transport_connection_quality_are_na_work',
+                                                             0, None, None, 1)
+
+    b_urban_home = Beta('b_urban_home', 0, None, None, 1)
+    b_rural_home = Beta('b_rural_home', 0, None, None, 1)
+    b_intermediate_home = Beta('b_intermediate_home', 0, None, None, 1)
+    b_urban_work = Beta('b_urban_work', 0, None, None, 1)
+    b_rural_work = Beta('b_rural_work', 0, None, None, 0)
+    b_intermediate_work = Beta('b_intermediate_work', 0, None, None, 1)
 
     b_home_work_distance = Beta('b_home_work_distance', 0, None, None, 0)
 
@@ -67,7 +85,6 @@ def apply_model_to_MTMC_data(data_file_directory_for_simulation, data_file_name_
     b_nationality_ch_germany_france_italy_nw_e = Beta('b_nationality_ch_germany_france_italy_nw_e', 0, None, None, 0)
     b_nationality_south_west_europe = Beta('b_nationality_south_west_europe', 0, None, None, 1)
     b_nationality_southeast_europe = Beta('b_nationality_southeast_europe', 0, None, None, 1)
-    b_several_part_time_jobs = Beta('b_several_part_time_jobs', 0, None, None, 0)
     b_hh_income_na = Beta('B_hh_income_na', 0, None, None, 1)
     b_hh_income_8000_or_less = Beta('b_hh_income_8000_or_less', 0, None, None, 0)
     b_hh_income_more_than_8000 = Beta('b_hh_income_more_than_8000', 0, None, None, 1)
@@ -87,15 +104,25 @@ def apply_model_to_MTMC_data(data_file_directory_for_simulation, data_file_name_
     single_parent_with_children = (hh_type == 230)
     not_family_household = (hh_type == 30)
 
-    public_transport_connection_quality_ARE_A = (public_transport_connection_quality_ARE == 1)
-    public_transport_connection_quality_ARE_B = (public_transport_connection_quality_ARE == 2)
-    public_transport_connection_quality_ARE_C = (public_transport_connection_quality_ARE == 3)
-    public_transport_connection_quality_ARE_D = (public_transport_connection_quality_ARE == 4)
-    public_transport_connection_quality_ARE_NA = (public_transport_connection_quality_ARE == 5)
+    public_transport_connection_quality_ARE_A_home = (public_transport_connection_quality_ARE_home == 1)
+    public_transport_connection_quality_ARE_B_home = (public_transport_connection_quality_ARE_home == 2)
+    public_transport_connection_quality_ARE_C_home = (public_transport_connection_quality_ARE_home == 3)
+    public_transport_connection_quality_ARE_D_home = (public_transport_connection_quality_ARE_home == 4)
+    public_transport_connection_quality_ARE_NA_home = (public_transport_connection_quality_ARE_home == 5)
 
-    urban = (urban_typology == 1)
-    rural = (urban_typology == 3)
-    intermediate = (urban_typology == 2)
+    public_transport_connection_quality_ARE_A_work = (public_transport_connection_quality_ARE_work == 1)
+    public_transport_connection_quality_ARE_B_work = (public_transport_connection_quality_ARE_work == 2)
+    public_transport_connection_quality_ARE_C_work = (public_transport_connection_quality_ARE_work == 3)
+    public_transport_connection_quality_ARE_D_work = (public_transport_connection_quality_ARE_work == 4)
+    public_transport_connection_quality_ARE_NA_work = (public_transport_connection_quality_ARE_work == 5)
+
+    urban_home = (urban_typology_home == 1)
+    rural_home = (urban_typology_work == 3)
+    intermediate_home = (urban_typology_home == 2)
+
+    urban_work = (urban_typology_work == 1)
+    rural_work = (urban_typology_work == 3)
+    intermediate_work = (urban_typology_work == 2)
 
     home_work_distance = (home_work_crow_fly_distance * (home_work_crow_fly_distance >= 0.0) / 100000.0)
 
@@ -173,14 +200,22 @@ def apply_model_to_MTMC_data(data_file_directory_for_simulation, data_file_name_
         b_couple_with_children * couple_with_children + \
         b_single_parent_with_children * single_parent_with_children + \
         b_not_family_household * not_family_household + \
-        b_public_transport_connection_quality_are_a * public_transport_connection_quality_ARE_A + \
-        b_public_transport_connection_quality_are_b * public_transport_connection_quality_ARE_B + \
-        b_public_transport_connection_quality_are_c * public_transport_connection_quality_ARE_C + \
-        b_public_transport_connection_quality_are_d * public_transport_connection_quality_ARE_D + \
-        b_public_transport_connection_quality_are_na * public_transport_connection_quality_ARE_NA + \
-        b_urban * urban + \
-        b_rural * rural + \
-        b_intermediate * intermediate + \
+        b_public_transport_connection_quality_are_a_home * public_transport_connection_quality_ARE_A_home + \
+        b_public_transport_connection_quality_are_b_home * public_transport_connection_quality_ARE_B_home + \
+        b_public_transport_connection_quality_are_c_home * public_transport_connection_quality_ARE_C_home + \
+        b_public_transport_connection_quality_are_d_home * public_transport_connection_quality_ARE_D_home + \
+        b_public_transport_connection_quality_are_na_home * public_transport_connection_quality_ARE_NA_home + \
+        b_public_transport_connection_quality_are_a_work * public_transport_connection_quality_ARE_A_work + \
+        b_public_transport_connection_quality_are_b_work * public_transport_connection_quality_ARE_B_work + \
+        b_public_transport_connection_quality_are_c_work * public_transport_connection_quality_ARE_C_work + \
+        b_public_transport_connection_quality_are_d_work * public_transport_connection_quality_ARE_D_work + \
+        b_public_transport_connection_quality_are_na_work * public_transport_connection_quality_ARE_NA_work + \
+        b_urban_home * urban_home + \
+        b_rural_home * rural_home + \
+        b_intermediate_home * intermediate_home + \
+        b_urban_work * urban_work + \
+        b_rural_work * rural_work + \
+        b_intermediate_work * intermediate_work + \
         b_home_work_distance * home_work_distance + \
         models.piecewiseFormula(age, [0, 20, 35, 75, 200]) + \
         b_business_sector_agriculture * business_sector_agriculture + \
@@ -202,7 +237,7 @@ def apply_model_to_MTMC_data(data_file_directory_for_simulation, data_file_name_
         b_nationality_south_west_europe * nationality_south_west_europe + \
         b_nationality_southeast_europe * nationality_southeast_europe + \
         b_nationality_ch_germany_france_italy_nw_e * nationality_eastern_europe + \
-        models.piecewiseFormula(work_percentage, [0, 90, 170]) + \
+        models.piecewiseFormula(work_percentage, [0, 90, 101]) + \
         b_hh_income_na * hh_income_na + \
         b_hh_income_8000_or_less * hh_income_less_than_2000 + \
         b_hh_income_8000_or_less * hh_income_2000_to_4000 + \
