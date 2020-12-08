@@ -55,9 +55,12 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_public_transport_connection_quality_are_na = Beta('b_public_transport_connection_quality_are_na', 0, None, None,
                                                         0)
 
-    b_urban = Beta('b_urban', 0, None, None, 1)
-    b_rural = Beta('b_rural', 0, None, None, 1)
-    b_intermediate = Beta('b_intermediate', 0, None, None, 1)
+    b_urban_home = Beta('b_urban_home', 0, None, None, 1)
+    b_rural_home = Beta('b_rural_home', 0, None, None, 1)
+    b_intermediate_home = Beta('b_intermediate_home', 0, None, None, 1)
+    b_urban_work = Beta('b_urban_work', 0, None, None, 1)
+    b_rural_work = Beta('b_rural_work', 0, None, None, 0)
+    b_intermediate_work = Beta('b_intermediate_work', 0, None, None, 1)
 
     b_home_work_distance = Beta('b_home_work_distance', 0, None, None, 0)
 
@@ -114,16 +117,19 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     public_transport_connection_quality_ARE_NA = DefineVariable('public_transport_connection_quality_ARE_NA',
                                                                 public_transport_connection_quality_ARE == 5, database)
 
-    urban = DefineVariable('urban', urban_typology == 1, database)
-    rural = DefineVariable('rural', urban_typology == 3, database)
-    intermediate = DefineVariable('intermediate', urban_typology == 2, database)
+    urban_home = DefineVariable('urban_home', urban_typology_home == 1, database)
+    rural_home = DefineVariable('rural_home', urban_typology_home == 3, database)
+    intermediate_home = DefineVariable('intermediate_home', urban_typology_home == 2, database)
+    urban_work = DefineVariable('urban_work', urban_typology_work == 1, database)
+    rural_work = DefineVariable('rural_work', urban_typology_work == 3, database)
+    intermediate_work = DefineVariable('intermediate_work', urban_typology_work == 2, database)
 
     home_work_distance = DefineVariable('home_work_distance',
                                         home_work_crow_fly_distance * (home_work_crow_fly_distance >= 0.0) / 100000.0,
                                         database)
 
     business_sector_agriculture = DefineVariable('business_sector_agriculture', 1 <= noga_08 <= 7, database)
-    business_sector_retail = DefineVariable('business_sector_retail', 47 <= noga_08 <= 47, database)
+    business_sector_retail = DefineVariable('business_sector_retail', noga_08 == 47, database)
     business_sector_gastronomy = DefineVariable('business_sector_gastronomy', 55 <= noga_08 <= 57, database)
     business_sector_finance = DefineVariable('business_sector_finance', 64 <= noga_08 <= 67, database)
     business_sector_production = DefineVariable('business_sector_production',
@@ -158,17 +164,17 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
                                                           (nation == 8212) | (nation == 8226) | (nation == 8233),
                                                           database)
     nationality_northwestern_europe = DefineVariable('nationality_northwestern_europe',
-                                                  (nation == 8204) |  # Belgium
-                                                  (nation == 8223) |  # Luxembourg
-                                                  (nation == 8227) |  # Netherlands
-                                                  (nation == 8206) |  # Denmark
-                                                  (nation == 8211) |  # Finland
-                                                  (nation == 8215) |  # United Kingdom
-                                                  (nation == 8216) |  # Ireland
-                                                  (nation == 8217) |  # Iceland
-                                                  (nation == 8228) |  # Norway
-                                                  (nation == 8234),  # Sweden
-                                                  database)
+                                                     (nation == 8204) |  # Belgium
+                                                     (nation == 8223) |  # Luxembourg
+                                                     (nation == 8227) |  # Netherlands
+                                                     (nation == 8206) |  # Denmark
+                                                     (nation == 8211) |  # Finland
+                                                     (nation == 8215) |  # United Kingdom
+                                                     (nation == 8216) |  # Ireland
+                                                     (nation == 8217) |  # Iceland
+                                                     (nation == 8228) |  # Norway
+                                                     (nation == 8234),  # Sweden
+                                                     database)
     nationality_south_west_europe = DefineVariable('nationality_south_west_europe',
                                                    (nation == 8231) |  # Portugal
                                                    (nation == 8236) |  # Spain
@@ -241,9 +247,12 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_public_transport_connection_quality_are_c * public_transport_connection_quality_ARE_C + \
         b_public_transport_connection_quality_are_d * public_transport_connection_quality_ARE_D + \
         b_public_transport_connection_quality_are_na * public_transport_connection_quality_ARE_NA + \
-        b_urban * urban + \
-        b_rural * rural + \
-        b_intermediate * intermediate + \
+        b_urban_home * urban_home + \
+        b_rural_home * rural_home + \
+        b_intermediate_home * intermediate_home + \
+        b_urban_work * urban_work + \
+        b_rural_work * rural_work + \
+        b_intermediate_work * intermediate_work + \
         b_home_work_distance * home_work_distance + \
         models.piecewiseFormula(age, [0, 20, 35, 75, 200]) + \
         b_business_sector_agriculture * business_sector_agriculture + \
@@ -322,7 +331,8 @@ def generate_data_file():
         """
     ''' Select the variables about the person from the tables of the MTMC 2015 '''
     selected_columns_zp = ['gesl', 'HAUSB', 'HHNR', 'f81300', 'A_X_CH1903', 'A_Y_CH1903', 'alter', 'f81400', 'noga_08',
-                           'sprache', 'f40800_01', 'f41100_01', 'nation', 'f40900', 'f40901_02', 'f40903', 'WP']
+                           'sprache', 'f40800_01', 'f41100_01', 'nation', 'f40900', 'f40901_02', 'f40903', 'WP',
+                           'A_BFS']
     df_zp = get_zp(2015, selected_columns_zp)
     selected_columns_hh = ['HHNR', 'hhtyp', 'W_OeV_KLASSE', 'W_BFS', 'W_X_CH1903', 'W_Y_CH1903', 'F20601']
     df_hh = get_hh(2015, selected_columns_hh)
@@ -342,20 +352,51 @@ def generate_data_file():
     df_zp['home_work_crow_fly_distance'].fillna(-999, inplace=True)
     df_zp.drop(['W_Y_CH1903', 'W_X_CH1903', 'A_Y_CH1903', 'A_X_CH1903'], axis=1, inplace=True)
 
-    ''' Add the data about the spatial typology '''
+    ''' Add the data about the spatial typology of the home address (in particular the home commune) '''
     path_to_typology = Path('../data/input/StadtLandTypologie/2015/Raumgliederungen.xlsx')
     df_typology = pd.read_excel(path_to_typology, sheet_name='Daten',
                                 skiprows=[0, 2],  # Removes the 1st row, with information, and the 2nd, with links
                                 usecols='A,G')  # Selects only the BFS commune number and the column with the typology
     df_zp = pd.merge(df_zp, df_typology, left_on='W_BFS', right_on='BFS Gde-nummer', how='left')
     df_zp.drop('BFS Gde-nummer', axis=1, inplace=True)
+    df_zp = df_zp.rename(columns={'Stadt/Land-Typologie': 'urban_typology_home'})
+
+    ''' Add the data about the spatial typology of the work address (in particular the work commune) '''
+    df_zp = pd.merge(df_zp, df_typology, left_on='A_BFS', right_on='BFS Gde-nummer', how='left')
+    df_zp.drop('BFS Gde-nummer', axis=1, inplace=True)
+    df_zp = df_zp.rename(columns={'Stadt/Land-Typologie': 'urban_typology_work'})
+    df_zp.urban_typology_work.fillna(-99, inplace=True)
 
     ''' Generate the variable about work position:
-         0 not employed / nicht erwerbstaetig
-         1 independent worker / Selbststaendige
-         2 employee / Angestellte
-         3 cadres / Kader '''
-    df_zp['work_position'] = df_zp.apply(generate_work_position, axis=1)
+    Code FaLC in English     FaLC in German   NPVM                       Code used below
+     0   Unemployed                                                      0
+     1   CEO                 Geschäftsführer  qualifizierter Mitarbeiter 1
+     11  business management Geschäftsleitung qualifizierter Mitarbeiter 1
+     12  management          qualifizierte MA qualifizierter Mitarbeiter 1
+     20  Employee            einfache MA      einfacher Mitarbeiter      2
+     3   Apprentice          Lehrling                                    3 
+     In the code below, -99 corresponds to no answer/does't know to the question about work position (if working) '''
+    df_zp.loc[df_zp['f40800_01'].isin([1,  # MTMC: "Selbstständig Erwerbende(r)"
+                                       2,  # MTMC: Arbeitnehmer in AG/GmbH, welche IHNEN selbst gehört
+                                       3]),  # MTMC: Arbeitnehmer im Familienbetrieb von Haushaltsmitglied
+              'work_position'] = 1  # NPVM: Qualifiziert
+    df_zp.loc[(df_zp['f40800_01'] == 4) &  # MTMC: Arbeitnehmer bei einem sonstigen Unternehmen
+              (df_zp['f41100_01'] == 1),  # MTMC: Angestellt ohne Cheffunktion
+              'work_position'] = 2  # NPVM: Einfach
+    df_zp.loc[(df_zp['f40800_01'] == 4) &  # MTMC: Arbeitnehmer bei einem sonstigen Unternehmen
+              (df_zp['f41100_01'].isin([2,  # MTMC: Angestellt mit Chefposition
+                                                      3])),  # MTMC: Angestellt als Mitglied von der Direktion
+              'work_position'] = 1  # SynPop: Qualifiziert
+    df_zp.loc[df_zp['f40800_01'] == 5,  # MTMC: Lehrling
+              'work_position'] = 3  # NPVM: Apprentice
+    df_zp.loc[df_zp['f41100_01'] == 3,  # MTMC: Angestellt als Mitglied von der Direktion
+              'work_position'] = 1  # NPVM: Qualifiziert
+    df_zp.loc[df_zp['f40800_01'] == -99,  # MTMC: Nicht erwerbstätig
+              'work_position'] = 0  # NPVM: Unemployed
+    df_zp.loc[(df_zp['f40800_01'] == 4) & (df_zp['f41100_01'].isin([-98, -97])),
+              'work_position'] = -99
+    del df_zp['f40800_01']
+    del df_zp['f41100_01']
 
     # Rename the variables
     df_zp = df_zp.rename(columns={'gesl': 'sex',
@@ -363,7 +404,6 @@ def generate_data_file():
                                   'f81300': 'home_office_is_possible',
                                   'hhtyp': 'hh_type',
                                   'W_OeV_KLASSE': 'public_transport_connection_quality_ARE',
-                                  'Stadt/Land-Typologie': 'urban_typology',
                                   'alter': 'age',
                                   'f81400': 'percentage_home_office',
                                   'sprache': 'language',
