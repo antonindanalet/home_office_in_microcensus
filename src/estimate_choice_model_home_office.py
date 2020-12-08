@@ -11,7 +11,7 @@ from utils_mtmc.define_home_office_variable import define_home_office_variable
 
 
 def estimate_choice_model_home_office():
-    # generate_data_file()
+    generate_data_file()
     data_file_directory = Path('../data/output/data/estimation/')
     data_file_name = 'persons.csv'
     output_directory = '../data/output/models/estimation/'
