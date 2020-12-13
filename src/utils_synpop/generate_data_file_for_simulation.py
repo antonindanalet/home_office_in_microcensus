@@ -45,13 +45,14 @@ def add_information_about_businesses_from_synthetic_population(df_persons):
     ''' Add the urban/rural typology of the work place '''
     # df_businesses = add_urban_rural_typology(df_businesses)
     ''' Add the public transport connection quality of the work place '''
-    df_businesses = add_public_transport_connection_quality_work(df_businesses)
+    geodf_businesses = add_public_transport_connection_quality_work(df_businesses)
+    df_businesses = add_spatial_typology_work(geodf_businesses)
     df_persons = pd.merge(df_persons, df_businesses, on='business_id', how='left')  # Add the result to df_persons
     df_persons['public_transport_connection_quality_ARE_work'].fillna('-99', inplace=True)  # Empty work places
     del df_persons['business_id']
     ''' Compute home-work distance: Add the distance (in meters) between home and work places '''
     df_persons = add_home_work_distance(df_persons)
-    df_persons.drop(['xcoord_work', 'ycoord_work', 'xcoord_home', 'ycoord_home', 'geometry'], axis=1, inplace=True)
+    df_persons.drop(['xcoord_work', 'ycoord_work', 'xcoord_home', 'ycoord_home'], axis=1, inplace=True)
     return df_persons
 
 
@@ -89,7 +90,7 @@ def add_information_about_households_from_synthetic_population(df_persons):
                                              geometry=geopandas.points_from_xy(df_households.xcoord_home,
                                                                                df_households.ycoord_home))
     geodf_household.set_crs(epsg=2056, inplace=True)  # Define the projection of the GeoDataFrame
-    df_persons = add_public_transport_connection_quality(df_persons, geodf_household)
+    df_persons = add_public_transport_connection_quality_home(df_persons, geodf_household)
     return df_persons
 
 
@@ -151,7 +152,6 @@ def add_public_transport_connection_quality_work(df_businesses):
     connection_quality_folder_path = Path('../data/input/OeV_Gueteklassen/Fahrplanperiode_17_18/')
     df_connection_quality = geopandas.read_file(connection_quality_folder_path / 'OeV_Gueteklassen_ARE.shp')
     df_connection_quality.to_crs(epsg=2056, inplace=True)  # Change the projection
-    # print(df_persons[['public_transport_connection_quality_ARE_home', 'xcoord_home', 'ycoord_home']])
     geodf_businesses = geopandas.GeoDataFrame(df_businesses,
                                               geometry=geopandas.points_from_xy(df_businesses.xcoord_work,
                                                                                 df_businesses.ycoord_work),
@@ -171,11 +171,11 @@ def add_public_transport_connection_quality_work(df_businesses):
     #                                                                   color='red',
     #                                                                   markersize=5)
     # plt.show()
-    geodf_businesses.drop(['index_right', 'geometry'], axis=1, inplace=True)
+    geodf_businesses.drop(['index_right'], axis=1, inplace=True)
     return geodf_businesses
 
 
-def add_public_transport_connection_quality(df_persons, geodf_household):
+def add_public_transport_connection_quality_home(df_persons, geodf_household):
     """ Add connection quality of public transport from coordinates
     :param df_persons: Contains the people from the SynPop
     :param geodf_household: Contains the households from the SynPop, incl. coordinates
@@ -204,19 +204,30 @@ def add_public_transport_connection_quality(df_persons, geodf_household):
     return df_persons
 
 
-def add_spatial_typology(df_zp):
-    ''' Add the data about the spatial typology of the home address (in particular the home commune) '''
-    path_to_typology = Path('../data/input/StadtLandTypologie/2015/Raumgliederungen.xlsx')
-    df_typology = pd.read_excel(path_to_typology, sheet_name='Daten',
-                                skiprows=[0, 2],  # Removes the 1st row, with information, and the 2nd, with links
-                                usecols='A,G')  # Selects only the BFS commune number and the column with the typology
-    df_zp = pd.merge(df_zp, df_typology, left_on='W_BFS', right_on='BFS Gde-nummer', how='left')
-    df_zp.drop('BFS Gde-nummer', axis=1, inplace=True)
-    df_zp = df_zp.rename(columns={'Stadt/Land-Typologie': 'urban_typology_home'})
-
-    ''' Add the data about the spatial typology of the work address (in particular the work commune) '''
-    df_zp = pd.merge(df_zp, df_typology, left_on='A_BFS', right_on='BFS Gde-nummer', how='left')
-    df_zp.drop('BFS Gde-nummer', axis=1, inplace=True)
-    df_zp = df_zp.rename(columns={'Stadt/Land-Typologie': 'urban_typology_work'})
-    df_zp.urban_typology_work.fillna(-99, inplace=True)
-    return df_zp
+def add_spatial_typology_work(geodf_businesses):
+    """ Add urban/rural typology of the work place from coordinates
+    :param df_businesses: Contains the businesses from the SynPop, incl. coordinates (type: GeoDataFrame)
+    :return: df_businesses: Contains the businesses from the SynPop, including a column containing the urban/rural
+    typologie
+         French        German      English (my own translation)
+    - 1: Urbain        Städtisch   urban
+    - 2: Intermédiaire Intermediär periruban
+    - 3: Rural         Ländlich    rural
+    """
+    # Read the shape file containing the urban/rural typology 2017
+    connection_quality_folder_path = Path('../data/input/StadtLandTypologie/2017/')
+    df_urban_typology = geopandas.read_file(connection_quality_folder_path / 'BFS_GemTyp12_Stadt_Land_2017.gpkg')
+    df_urban_typology.to_crs(epsg=2056, inplace=True)  # Change the projection
+    geodf_businesses = geopandas.sjoin(geodf_businesses, df_urban_typology[['TypBFS12_Stadt_Land_No', 'geometry']],
+                                       how='left', op='intersects')
+    geodf_businesses['TypBFS12_Stadt_Land_No'].fillna(-99, inplace=True)
+    # Rename the column with the urban/rural typology
+    geodf_businesses.rename(columns={'TypBFS12_Stadt_Land_No': 'urban_rural_typology_work'}, inplace=True)
+    # base = df_urban_typology.plot()
+    # geodf_businesses[geodf_businesses['urban_rural_typology_work'] == 1].head(n=5000).plot(ax=base,
+    #                                                                                        marker='o',
+    #                                                                                        color='red',
+    #                                                                                        markersize=5)
+    # plt.show()
+    geodf_businesses.drop(['index_right', 'geometry'], axis=1, inplace=True)
+    return geodf_businesses
