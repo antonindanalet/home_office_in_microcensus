@@ -4,6 +4,7 @@ import os
 import biogeme.results as res
 import math
 from apply_model_to_MTMC_data import apply_model_to_MTMC_data
+from mtmc2015.utils2015.compute_confidence_interval import get_weighted_avg_and_std
 
 
 def calibrate_the_constant():
@@ -18,8 +19,9 @@ def calibrate_the_constant():
     betas = get_estimated_betas(path_to_estimated_betas, estimated_betas_name)
     while abs(observed_rate_of_home_office - predicted_rate_of_home_office) > 0.001:
         betas = update_constant(betas, observed_rate_of_home_office, predicted_rate_of_home_office)
-        predicted_rate_of_home_office = compute_predicted_rate_of_home_office(path_to_estimation_file, estimation_file_name,
-                                                                              '', '', betas=betas)
+        predicted_rate_of_home_office = compute_predicted_rate_of_home_office(path_to_estimation_file,
+                                                                              estimation_file_name, '', '', betas=betas)
+    return betas
 
 
 def update_constant(betas, observed_rate_of_home_office, predicted_rate_of_home_office):
@@ -52,11 +54,13 @@ def compute_predicted_rate_of_home_office(path_to_estimation_file, estimation_fi
                              path_to_estimated_betas, estimated_betas_name, betas=betas)
     ''' compute the predicted rate of home office from the output of the simulation '''
     df_persons = pd.read_csv(output_directory_for_simulation / output_file_name)
-    predicted_rate_of_home_office = df_persons['Prob. home office'].mean()
+    weighted_avg_and_std = get_weighted_avg_and_std(df_persons, weights='WP', list_of_columns=['Prob. home office'])
+    predicted_rate_of_home_office = weighted_avg_and_std[0]['Prob. home office'][0]
     return predicted_rate_of_home_office
 
 
 def compute_observed_rate_of_home_office(path_to_estimation_file, estimation_file_name):
     df_persons = pd.read_csv(path_to_estimation_file / estimation_file_name, sep=';')
-    observed_rate_of_home_office = df_persons['home_office'].mean()
+    weighted_avg_and_std = get_weighted_avg_and_std(df_persons, weights='WP', list_of_columns=['home_office'])
+    observed_rate_of_home_office = weighted_avg_and_std[0]['home_office'][0]
     return observed_rate_of_home_office
