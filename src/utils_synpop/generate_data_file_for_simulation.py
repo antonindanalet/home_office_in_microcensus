@@ -48,11 +48,12 @@ def add_information_about_businesses_from_synthetic_population(df_persons):
     geodf_businesses = add_public_transport_connection_quality_work(df_businesses)
     df_businesses = add_spatial_typology_work(geodf_businesses)
     df_persons = pd.merge(df_persons, df_businesses, on='business_id', how='left')  # Add the result to df_persons
-    df_persons['public_transport_connection_quality_ARE_work'].fillna('-99', inplace=True)  # Empty work places
+    df_persons['public_transport_connection_quality_ARE_work'].fillna('-99', inplace=True)  # Undefined work places
+    df_persons['urban_rural_typology_work'].fillna(-99, inplace=True)  # Undefined work places
     del df_persons['business_id']
     ''' Compute home-work distance: Add the distance (in meters) between home and work places '''
     df_persons = add_home_work_distance(df_persons)
-    df_persons.drop(['xcoord_work', 'ycoord_work', 'xcoord_home', 'ycoord_home'], axis=1, inplace=True)
+    df_persons.drop(['xcoord_work', 'ycoord_work', 'xcoord_home', 'ycoord_home', 'geometry'], axis=1, inplace=True)
     return df_persons
 
 
@@ -220,7 +221,6 @@ def add_spatial_typology_work(geodf_businesses):
     df_urban_typology.to_crs(epsg=2056, inplace=True)  # Change the projection
     geodf_businesses = geopandas.sjoin(geodf_businesses, df_urban_typology[['TypBFS12_Stadt_Land_No', 'geometry']],
                                        how='left', op='intersects')
-    geodf_businesses['TypBFS12_Stadt_Land_No'].fillna(-99, inplace=True)
     # Rename the column with the urban/rural typology
     geodf_businesses.rename(columns={'TypBFS12_Stadt_Land_No': 'urban_rural_typology_work'}, inplace=True)
     # base = df_urban_typology.plot()
