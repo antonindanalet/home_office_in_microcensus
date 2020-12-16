@@ -50,7 +50,7 @@ def apply_model_to_MTMC_data(data_file_directory_for_simulation, data_file_name_
                                                              0, None, None, 0)
 
     b_public_transport_connection_quality_are_a_work = Beta('b_public_transport_connection_quality_are_a_work',
-                                                            0, None, None, 0)
+                                                            0, None, None, 1)
     b_public_transport_connection_quality_are_b_work = Beta('b_public_transport_connection_quality_are_b_work',
                                                             0, None, None, 1)
     b_public_transport_connection_quality_are_c_work = Beta('b_public_transport_connection_quality_are_c_work',
@@ -148,7 +148,7 @@ def apply_model_to_MTMC_data(data_file_directory_for_simulation, data_file_name_
                                                 database)
 
     employees = work_position == 2
-    executives = (work_position == 3) + (work_position == 1)
+    executives = work_position == 1
 
     german = language == 1
 
