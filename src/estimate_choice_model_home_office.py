@@ -60,7 +60,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
                                                              0, None, None, 0)
 
     b_public_transport_connection_quality_are_a_work = Beta('b_public_transport_connection_quality_are_a_work',
-                                                            0, None, None, 0)
+                                                            0, None, None, 1)
     b_public_transport_connection_quality_are_b_work = Beta('b_public_transport_connection_quality_are_b_work',
                                                             0, None, None, 1)
     b_public_transport_connection_quality_are_c_work = Beta('b_public_transport_connection_quality_are_c_work',
@@ -186,7 +186,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
                                                 database)
 
     employees = DefineVariable('employees', work_position == 2, database)
-    executives = DefineVariable('executives', (work_position == 3) + (work_position == 1), database)
+    executives = DefineVariable('executives', work_position == 1, database)
 
     german = DefineVariable('german', language == 1, database)
 
