@@ -16,7 +16,6 @@ def apply_model_to_synthetic_population(betas):
     ''' External validation using a synthetic population '''
     # Prepare the data for PandasBiogeme
     generate_data_file_for_simulation()
-    print('Data generated!')
     # Definition of the household income limit corresponding to the distribution of the MTMC
     household_income_limit = compute_household_income_limit()
     # Simulate the model on the synthetic population
@@ -83,7 +82,7 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
     b_public_transport_connection_quality_na_home = Beta('b_public_transport_connection_quality_na_home',
                                                          0, None, None, 0)
     b_public_transport_connection_quality_a_work = Beta('b_public_transport_connection_quality_are_a_work',
-                                                        0, None, None, 0)
+                                                        0, None, None, 1)
     b_rural_work = Beta('b_rural_work', 0, None, None, 0)
     b_home_work_distance = Beta('b_home_work_distance', 0, None, None, 0)
     b_business_sector_agriculture = Beta('b_business_sector_agriculture', 0, None, None, 0)
