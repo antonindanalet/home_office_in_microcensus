@@ -12,30 +12,37 @@ from utils_mtmc.define_home_office_variable import define_home_office_variable
 from mtmc2015.utils2015.compute_confidence_interval import get_weighted_avg_and_std
 
 
-def apply_model_to_synthetic_population(betas):
+def validation_with_syn_pop(betas):
+    output_directory_for_simulation = Path('../data/output/models/validation_with_SynPop/')
     ''' External validation using a synthetic population '''
     # Prepare the data for PandasBiogeme
     generate_data_file_for_simulation()
     # Definition of the household income limit corresponding to the distribution of the MTMC
     household_income_limit = compute_household_income_limit()
+    predicted_rate_of_home_office = apply_model_to_synthetic_population(betas, output_directory_for_simulation,
+                                                                        household_income_limit)
+    # Compare rate of home office in the MTMC and in the synthetic population
+    descr_stat_mtmc()
+    print('Proportion of home office (synpop):', predicted_rate_of_home_office)
+
+
+def apply_model_to_synthetic_population(betas, output_directory_for_simulation, household_income_limit):
     # Simulate the model on the synthetic population
     data_file_directory_for_simulation = Path('../data/output/data/validation_with_SynPop/')
     data_file_name_for_simulation = 'persons_from_SynPop2017.csv'
-    output_directory_for_simulation = Path('../data/output/models/validation_with_SynPop/')
     run_simulation(data_file_directory_for_simulation, data_file_name_for_simulation, output_directory_for_simulation,
                    betas, household_income_limit)
-    # Compare rate of home office in the MTMC and in the synthetic population
-    descr_stat_mtmc()
-    descr_stat_synpop()
+    predicted_rate_of_home_office = get_predicted_rate_of_home_office(output_directory_for_simulation)
+    return predicted_rate_of_home_office
 
 
-def descr_stat_synpop():
-    synpop_directory = Path('../data/output/models/validation_with_SynPop/')
+def get_predicted_rate_of_home_office(synpop_directory):
     synpop_filename = 'persons_from_SynPop_with_probability_home_office.csv'
     # Get the data
     df_persons = pd.read_csv(synpop_directory / synpop_filename, sep=',')
     df_persons.drop(df_persons[df_persons.position_in_bus.isin([-99, 0, 3])].index, inplace=True)
-    print('Proportion of home office (synpop):', df_persons['Prob. home office'].mean())
+    predicted_rate_of_home_office = df_persons['Prob. home office'].mean()
+    return predicted_rate_of_home_office
 
 
 def descr_stat_mtmc():
@@ -224,9 +231,8 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
     df_persons.loc[df_persons.position_in_bus == 3, 4] = 0.0
 
     ''' Save the file '''
-    output_directory = Path('../data/output/models/validation_with_SynPop/')
     data_file_name = 'persons_from_SynPop_with_probability_home_office.csv'
-    df_persons.to_csv(output_directory / data_file_name, sep=',', index=False)
+    df_persons.to_csv(output_directory_for_simulation / data_file_name, sep=',', index=False)
 
 
 def compute_household_income_limit():
