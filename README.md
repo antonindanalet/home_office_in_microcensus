@@ -1,4 +1,4 @@
-# Home-based telecommuting in Switzerland, 2015-2050: binary logit
+# Home-based telecommuting in Switzerland, 2015-2050
 
 This codes estimates a (very simple) binary logit from the data of the Mobility and Transport Microcensus 2015 explaining the "choice" of making - at least from time to time - home office. The outputs are available in an HTML file.
 
