@@ -5,22 +5,51 @@ import biogeme.results as res
 import math
 from apply_model_to_MTMC_data import apply_model_to_MTMC_data
 from mtmc2015.utils2015.compute_confidence_interval import get_weighted_avg_and_std
+from apply_model_to_synthetic_population import get_predicted_rate_of_home_office, \
+    apply_model_to_synthetic_population, compute_household_income_limit
 
 
-def calibrate_the_constant():
+def calibrate_the_constant_by_simulating_on_synthetic_population(betas):
+    synpop_directory = Path('../data/output/models/validation_with_SynPop/')
+    predicted_rate_of_home_office = get_predicted_rate_of_home_office(synpop_directory)
+    print('Proportion of home office (synpop):', predicted_rate_of_home_office)
+    path_to_estimation_file = Path('../data/output/data/estimation/')
+    estimation_file_name = 'persons.csv'
+    observed_rate_of_home_office = compute_observed_rate_of_home_office(path_to_estimation_file, estimation_file_name)
+    household_income_limit = compute_household_income_limit()
+    print(betas['alternative_specific_constant'])
+    while abs(observed_rate_of_home_office - predicted_rate_of_home_office) > 0.001:
+        betas = update_constant(betas, observed_rate_of_home_office, predicted_rate_of_home_office)
+        print(betas['alternative_specific_constant'])
+        predicted_rate_of_home_office = compute_predicted_rate_of_home_office_for_syn_pop(betas, household_income_limit)
+        print(predicted_rate_of_home_office)
+    return betas
+
+
+def compute_predicted_rate_of_home_office_for_syn_pop(betas, household_income_limit):
+    output_directory_for_simulation = Path('../data/output/models/simulation_for_constant_calibration/SynPop/')
+    predicted_rate_of_home_office = apply_model_to_synthetic_population(betas, output_directory_for_simulation,
+                                                                        household_income_limit)
+    return predicted_rate_of_home_office
+
+
+def calibrate_the_constant_by_simulating_on_microcensus():
     path_to_estimation_file = Path('../data/output/data/estimation/')
     estimation_file_name = 'persons.csv'
     observed_rate_of_home_office = compute_observed_rate_of_home_office(path_to_estimation_file, estimation_file_name)
     path_to_estimated_betas = Path('../data/output/models/estimation/')
     estimated_betas_name = 'logit_home_office'
-    predicted_rate_of_home_office = compute_predicted_rate_of_home_office(path_to_estimation_file, estimation_file_name,
-                                                                          path_to_estimated_betas, estimated_betas_name)
+    predicted_rate_of_home_office = compute_predicted_rate_of_home_office_for_microcensus(path_to_estimation_file,
+                                                                                          estimation_file_name,
+                                                                                          path_to_estimated_betas,
+                                                                                          estimated_betas_name)
     # Get the betas from the estimation
     betas = get_estimated_betas(path_to_estimated_betas, estimated_betas_name)
     while abs(observed_rate_of_home_office - predicted_rate_of_home_office) > 0.001:
         betas = update_constant(betas, observed_rate_of_home_office, predicted_rate_of_home_office)
-        predicted_rate_of_home_office = compute_predicted_rate_of_home_office(path_to_estimation_file,
-                                                                              estimation_file_name, '', '', betas=betas)
+        predicted_rate_of_home_office = compute_predicted_rate_of_home_office_for_microcensus(path_to_estimation_file,
+                                                                                              estimation_file_name, '',
+                                                                                              '', betas=betas)
     return betas
 
 
@@ -44,10 +73,10 @@ def get_estimated_betas(path_to_estimated_betas, estimated_betas_name):
     return betas
 
 
-def compute_predicted_rate_of_home_office(path_to_estimation_file, estimation_file_name,
-                                          path_to_estimated_betas, estimated_betas_name, betas=None):
+def compute_predicted_rate_of_home_office_for_microcensus(path_to_estimation_file, estimation_file_name,
+                                                          path_to_estimated_betas, estimated_betas_name, betas=None):
     ''' Simulate the model on the full dataset used for estimation '''
-    output_directory_for_simulation = Path('../data/output/models/simulation_for_constant_calibration/')
+    output_directory_for_simulation = Path('../data/output/models/simulation_for_constant_calibration/MTMC/')
     output_file_name = 'persons_with_probability_home_office.csv'
     apply_model_to_MTMC_data(path_to_estimation_file, estimation_file_name,
                              output_directory_for_simulation, output_file_name,
