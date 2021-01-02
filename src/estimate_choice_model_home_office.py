@@ -79,7 +79,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
 
     b_home_work_distance = Beta('b_home_work_distance', 0, None, None, 0)
 
-    b_business_sector_agriculture = Beta('b_business_sector_agriculture', 0, None, None, 0)
+    b_business_sector_agriculture = Beta('b_business_sector_agriculture', 0, lowerbound=0, upperbound=2, status=0)
     b_business_sector_production = Beta('b_business_sector_production', 0, None, None, 0)
     b_business_sector_wholesale = Beta('b_business_sector_wholesale', 0, None, None, 1)
     b_business_sector_retail = Beta('b_business_sector_retail', 0, None, None, 0)

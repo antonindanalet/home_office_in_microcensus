@@ -2,11 +2,15 @@ import pandas as pd
 from pathlib import Path
 from estimate_choice_model_home_office import run_estimation
 from mtmc2015.utils2015.compute_confidence_interval import get_weighted_avg_and_std
-from apply_model_to_MTMC_data import apply_model_to_MTMC_data
+from src.mtmc2015.apply_model_to_microcensus import apply_model_to_microcensus
 
 
-def validate_choice_model_home_office():
-    ''' Internal cross internal_validation '''
+def validate_model_with_microcensus_2015():
+    """ This function validates the model internally. First, it decomposes the data in two sets:
+    - one for the estimation (of 80% of the original dataset);
+    - another one for the simulation (of 20% of the original dataset).
+    Then, it estimates the model on 80% of the dataset, simulate it on the remaining 20%.
+    Finally, it computes the predicted and observed proportions of people working from home in the 20%. """
     # Read the complete dataset, used for estimation
     df_persons = get_persons()
     # Save 80% of the data for estimation and 20% of the data for simulation for internal validation
@@ -25,19 +29,20 @@ def validate_choice_model_home_office():
     output_file_name = 'persons20_with_probability_home_office.csv'
     path_to_estimated_betas = Path('../data/output/models/internal_validation/estimation/')
     estimated_betas_name = 'logit_home_office_80'
-    apply_model_to_MTMC_data(data_file_directory_for_simulation, data_file_name_for_simulation,
-                             output_directory_for_simulation, output_file_name,
-                             path_to_estimated_betas, estimated_betas_name)
+    apply_model_to_microcensus(data_file_directory_for_simulation, data_file_name_for_simulation,
+                               output_directory_for_simulation, output_file_name,
+                               path_to_estimated_betas, estimated_betas_name)
     # Compute the proportion of people doing home office in the data and in the simulation
     compute_proportion_of_people_doing_home_office()
 
 
 def compute_proportion_of_people_doing_home_office():
+    """ This function computes the observed and predicted proportion of people working from home
+    (among the 20% of the original dataset). """
     ''' Get the data '''
     simulation_results_directory = Path('../data/output/models/internal_validation/simulation/')
     data_file_name = 'persons20_with_probability_home_office.csv'
     df_persons = pd.read_csv(simulation_results_directory / data_file_name, sep=',')
-    print(df_persons.columns)
     print('Observed proportion of people doing home office (unweighted):',
           str(100 * round(df_persons['home_office'].mean(), 3)) + '%')
     print('Predicted proportion of people doing home office (unweighted):',

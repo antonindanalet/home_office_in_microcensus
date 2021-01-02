@@ -7,9 +7,9 @@ import biogeme.results as res
 import os
 
 
-def apply_model_to_MTMC_data(data_file_directory_for_simulation, data_file_name_for_simulation,
-                             output_directory_for_simulation, output_file_name,
-                             path_to_estimated_betas, estimated_betas_name, betas=None):
+def apply_model_to_microcensus(data_file_directory_for_simulation, data_file_name_for_simulation,
+                               output_directory_for_simulation, output_file_name,
+                               path_to_estimated_betas, estimated_betas_name, betas=None):
     """
     :author: Antonin Danalet, based on the example '01logit_simul.py' by Michel Bierlaire, EPFL, on biogeme.epfl.ch
 

@@ -6,30 +6,18 @@ import biogeme.models as models
 import biogeme.biogeme as bio
 import biogeme.messaging as msg
 import os
-from utils_synpop.generate_data_file_for_simulation import generate_data_file_for_simulation
-from utils_mtmc.get_mtmc_files import get_zp
-from utils_mtmc.define_home_office_variable import define_home_office_variable
-from mtmc2015.utils2015.compute_confidence_interval import get_weighted_avg_and_std
 
 
-def validation_with_syn_pop(betas):
-    output_directory_for_simulation = Path('../data/output/models/validation_with_SynPop/')
-    ''' External validation using a synthetic population '''
-    # Prepare the data for PandasBiogeme
-    generate_data_file_for_simulation()
-    # Definition of the household income limit corresponding to the distribution of the MTMC
-    household_income_limit = compute_household_income_limit()
-    predicted_rate_of_home_office = apply_model_to_synthetic_population(betas, output_directory_for_simulation,
-                                                                        household_income_limit)
-    # Compare rate of home office in the MTMC and in the synthetic population
-    descr_stat_mtmc()
-    print('Proportion of home office (synpop):', predicted_rate_of_home_office)
-
-
-def apply_model_to_synthetic_population(betas, output_directory_for_simulation, household_income_limit):
+def apply_model_to_synthetic_population(betas, output_directory_for_simulation, household_income_limit, year):
     # Simulate the model on the synthetic population
-    data_file_directory_for_simulation = Path('../data/output/data/validation_with_SynPop/')
-    data_file_name_for_simulation = 'persons_from_SynPop2017.csv'
+    if year == 2017:
+        data_file_directory_for_simulation = Path('../data/output/data/validation_with_SynPop/')
+        data_file_name_for_simulation = 'persons_from_SynPop2017.csv'
+    elif year in [2030, 2040, 2050]:
+        data_file_directory_for_simulation = Path('../data/output/data/application_to_SynPop_' + str(year) + '/')
+        data_file_name_for_simulation = 'persons_from_SynPop' + str(year) + '.csv'
+    else:
+        raise Exception('Year not well defined!')
     run_simulation(data_file_directory_for_simulation, data_file_name_for_simulation, output_directory_for_simulation,
                    betas, household_income_limit)
     predicted_rate_of_home_office = get_predicted_rate_of_home_office(output_directory_for_simulation)
@@ -43,26 +31,6 @@ def get_predicted_rate_of_home_office(synpop_directory):
     df_persons.drop(df_persons[df_persons.position_in_bus.isin([-99, 0, 3])].index, inplace=True)
     predicted_rate_of_home_office = df_persons['Prob. home office'].mean()
     return predicted_rate_of_home_office
-
-
-def descr_stat_mtmc():
-    # Get the data
-    selected_columns = ['HHNR', 'WP', 'f81300', 'f81400']
-    df_zp = get_zp(2015, selected_columns=selected_columns)
-    df_zp = df_zp.rename(columns={'f81300': 'home_office_is_possible',
-                                  'f81400': 'percentage_home_office'})
-    ''' Removing people who did not get the question or did not answer. '''
-    df_zp.drop(df_zp[df_zp.home_office_is_possible < 0].index, inplace=True)
-    df_zp.drop(df_zp[df_zp.percentage_home_office == -98].index, inplace=True)
-    df_zp.drop(df_zp[df_zp.percentage_home_office == -97].index, inplace=True)
-    df_zp['home_office'] = df_zp.apply(define_home_office_variable, axis=1)
-    # Percentage of people doing home office among people working (and who answered to the question about home office)
-    weighted_avg_and_std = get_weighted_avg_and_std(df_zp, weights='WP', list_of_columns=['home_office'])
-    weighted_avg = round(weighted_avg_and_std[0]['home_office'][0], 3)
-    weighted_std = round(weighted_avg_and_std[0]['home_office'][1], 3)
-    nb_obs = weighted_avg_and_std[1]
-    print('Proportion of people doing home office among workers (MTMC):',
-          str(weighted_avg * 100) + '% (+/-', str(weighted_std * 100) + ', n=' + str(nb_obs) + ')')
 
 
 def run_simulation(data_file_directory_for_simulation, data_file_name_for_simulation, output_directory_for_simulation,
@@ -233,23 +201,3 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
     ''' Save the file '''
     data_file_name = 'persons_from_SynPop_with_probability_home_office.csv'
     df_persons.to_csv(output_directory_for_simulation / data_file_name, sep=',', index=False)
-
-
-def compute_household_income_limit():
-    # Proportion of employees with household income < 8000 CHF (MTMC):
-    percent_employees_with_income_less_8000 = 0.38921317978801245
-    # Read SynPop data
-    output_directory = Path('../data/output/data/validation_with_SynPop/')
-    data_file_name = 'persons_from_SynPop2017.csv'
-    df_persons_from_synpop = pd.read_csv(output_directory / data_file_name, sep=';')
-    # Remove children
-    df_persons_from_synpop.drop(df_persons_from_synpop[df_persons_from_synpop.age <= 5].index, inplace=True)
-    # Remove people unemployed (0) and apprentices (3)
-    df_persons_from_synpop.drop(df_persons_from_synpop[df_persons_from_synpop.position_in_bus.isin([-99, 0, 3])].index,
-                                inplace=True)
-    number_of_employees = len(df_persons_from_synpop)
-    number_of_employees_with_income_less_than_8000 = int(number_of_employees * percent_employees_with_income_less_8000)
-    df_persons_from_synpop_sorted = df_persons_from_synpop.sort_values(by='hh_income').reset_index()
-    household_income_limit = df_persons_from_synpop_sorted.loc[number_of_employees_with_income_less_than_8000,
-                                                               'hh_income']
-    return household_income_limit
