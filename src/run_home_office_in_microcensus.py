@@ -10,7 +10,7 @@ from apply_model_to_syn_pop_2050 import apply_model_to_syn_pop_2050
 def run_home_office_in_microcensus():
     estimate_choice_model_home_office()
     validate_model_with_microcensus_2015()
-    # descriptive_statistics()
+    descriptive_statistics()
     betas = calibrate_the_constant_by_simulating_on_microcensus()
     validate_model_with_syn_pop_2017(betas)
     betas = calibrate_the_constant_by_simulating_on_synthetic_population(betas)
