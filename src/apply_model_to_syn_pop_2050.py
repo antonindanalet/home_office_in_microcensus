@@ -12,6 +12,7 @@ def apply_model_to_syn_pop_2050(betas):
         generate_data_file_for_simulation(year)
         # Definition of the household income limit corresponding to the distribution of the MTMC
         household_income_limit = compute_household_income_limit(year)
+        print('Household income limit used in', str(year) + ':', household_income_limit)
         predicted_rate_of_home_office = apply_model_to_synthetic_population(betas, output_directory_for_simulation,
                                                                             household_income_limit, year)
         print('Proportion of home office (synpop) in', str(year) + ':', predicted_rate_of_home_office)
