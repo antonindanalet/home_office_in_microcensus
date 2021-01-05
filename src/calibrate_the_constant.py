@@ -23,7 +23,7 @@ def calibrate_the_constant_by_simulating_on_synthetic_population(betas):
         # print(betas['alternative_specific_constant'])
         predicted_rate_of_home_office = compute_predicted_rate_of_home_office_for_syn_pop(betas, household_income_limit)
         # print('Final beta:', betas['alternative_specific_constant'])
-    print('Final beta:', betas['alternative_specific_constant'])
+    print('Final alternative specific constant:', betas['alternative_specific_constant'])
     return betas
 
 
