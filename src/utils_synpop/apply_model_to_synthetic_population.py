@@ -192,12 +192,9 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
     df_persons.loc[df_persons.employed == 0, 'Prob. no home office'] = 1.0  # Unemployed people
     df_persons.loc[df_persons.employed == -99, 'Prob. home office'] = 0.0  # Other people
     df_persons.loc[df_persons.employed == -99, 'Prob. no home office'] = 1.0  # Other people
-    # By definition, apprentices don't do home office (because they were not asked in the MTMC)
-    df_persons.loc[df_persons.position_in_bus == 3, 0] = 1.0
-    df_persons.loc[df_persons.position_in_bus == 3, 1] = 0.0
-    df_persons.loc[df_persons.position_in_bus == 3, 2] = 0.0
-    df_persons.loc[df_persons.position_in_bus == 3, 3] = 0.0
-    df_persons.loc[df_persons.position_in_bus == 3, 4] = 0.0
+    # By definition, apprentices don't work from home (because they were not asked in the MTMC)
+    df_persons.loc[df_persons.position_in_bus == 3, 'Prob. home office'] = 0.0
+    df_persons.loc[df_persons.position_in_bus == 3, 'Prob. no home office'] = 1.0
 
     # Add a realisation of the probability
     df_persons['random 0/1'] = np.random.rand(len(df_persons))
