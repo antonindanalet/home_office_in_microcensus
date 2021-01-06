@@ -6,6 +6,7 @@ import biogeme.models as models
 import biogeme.biogeme as bio
 import biogeme.messaging as msg
 import os
+import numpy as np
 
 
 def apply_model_to_synthetic_population(betas, output_directory_for_simulation, household_income_limit, year):
@@ -197,6 +198,10 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
     df_persons.loc[df_persons.position_in_bus == 3, 2] = 0.0
     df_persons.loc[df_persons.position_in_bus == 3, 3] = 0.0
     df_persons.loc[df_persons.position_in_bus == 3, 4] = 0.0
+
+    # Add a realisation of the probability
+    df_persons['random 0/1'] = np.random.rand(len(df_persons))
+    df_persons['Home office 0/1'] = np.where(df_persons['random 0/1'] < df_persons['Prob. home office'], 1, 0)
 
     ''' Save the file '''
     data_file_name = 'persons_from_SynPop_with_probability_home_office.csv'
