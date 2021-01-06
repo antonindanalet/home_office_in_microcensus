@@ -51,6 +51,7 @@ def calibrate_the_constant_by_simulating_on_microcensus():
         predicted_rate_of_home_office = compute_predicted_rate_of_home_office_for_microcensus(path_to_estimation_file,
                                                                                               estimation_file_name, '',
                                                                                               '', betas=betas)
+    print('Alternative specific constant used for internal validation:', betas['alternative_specific_constant'])
     return betas
 
 
