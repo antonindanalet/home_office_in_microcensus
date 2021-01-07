@@ -17,11 +17,11 @@ def descriptive_statistics_comparison():
     df_persons_from_synpop = pd.read_csv(output_directory / data_file_name, sep=';')
     df_persons_from_synpop.drop(df_persons_from_synpop[df_persons_from_synpop.age <= 5].index, inplace=True)
     # Read MTMC data (only employees)
-    directory_home_office = Path('../data/output/data/estimation/')
-    data_file_name_home_office = 'persons.csv'
-    df_persons_home_office = pd.read_csv(directory_home_office / data_file_name_home_office, sep=';')
+    directory_telecommuting = Path('../data/output/data/estimation/')
+    data_file_name_telecommuting = 'persons.csv'
+    df_persons_telecommuting = pd.read_csv(directory_telecommuting / data_file_name_telecommuting, sep=';')
 
-    descriptive_statistics_income(df_persons_home_office, df_persons_from_synpop)
+    descriptive_statistics_income(df_persons_telecommuting, df_persons_from_synpop)
 
 
 def descriptive_statistics_synpop():
@@ -46,35 +46,34 @@ def descriptive_statistics_microcensus():
     descriptive_statistics_microcensus_employed(df_persons_full_sample)
     descriptive_statistics_microcensus_reasons_for_teleworking(df_persons_full_sample)
     ''' Statistics among people with a job and people who answered the question about home office '''
-    directory_home_office = Path('../data/output/data/estimation/')
-    data_file_name_home_office = 'persons.csv'
-    df_persons_home_office = pd.read_csv(directory_home_office / data_file_name_home_office, sep=';')
-    descriptive_statistics_microcensus_working_from_home_percentage(df_persons_home_office)
-    descriptive_statistics_microcensus_business_sector(df_persons_home_office)
-    descriptive_statistics_microcensus_work_position(df_persons_home_office)
-    descriptive_statistics_income(df_persons_home_office)
-    descriptive_statistics_home_work_distance(df_persons_home_office)
-    descriptive_statistics_microcensus_nationality(df_persons_home_office)
+    directory_telecommuting = Path('../data/output/data/estimation/')
+    data_file_name_telecommuting = 'persons.csv'
+    df_persons_telecommuting = pd.read_csv(directory_telecommuting / data_file_name_telecommuting, sep=';')
+    descriptive_statistics_microcensus_working_from_home_percentage(df_persons_telecommuting)
+    descriptive_statistics_microcensus_business_sector(df_persons_telecommuting)
+    descriptive_statistics_microcensus_work_position(df_persons_telecommuting)
+    descriptive_statistics_home_work_distance(df_persons_telecommuting)
+    descriptive_statistics_microcensus_nationality(df_persons_telecommuting)
 
 
 def descriptive_statistics_microcensus_reasons_for_teleworking(df_persons_full_sample):
-    df_persons_home_office_possible = \
+    df_persons_telecommuting_possible = \
         df_persons_full_sample[df_persons_full_sample['f81300'].isin([1, 2])]
-    df_persons_home_office_more_than_nothing = \
-        df_persons_home_office_possible[df_persons_home_office_possible['f81400'] > 0]
-    df_persons_home_office_with_a_reason = \
-        df_persons_home_office_more_than_nothing[df_persons_home_office_more_than_nothing['f81450'] > 0].copy()
-    nb_observations = len(df_persons_home_office_with_a_reason)
-    df_persons_home_office_with_a_reason['travel_time'] = df_persons_home_office_with_a_reason.f81450 == 1
-    df_persons_home_office_with_a_reason['workplace_is_home'] = df_persons_home_office_with_a_reason.f81450 == 2
-    df_persons_home_office_with_a_reason['congestion'] = df_persons_home_office_with_a_reason.f81450.isin([3, 4])
-    df_persons_home_office_with_a_reason['family_reasons'] = df_persons_home_office_with_a_reason.f81450 == 5
-    df_persons_home_office_with_a_reason['work_atmosphere'] = df_persons_home_office_with_a_reason.f81450 == 6
-    df_persons_home_office_with_a_reason['quiet'] = df_persons_home_office_with_a_reason.f81450 == 7
-    df_persons_home_office_with_a_reason['business_meeting_outside_of_work'] = \
-        df_persons_home_office_with_a_reason.f81450 == 8
-    df_persons_home_office_with_a_reason['other'] = df_persons_home_office_with_a_reason.f81450 == 9
-    weighted_avg_and_std = get_weighted_avg_and_std(df_persons_home_office_with_a_reason, weights='WP',
+    df_persons_telecommuting_more_than_nothing = \
+        df_persons_telecommuting_possible[df_persons_telecommuting_possible['f81400'] > 0]
+    df_persons_telecommuting_with_a_reason = \
+        df_persons_telecommuting_more_than_nothing[df_persons_telecommuting_more_than_nothing['f81450'] > 0].copy()
+    nb_observations = len(df_persons_telecommuting_with_a_reason)
+    df_persons_telecommuting_with_a_reason['travel_time'] = df_persons_telecommuting_with_a_reason.f81450 == 1
+    df_persons_telecommuting_with_a_reason['workplace_is_home'] = df_persons_telecommuting_with_a_reason.f81450 == 2
+    df_persons_telecommuting_with_a_reason['congestion'] = df_persons_telecommuting_with_a_reason.f81450.isin([3, 4])
+    df_persons_telecommuting_with_a_reason['family_reasons'] = df_persons_telecommuting_with_a_reason.f81450 == 5
+    df_persons_telecommuting_with_a_reason['work_atmosphere'] = df_persons_telecommuting_with_a_reason.f81450 == 6
+    df_persons_telecommuting_with_a_reason['quiet'] = df_persons_telecommuting_with_a_reason.f81450 == 7
+    df_persons_telecommuting_with_a_reason['business_meeting_outside_of_work'] = \
+        df_persons_telecommuting_with_a_reason.f81450 == 8
+    df_persons_telecommuting_with_a_reason['other'] = df_persons_telecommuting_with_a_reason.f81450 == 9
+    weighted_avg_and_std = get_weighted_avg_and_std(df_persons_telecommuting_with_a_reason, weights='WP',
                                                     list_of_columns=['travel_time',
                                                                      'workplace_is_home',
                                                                      'congestion',
@@ -132,64 +131,64 @@ def descriptive_statistics_microcensus_reasons_for_teleworking(df_persons_full_s
     fig.savefig(path / file_name)
 
 
-def descriptive_statistics_microcensus_working_from_home_percentage(df_persons_home_office):
-    df_persons_home_office_possible = \
-        df_persons_home_office[df_persons_home_office['home_office_is_possible'].isin([1, 2])]
-    df_persons_home_office_more_than_nothing = \
-        df_persons_home_office_possible[df_persons_home_office_possible['percentage_home_office'] > 0].copy()
-    nb_observations = len(df_persons_home_office_more_than_nothing)
+def descriptive_statistics_microcensus_working_from_home_percentage(df_persons_telecommuting):
+    df_persons_telecommuting_possible = \
+        df_persons_telecommuting[df_persons_telecommuting['telecommuting_is_possible'].isin([1, 2])]
+    df_persons_telecommuting_more_than_nothing = \
+        df_persons_telecommuting_possible[df_persons_telecommuting_possible['percentage_telecommuting'] > 0].copy()
+    nb_observations = len(df_persons_telecommuting_more_than_nothing)
     ''' Histogram '''
-    df_persons_home_office_more_than_nothing['percentage_home_office_1_10'] = \
-        (1 <= df_persons_home_office_more_than_nothing.percentage_home_office) & \
-        (df_persons_home_office_more_than_nothing.percentage_home_office <= 10)
-    df_persons_home_office_more_than_nothing['percentage_home_office_11_20'] = \
-        (11 <= df_persons_home_office_more_than_nothing.percentage_home_office) & \
-        (df_persons_home_office_more_than_nothing.percentage_home_office <= 20)
-    df_persons_home_office_more_than_nothing['percentage_home_office_21_30'] = \
-        (21 <= df_persons_home_office_more_than_nothing.percentage_home_office) & \
-        (df_persons_home_office_more_than_nothing.percentage_home_office <= 30)
-    df_persons_home_office_more_than_nothing['percentage_home_office_31_40'] = \
-        (31 <= df_persons_home_office_more_than_nothing.percentage_home_office) & \
-        (df_persons_home_office_more_than_nothing.percentage_home_office <= 40)
-    df_persons_home_office_more_than_nothing['percentage_home_office_41_50'] = \
-        (41 <= df_persons_home_office_more_than_nothing.percentage_home_office) & \
-        (df_persons_home_office_more_than_nothing.percentage_home_office <= 50)
-    df_persons_home_office_more_than_nothing['percentage_home_office_51_60'] = \
-        (51 <= df_persons_home_office_more_than_nothing.percentage_home_office) & \
-        (df_persons_home_office_more_than_nothing.percentage_home_office <= 60)
-    df_persons_home_office_more_than_nothing['percentage_home_office_61_70'] = \
-        (61 <= df_persons_home_office_more_than_nothing.percentage_home_office) & \
-        (df_persons_home_office_more_than_nothing.percentage_home_office <= 70)
-    df_persons_home_office_more_than_nothing['percentage_home_office_71_80'] = \
-        (71 <= df_persons_home_office_more_than_nothing.percentage_home_office) & \
-        (df_persons_home_office_more_than_nothing.percentage_home_office <= 80)
-    df_persons_home_office_more_than_nothing['percentage_home_office_81_90'] = \
-        (81 <= df_persons_home_office_more_than_nothing.percentage_home_office) & \
-        (df_persons_home_office_more_than_nothing.percentage_home_office <= 90)
-    df_persons_home_office_more_than_nothing['percentage_home_office_91_100'] = \
-        (91 <= df_persons_home_office_more_than_nothing.percentage_home_office) & \
-        (df_persons_home_office_more_than_nothing.percentage_home_office <= 100)
-    weighted_avg_and_std = get_weighted_avg_and_std(df_persons_home_office_more_than_nothing, weights='WP',
-                                                    list_of_columns=['percentage_home_office_1_10',
-                                                                     'percentage_home_office_11_20',
-                                                                     'percentage_home_office_21_30',
-                                                                     'percentage_home_office_31_40',
-                                                                     'percentage_home_office_41_50',
-                                                                     'percentage_home_office_51_60',
-                                                                     'percentage_home_office_61_70',
-                                                                     'percentage_home_office_71_80',
-                                                                     'percentage_home_office_81_90',
-                                                                     'percentage_home_office_91_100'])
-    weighted_avg_1_10 = weighted_avg_and_std[0]['percentage_home_office_1_10'][0]
-    weighted_avg_11_20 = weighted_avg_and_std[0]['percentage_home_office_11_20'][0]
-    weighted_avg_21_30 = weighted_avg_and_std[0]['percentage_home_office_21_30'][0]
-    weighted_avg_31_40 = weighted_avg_and_std[0]['percentage_home_office_31_40'][0]
-    weighted_avg_41_50 = weighted_avg_and_std[0]['percentage_home_office_41_50'][0]
-    weighted_avg_51_60 = weighted_avg_and_std[0]['percentage_home_office_51_60'][0]
-    weighted_avg_61_70 = weighted_avg_and_std[0]['percentage_home_office_61_70'][0]
-    weighted_avg_71_80 = weighted_avg_and_std[0]['percentage_home_office_71_80'][0]
-    weighted_avg_81_90 = weighted_avg_and_std[0]['percentage_home_office_81_90'][0]
-    weighted_avg_91_100 = weighted_avg_and_std[0]['percentage_home_office_91_100'][0]
+    df_persons_telecommuting_more_than_nothing['percentage_telecommuting_1_10'] = \
+        (1 <= df_persons_telecommuting_more_than_nothing.percentage_telecommuting) & \
+        (df_persons_telecommuting_more_than_nothing.percentage_telecommuting <= 10)
+    df_persons_telecommuting_more_than_nothing['percentage_telecommuting_11_20'] = \
+        (11 <= df_persons_telecommuting_more_than_nothing.percentage_telecommuting) & \
+        (df_persons_telecommuting_more_than_nothing.percentage_telecommuting <= 20)
+    df_persons_telecommuting_more_than_nothing['percentage_telecommuting_21_30'] = \
+        (21 <= df_persons_telecommuting_more_than_nothing.percentage_telecommuting) & \
+        (df_persons_telecommuting_more_than_nothing.percentage_telecommuting <= 30)
+    df_persons_telecommuting_more_than_nothing['percentage_telecommuting_31_40'] = \
+        (31 <= df_persons_telecommuting_more_than_nothing.percentage_telecommuting) & \
+        (df_persons_telecommuting_more_than_nothing.percentage_telecommuting <= 40)
+    df_persons_telecommuting_more_than_nothing['percentage_telecommuting_41_50'] = \
+        (41 <= df_persons_telecommuting_more_than_nothing.percentage_telecommuting) & \
+        (df_persons_telecommuting_more_than_nothing.percentage_telecommuting <= 50)
+    df_persons_telecommuting_more_than_nothing['percentage_telecommuting_51_60'] = \
+        (51 <= df_persons_telecommuting_more_than_nothing.percentage_telecommuting) & \
+        (df_persons_telecommuting_more_than_nothing.percentage_telecommuting <= 60)
+    df_persons_telecommuting_more_than_nothing['percentage_telecommuting_61_70'] = \
+        (61 <= df_persons_telecommuting_more_than_nothing.percentage_telecommuting) & \
+        (df_persons_telecommuting_more_than_nothing.percentage_telecommuting <= 70)
+    df_persons_telecommuting_more_than_nothing['percentage_telecommuting_71_80'] = \
+        (71 <= df_persons_telecommuting_more_than_nothing.percentage_telecommuting) & \
+        (df_persons_telecommuting_more_than_nothing.percentage_telecommuting <= 80)
+    df_persons_telecommuting_more_than_nothing['percentage_telecommuting_81_90'] = \
+        (81 <= df_persons_telecommuting_more_than_nothing.percentage_telecommuting) & \
+        (df_persons_telecommuting_more_than_nothing.percentage_telecommuting <= 90)
+    df_persons_telecommuting_more_than_nothing['percentage_telecommuting_91_100'] = \
+        (91 <= df_persons_telecommuting_more_than_nothing.percentage_telecommuting) & \
+        (df_persons_telecommuting_more_than_nothing.percentage_telecommuting <= 100)
+    weighted_avg_and_std = get_weighted_avg_and_std(df_persons_telecommuting_more_than_nothing, weights='WP',
+                                                    list_of_columns=['percentage_telecommuting_1_10',
+                                                                     'percentage_telecommuting_11_20',
+                                                                     'percentage_telecommuting_21_30',
+                                                                     'percentage_telecommuting_31_40',
+                                                                     'percentage_telecommuting_41_50',
+                                                                     'percentage_telecommuting_51_60',
+                                                                     'percentage_telecommuting_61_70',
+                                                                     'percentage_telecommuting_71_80',
+                                                                     'percentage_telecommuting_81_90',
+                                                                     'percentage_telecommuting_91_100'])
+    weighted_avg_1_10 = weighted_avg_and_std[0]['percentage_telecommuting_1_10'][0]
+    weighted_avg_11_20 = weighted_avg_and_std[0]['percentage_telecommuting_11_20'][0]
+    weighted_avg_21_30 = weighted_avg_and_std[0]['percentage_telecommuting_21_30'][0]
+    weighted_avg_31_40 = weighted_avg_and_std[0]['percentage_telecommuting_31_40'][0]
+    weighted_avg_41_50 = weighted_avg_and_std[0]['percentage_telecommuting_41_50'][0]
+    weighted_avg_51_60 = weighted_avg_and_std[0]['percentage_telecommuting_51_60'][0]
+    weighted_avg_61_70 = weighted_avg_and_std[0]['percentage_telecommuting_61_70'][0]
+    weighted_avg_71_80 = weighted_avg_and_std[0]['percentage_telecommuting_71_80'][0]
+    weighted_avg_81_90 = weighted_avg_and_std[0]['percentage_telecommuting_81_90'][0]
+    weighted_avg_91_100 = weighted_avg_and_std[0]['percentage_telecommuting_91_100'][0]
     fig, ax = plt.subplots()
 
     x = ['1-10%', '11-20%', '21-30%', '31-40%', '41-50%', '51-60%', '61-70%', '71-80%', '81-90%', '91-100%']
@@ -230,24 +229,24 @@ def descriptive_statistics_synpop_income(df_persons_from_synpop):
           df_persons_from_synpop_employed['hh_income_6509_or_less'].mean())
 
 
-def descriptive_statistics_income(df_persons_home_office, df_persons_from_synpop):
+def descriptive_statistics_income(df_persons_telecommuting, df_persons_from_synpop):
     ''' Proportion MTMC '''
-    df_persons_home_office['less_than_8000'] = df_persons_home_office.hh_income.isin([1, 2, 3, 4])
-    weighted_avg_and_std = get_weighted_avg_and_std(df_persons_home_office, weights='WP',
+    df_persons_telecommuting['less_than_8000'] = df_persons_telecommuting.hh_income.isin([1, 2, 3, 4])
+    weighted_avg_and_std = get_weighted_avg_and_std(df_persons_telecommuting, weights='WP',
                                                     list_of_columns=['less_than_8000'])
     weighted_avg_less_than_8000 = weighted_avg_and_std[0]['less_than_8000'][0]
     print('Proportion of employees with household income < 8000 CHF (MTMC):', weighted_avg_less_than_8000)
     ''' Histogram '''
-    df_persons_home_office['hh_income_less_than_2000'] = df_persons_home_office.hh_income == 1
-    df_persons_home_office['hh_income_2000_to_4000'] = df_persons_home_office.hh_income == 2
-    df_persons_home_office['hh_income_4001_to_6000'] = df_persons_home_office.hh_income == 3
-    df_persons_home_office['hh_income_6001_to_8000'] = df_persons_home_office.hh_income == 4
-    df_persons_home_office['hh_income_8001_to_10000'] = df_persons_home_office.hh_income == 5
-    df_persons_home_office['hh_income_10001_to_12000'] = df_persons_home_office.hh_income == 6
-    df_persons_home_office['hh_income_12001_to_14000'] = df_persons_home_office.hh_income == 7
-    df_persons_home_office['hh_income_14001_to_16000'] = df_persons_home_office.hh_income == 8
-    df_persons_home_office['hh_income_more_than_16000'] = df_persons_home_office.hh_income == 9
-    weighted_avg_and_std = get_weighted_avg_and_std(df_persons_home_office, weights='WP',
+    df_persons_telecommuting['hh_income_less_than_2000'] = df_persons_telecommuting.hh_income == 1
+    df_persons_telecommuting['hh_income_2000_to_4000'] = df_persons_telecommuting.hh_income == 2
+    df_persons_telecommuting['hh_income_4001_to_6000'] = df_persons_telecommuting.hh_income == 3
+    df_persons_telecommuting['hh_income_6001_to_8000'] = df_persons_telecommuting.hh_income == 4
+    df_persons_telecommuting['hh_income_8001_to_10000'] = df_persons_telecommuting.hh_income == 5
+    df_persons_telecommuting['hh_income_10001_to_12000'] = df_persons_telecommuting.hh_income == 6
+    df_persons_telecommuting['hh_income_12001_to_14000'] = df_persons_telecommuting.hh_income == 7
+    df_persons_telecommuting['hh_income_14001_to_16000'] = df_persons_telecommuting.hh_income == 8
+    df_persons_telecommuting['hh_income_more_than_16000'] = df_persons_telecommuting.hh_income == 9
+    weighted_avg_and_std = get_weighted_avg_and_std(df_persons_telecommuting, weights='WP',
                                                     list_of_columns=['hh_income_less_than_2000',
                                                                      'hh_income_2000_to_4000',
                                                                      'hh_income_4001_to_6000',
@@ -381,7 +380,6 @@ def descriptive_statistics_microcensus_work_position(df_persons):
 
 
 def descriptive_statistics_synpop_work_position(df_persons):
-    print(df_persons.position_in_bus.unique())
     df_persons_from_synpop_employed = df_persons[df_persons.position_in_bus.isin([1, 11, 12, 20])].copy()
     df_persons_from_synpop_employed['cadres'] = df_persons_from_synpop_employed.position_in_bus.isin([1, 11, 12])
     df_persons_from_synpop_employed['employees'] = df_persons_from_synpop_employed. position_in_bus == 20

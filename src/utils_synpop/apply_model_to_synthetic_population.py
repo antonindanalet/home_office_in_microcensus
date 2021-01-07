@@ -21,17 +21,17 @@ def apply_model_to_synthetic_population(betas, output_directory_for_simulation, 
         raise Exception('Year not well defined!')
     run_simulation(data_file_directory_for_simulation, data_file_name_for_simulation, output_directory_for_simulation,
                    betas, household_income_limit)
-    predicted_rate_of_home_office = get_predicted_rate_of_home_office(output_directory_for_simulation)
-    return predicted_rate_of_home_office
+    predicted_rate_of_telecommuting = get_predicted_rate_of_telecommuting(output_directory_for_simulation)
+    return predicted_rate_of_telecommuting
 
 
-def get_predicted_rate_of_home_office(synpop_directory):
-    synpop_filename = 'persons_from_SynPop_with_probability_home_office.csv'
+def get_predicted_rate_of_telecommuting(synpop_directory):
+    synpop_filename = 'persons_from_SynPop_with_probability_telecommuting.csv'
     # Get the data
     df_persons = pd.read_csv(synpop_directory / synpop_filename, sep=',')
     df_persons.drop(df_persons[df_persons.position_in_bus.isin([-99, 0, 3])].index, inplace=True)
-    predicted_rate_of_home_office = df_persons['Prob. home office'].mean()
-    return predicted_rate_of_home_office
+    predicted_rate_of_telecommuting = df_persons['Prob. telecommuting'].mean()
+    return predicted_rate_of_telecommuting
 
 
 def run_simulation(data_file_directory_for_simulation, data_file_name_for_simulation, output_directory_for_simulation,
@@ -111,56 +111,56 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
     rural_work = urban_rural_typology_work == 3
 
     #  Utility
-    utility_function_home_office = alternative_specific_constant + \
-                                   b_executives * executives + \
-                                   b_no_post_school_education * no_post_school_educ + \
-                                   b_secondary_education * secondary_education + \
-                                   b_tertiary_education * tertiary_education + \
-                                   b_university * university + \
-                                   b_male * male + \
-                                   b_public_transport_connection_quality_na_home * public_transport_quality_NA_home + \
-                                   b_public_transport_connection_quality_a_work * public_transport_quality_A_work + \
-                                   b_rural_work * rural_work + \
-                                   b_home_work_distance * home_work_distance + \
-                                   models.piecewiseFormula(age, [0, 20, 35, 75, 200]) + \
-                                   b_business_sector_agriculture * business_sector_agriculture + \
-                                   b_business_sector_retail * business_sector_retail + \
-                                   b_business_sector_gastronomy * business_sector_gastronomy + \
-                                   b_business_sector_finance * business_sector_finance + \
-                                   b_business_sector_production * business_sector_production + \
-                                   b_business_sector_wholesale * business_sector_wholesale + \
-                                   b_business_sector_services_fc * business_sector_services_fC + \
-                                   b_business_sector_other_services * business_sector_other_services + \
-                                   b_business_sector_others * business_sector_others + \
-                                   b_business_sector_non_movers * business_sector_non_movers + \
-                                   b_german * german + \
-                                   b_nationality_ch_germany_france_italy_nw_e * nationality_switzerland + \
-                                   b_nationality_ch_germany_france_italy_nw_e * nationality_germany_austria + \
-                                   b_nationality_ch_germany_france_italy_nw_e * nationality_italy_vatican + \
-                                   b_nationality_ch_germany_france_italy_nw_e * nationality_france_monaco_san_marino + \
-                                   b_nationality_ch_germany_france_italy_nw_e * nationality_northwestern_europe + \
-                                   b_nationality_ch_germany_france_italy_nw_e * nationality_eastern_europe + \
-                                   models.piecewiseFormula(work_percentage, [0, 90, 101]) + \
-                                   b_hh_income_8000_or_less * hh_income_8000_or_less
-    utility_function_no_home_office = 0
+    utility_function_telecommuting = alternative_specific_constant + \
+                                     b_executives * executives + \
+                                     b_no_post_school_education * no_post_school_educ + \
+                                     b_secondary_education * secondary_education + \
+                                     b_tertiary_education * tertiary_education + \
+                                     b_university * university + \
+                                     b_male * male + \
+                                     b_public_transport_connection_quality_na_home * public_transport_quality_NA_home + \
+                                     b_public_transport_connection_quality_a_work * public_transport_quality_A_work + \
+                                     b_rural_work * rural_work + \
+                                     b_home_work_distance * home_work_distance + \
+                                     models.piecewiseFormula(age, [0, 20, 35, 75, 200]) + \
+                                     b_business_sector_agriculture * business_sector_agriculture + \
+                                     b_business_sector_retail * business_sector_retail + \
+                                     b_business_sector_gastronomy * business_sector_gastronomy + \
+                                     b_business_sector_finance * business_sector_finance + \
+                                     b_business_sector_production * business_sector_production + \
+                                     b_business_sector_wholesale * business_sector_wholesale + \
+                                     b_business_sector_services_fc * business_sector_services_fC + \
+                                     b_business_sector_other_services * business_sector_other_services + \
+                                     b_business_sector_others * business_sector_others + \
+                                     b_business_sector_non_movers * business_sector_non_movers + \
+                                     b_german * german + \
+                                     b_nationality_ch_germany_france_italy_nw_e * nationality_switzerland + \
+                                     b_nationality_ch_germany_france_italy_nw_e * nationality_germany_austria + \
+                                     b_nationality_ch_germany_france_italy_nw_e * nationality_italy_vatican + \
+                                     b_nationality_ch_germany_france_italy_nw_e * nationality_france_monaco_san_marino + \
+                                     b_nationality_ch_germany_france_italy_nw_e * nationality_northwestern_europe + \
+                                     b_nationality_ch_germany_france_italy_nw_e * nationality_eastern_europe + \
+                                     models.piecewiseFormula(work_percentage, [0, 90, 101]) + \
+                                     b_hh_income_8000_or_less * hh_income_8000_or_less
+    utility_function_no_telecommuting = 0
 
     # Associate utility functions with the numbering of alternatives
-    utility_functions_with_numbering_of_alternatives = {1: utility_function_home_office,  # Yes or sometimes
-                                                        3: utility_function_no_home_office}  # No
+    utility_functions_with_numbering_of_alternatives = {1: utility_function_telecommuting,  # Yes or sometimes
+                                                        3: utility_function_no_telecommuting}  # No
 
     availability_conditions = {1: 1,  # Always available
                                3: 1}  # Always available
 
     # The choice model is a logit, with availability conditions
-    prob_home_office = models.logit(utility_functions_with_numbering_of_alternatives, availability_conditions, 1)
-    prob_no_home_office = models.logit(utility_functions_with_numbering_of_alternatives, availability_conditions, 3)
+    prob_telecommuting = models.logit(utility_functions_with_numbering_of_alternatives, availability_conditions, 1)
+    prob_no_telecommuting = models.logit(utility_functions_with_numbering_of_alternatives, availability_conditions, 3)
 
-    simulate = {'Prob. home office': prob_home_office,
-                'Prob. no home office': prob_no_home_office}
+    simulate = {'Prob. telecommuting': prob_telecommuting,
+                'Prob. no telecommuting': prob_no_telecommuting}
 
     # Create the Biogeme object
     biogeme = bio.BIOGEME(database, simulate)
-    biogeme.modelName = 'logit_home_office_simul'
+    biogeme.modelName = 'logit_telecommuting_simul'
 
     # Define level of verbosity
     logger = msg.bioMessage()
@@ -171,9 +171,9 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
 
     # Get the betas from the estimation (without corrections)
     # path_to_estimation_folder = Path('../data/output/models/estimation/')
-    # if os.path.isfile(path_to_estimation_folder / 'logit_home_office~00.pickle'):
+    # if os.path.isfile(path_to_estimation_folder / 'logit_telecommuting~00.pickle'):
     #     raise Exception('There are several model outputs! Careful.')
-    # results = res.bioResults(pickleFile=path_to_estimation_folder / 'logit_home_office.pickle')
+    # results = res.bioResults(pickleFile=path_to_estimation_folder / 'logit_telecommuting.pickle')
     # betas_without_correction = results.getBetaValues()
 
     # Change the working directory, so that biogeme writes in the correct folder, i.e., where this file is
@@ -188,18 +188,19 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
     os.chdir(standard_directory)
 
     # For unemployed people, fix probability of doing some home office to 0 (and probability of not doing to 1).
-    df_persons.loc[df_persons.employed == 0, 'Prob. home office'] = 0.0  # Unemployed people
-    df_persons.loc[df_persons.employed == 0, 'Prob. no home office'] = 1.0  # Unemployed people
-    df_persons.loc[df_persons.employed == -99, 'Prob. home office'] = 0.0  # Other people
-    df_persons.loc[df_persons.employed == -99, 'Prob. no home office'] = 1.0  # Other people
+    df_persons.loc[df_persons.employed == 0, 'Prob. telecommuting'] = 0.0  # Unemployed people
+    df_persons.loc[df_persons.employed == 0, 'Prob. no telecommuting'] = 1.0  # Unemployed people
+    df_persons.loc[df_persons.employed == -99, 'Prob. telecommuting'] = 0.0  # Other people
+    df_persons.loc[df_persons.employed == -99, 'Prob. no telecommuting'] = 1.0  # Other people
     # By definition, apprentices don't work from home (because they were not asked in the MTMC)
-    df_persons.loc[df_persons.position_in_bus == 3, 'Prob. home office'] = 0.0
-    df_persons.loc[df_persons.position_in_bus == 3, 'Prob. no home office'] = 1.0
+    df_persons.loc[df_persons.position_in_bus == 3, 'Prob. telecommuting'] = 0.0
+    df_persons.loc[df_persons.position_in_bus == 3, 'Prob. no telecommuting'] = 1.0
 
     # Add a realisation of the probability
     df_persons['random 0/1'] = np.random.rand(len(df_persons))
-    df_persons['Home office 0/1'] = np.where(df_persons['random 0/1'] < df_persons['Prob. home office'], 1, 0)
+    df_persons['telecommuting_model'] = np.where(df_persons['random 0/1'] < df_persons['Prob. telecommuting'], 1, 0)
+    del df_persons['random 0/1']
 
     ''' Save the file '''
-    data_file_name = 'persons_from_SynPop_with_probability_home_office.csv'
+    data_file_name = 'persons_from_SynPop_with_probability_telecommuting.csv'
     df_persons.to_csv(output_directory_for_simulation / data_file_name, sep=',', index=False)

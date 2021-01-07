@@ -248,25 +248,25 @@ def apply_model_to_microcensus(data_file_directory_for_simulation, data_file_nam
         b_hh_income_more_than_8000 * hh_income_12001_to_14000 + \
         b_hh_income_more_than_8000 * hh_income_14001_to_16000 + \
         b_hh_income_more_than_8000 * hh_income_more_than_16000
-    U_No_home_office = 0
+    U_No_telecommuting = 0
 
     # Associate utility functions with the numbering of alternatives
     V = {1: U,  # Yes or sometimes
-         0: U_No_home_office}  # No
+         0: U_No_telecommuting}  # No
 
     av = {1: 1,
           0: 1}
 
     # The choice model is a logit, with availability conditions
-    prob_home_office = models.logit(V, av, 1)
-    prob_no_home_office = models.logit(V, av, 0)
+    prob_telecommuting = models.logit(V, av, 1)
+    prob_no_telecommuting = models.logit(V, av, 0)
 
-    simulate = {'Prob. home office': prob_home_office,
-                'Prob. no home office': prob_no_home_office}
+    simulate = {'Prob. telecommuting': prob_telecommuting,
+                'Prob. no telecommuting': prob_no_telecommuting}
 
     # Create the Biogeme object
     biogeme = bio.BIOGEME(database, simulate)
-    biogeme.modelName = 'logit_home_office_simul'
+    biogeme.modelName = 'logit_telecommuting_simul'
     # Get the betas from the estimation
     if betas is None:
         if os.path.isfile(path_to_estimated_betas / (estimated_betas_name + '~00.pickle')):

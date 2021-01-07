@@ -3,7 +3,7 @@ import pandas as pd
 from math import isnan
 import numpy as np
 # import shapely
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import geopandas
 
 
@@ -173,17 +173,17 @@ def get_persons_from_synthetic_population(year):
     df_hh_income = df_persons[['household_id', 'income']].groupby(['household_id']).sum()  # Aggregate over people
     df_hh_income = df_hh_income.rename(columns={'income': 'hh_income'})  # Rename the variable
     df_hh_income['hh_income'] = df_hh_income['hh_income'] / 12.0  # Transform from yearly to monthly income
-    # df_hh_income['hh_income_category'] = np.select(condlist=[df_hh_income['hh_income'] < 2000,
-    #                                                          df_hh_income['hh_income'].between(2000, 4000),
-    #                                                          df_hh_income['hh_income'].between(4001, 6000),
-    #                                                          df_hh_income['hh_income'].between(6001, 8000),
-    #                                                          df_hh_income['hh_income'].between(8001, 10000),
-    #                                                          df_hh_income['hh_income'].between(10001, 12000),
-    #                                                          df_hh_income['hh_income'].between(12001, 14000),
-    #                                                          df_hh_income['hh_income'].between(14001, 16000),
-    #                                                          16000 < df_hh_income['hh_income']],
-    #                                                choicelist=[1, 2, 3, 4, 5, 6, 7, 8, 9],
-    #                                                default=-98)  # Transform CHF to MTMC categories
+    df_hh_income['hh_income_category'] = np.select(condlist=[df_hh_income['hh_income'] < 2000,
+                                                             df_hh_income['hh_income'].between(2000, 4000),
+                                                             df_hh_income['hh_income'].between(4001, 6000),
+                                                             df_hh_income['hh_income'].between(6001, 8000),
+                                                             df_hh_income['hh_income'].between(8001, 10000),
+                                                             df_hh_income['hh_income'].between(10001, 12000),
+                                                             df_hh_income['hh_income'].between(12001, 14000),
+                                                             df_hh_income['hh_income'].between(14001, 16000),
+                                                             16000 < df_hh_income['hh_income']],
+                                                   choicelist=[1, 2, 3, 4, 5, 6, 7, 8, 9],
+                                                   default=-98)  # Transform CHF to MTMC categories
     df_persons = pd.merge(df_persons, df_hh_income, on='household_id', how='left')  # Add the result to df_persons
     del df_persons['income']
     return df_persons

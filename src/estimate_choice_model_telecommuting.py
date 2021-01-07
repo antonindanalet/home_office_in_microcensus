@@ -7,10 +7,10 @@ import biogeme.models as models
 from biogeme.expressions import Beta, DefineVariable, bioMin
 import os
 from utils_mtmc.get_mtmc_files import get_zp, get_hh
-from utils_mtmc.define_home_office_variable import define_home_office_variable
+from utils_mtmc.define_telecommuting_variable import define_telecommuting_variable
 
 
-def estimate_choice_model_home_office():
+def estimate_choice_model_telecommuting():
     generate_data_file()
     data_file_directory = Path('../data/output/data/estimation/')
     data_file_name = 'persons.csv'
@@ -18,7 +18,7 @@ def estimate_choice_model_home_office():
     run_estimation(data_file_directory, data_file_name, output_directory)
 
 
-def run_estimation(data_file_directory, data_file_name, output_directory, output_file_name='logit_home_office'):
+def run_estimation(data_file_directory, data_file_name, output_directory, output_file_name='logit_telecommuting'):
     """
     :author: Antonin Danalet, based on the example '01logit.py' by Michel Bierlaire, EPFL, on biogeme.epfl.ch
 
@@ -327,11 +327,11 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_hh_income_more_than_8000 * hh_income_12001_to_14000 + \
         b_hh_income_more_than_8000 * hh_income_14001_to_16000 + \
         b_hh_income_more_than_8000 * hh_income_more_than_16000
-    U_No_home_office = 0
+    U_No_telecommuting = 0
 
     # Associate utility functions with the numbering of alternatives
     V = {1: U,  # Yes or sometimes
-         0: U_No_home_office}  # No
+         0: U_No_telecommuting}  # No
 
     av = {1: 1,
           0: 1}
@@ -339,7 +339,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     # Definition of the model. This is the contribution of each
     # observation to the log likelihood function.
     logprob = models.loglogit(V, av,  # All alternatives are supposed to be always available
-                              home_office)  # Choice variable
+                              telecommuting)  # Choice variable
 
     # Change the working directory, so that biogeme writes in the correct folder, i.e., where this file is
     standard_directory = os.getcwd()
@@ -357,7 +357,6 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
 
     # Get the results in a pandas table
     pandas_results = results.getEstimatedParameters()
-    print(pandas_results)
 
     # Go back to the normal working directory
     os.chdir(standard_directory)
@@ -440,22 +439,22 @@ def generate_data_file():
     # Rename the variables
     df_zp = df_zp.rename(columns={'gesl': 'sex',
                                   'HAUSB': 'highest_educ',
-                                  'f81300': 'home_office_is_possible',
+                                  'f81300': 'telecommuting_is_possible',
                                   'hhtyp': 'hh_type',
                                   'W_OeV_KLASSE': 'public_transport_connection_quality_ARE_home',
                                   'alter': 'age',
-                                  'f81400': 'percentage_home_office',
+                                  'f81400': 'percentage_telecommuting',
                                   'sprache': 'language',
                                   'f40900': 'full_part_time_job',
                                   'f40901_02': 'percentage_first_part_time_job',
                                   'f40903': 'percentage_second_part_time_job',
                                   'F20601': 'hh_income'})
     ''' Removing people who did not get the question or did not answer. '''
-    df_zp.drop(df_zp[df_zp.home_office_is_possible < 0].index, inplace=True)
-    df_zp.drop(df_zp[df_zp.percentage_home_office == -98].index, inplace=True)
-    df_zp.drop(df_zp[df_zp.percentage_home_office == -97].index, inplace=True)
+    df_zp.drop(df_zp[df_zp.telecommuting_is_possible < 0].index, inplace=True)
+    df_zp.drop(df_zp[df_zp.percentage_telecommuting == -98].index, inplace=True)
+    df_zp.drop(df_zp[df_zp.percentage_telecommuting == -97].index, inplace=True)
     ''' Define the variable home office as "possibility to do home office" and "practically do some" '''
-    df_zp['home_office'] = df_zp.apply(define_home_office_variable, axis=1)
+    df_zp['telecommuting'] = df_zp.apply(define_telecommuting_variable, axis=1)
     ''' Test that no column contains NA values '''
     for column in df_zp.columns:
         if df_zp[column].isna().any():
