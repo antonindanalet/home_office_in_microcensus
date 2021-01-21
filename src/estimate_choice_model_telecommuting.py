@@ -35,10 +35,10 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     # Parameters to be estimated
     alternative_specific_constant = Beta('alternative_specific_constant', 0, None, None, 0)
 
-    b_no_post_school_education = Beta('b_no_post_school_education', 0, None, None, 0)
+    b_no_post_school_education = Beta('b_no_post_school_education', 0, None, None, 1)
     b_secondary_education = Beta('b_secondary_education', 0, None, None, 0)
     b_tertiary_education = Beta('b_tertiary_education', 0, None, None, 0)
-    b_university = Beta('b_university', 0, None, None, 1)
+    b_university = Beta('b_university', 0, None, None, 0)
 
     b_male = Beta('b_male', 0, None, None, 0)
 

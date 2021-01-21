@@ -29,7 +29,7 @@ def get_predicted_rate_of_telecommuting(synpop_directory):
     synpop_filename = 'persons_from_SynPop_with_probability_telecommuting.csv'
     # Get the data
     df_persons = pd.read_csv(synpop_directory / synpop_filename, sep=',')
-    df_persons.drop(df_persons[df_persons.position_in_bus.isin([-99, 0, 3])].index, inplace=True)
+    df_persons.drop(df_persons[df_persons.position_in_bus.isin([-99, 0, 3])].index, inplace=True)  # Keep only employees
     predicted_rate_of_telecommuting = df_persons['Prob. telecommuting'].mean()
     return predicted_rate_of_telecommuting
 
@@ -50,10 +50,10 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
 
     # Parameters to be estimated
     alternative_specific_constant = Beta('alternative_specific_constant', 0, None, None, 0)
-    b_no_post_school_education = Beta('b_no_post_school_education', 0, None, None, 0)
+    b_no_post_school_education = Beta('b_no_post_school_education', 0, None, None, 1)
     b_secondary_education = Beta('b_secondary_education', 0, None, None, 0)
     b_tertiary_education = Beta('b_tertiary_education', 0, None, None, 0)
-    b_university = Beta('b_university', 0, None, None, 1)
+    b_university = Beta('b_university', 0, None, None, 0)
     b_male = Beta('b_male', 0, None, None, 0)
     b_public_transport_connection_quality_na_home = Beta('b_public_transport_connection_quality_na_home',
                                                          0, None, None, 0)

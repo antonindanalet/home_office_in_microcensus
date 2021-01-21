@@ -16,13 +16,13 @@ def calibrate_the_constant_by_simulating_on_synthetic_population(betas):
     # print('Proportion of home office (synpop):', predicted_rate_of_telecommuting)
     path_to_estimation_file = Path('../data/output/data/estimation/')
     estimation_file_name = 'persons.csv'
-    observed_rate_of_telecommuting = compute_observed_rate_of_telecommuting(path_to_estimation_file, estimation_file_name)
+    observed_rate_of_telecommuting = compute_observed_rate_of_telecommuting(path_to_estimation_file,
+                                                                            estimation_file_name)
     household_income_limit = compute_household_income_limit(year=2017)
     while abs(observed_rate_of_telecommuting - predicted_rate_of_telecommuting) > 0.001:
         betas = update_constant(betas, observed_rate_of_telecommuting, predicted_rate_of_telecommuting)
-        # print(betas['alternative_specific_constant'])
-        predicted_rate_of_telecommuting = compute_predicted_rate_of_telecommuting_for_syn_pop(betas, household_income_limit)
-        # print('Final beta:', betas['alternative_specific_constant'])
+        predicted_rate_of_telecommuting = compute_predicted_rate_of_telecommuting_for_syn_pop(betas,
+                                                                                              household_income_limit)
     print('Final alternative specific constant:', betas['alternative_specific_constant'])
     return betas
 

@@ -14,5 +14,5 @@ def apply_model_to_syn_pop_2050(betas):
         household_income_limit = compute_household_income_limit(year)
         print('Household income limit used in', str(year) + ':', household_income_limit)
         predicted_rate_of_telecommuting = apply_model_to_synthetic_population(betas, output_directory_for_simulation,
-                                                                            household_income_limit, year)
+                                                                              household_income_limit, year)
         print('Proportion of telecommuting (synpop) in', str(year) + ':', predicted_rate_of_telecommuting)
