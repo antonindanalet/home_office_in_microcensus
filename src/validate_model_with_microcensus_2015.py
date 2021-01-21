@@ -33,10 +33,10 @@ def validate_model_with_microcensus_2015():
                                output_directory_for_simulation, output_file_name,
                                path_to_estimated_betas, estimated_betas_name)
     # Compute the proportion of people doing home office in the data and in the simulation
-    compute_proportion_of_people_doing_telecommuting()
+    compute_proportion_of_people_telecommuting()
 
 
-def compute_proportion_of_people_doing_telecommuting():
+def compute_proportion_of_people_telecommuting():
     """ This function computes the observed and predicted proportion of people working from home
     (among the 20% of the original dataset). """
     ''' Get the data '''
@@ -46,15 +46,15 @@ def compute_proportion_of_people_doing_telecommuting():
     print('Observed proportion of people telecommuting (unweighted):',
           str(100 * round(df_persons['telecommuting'].mean(), 3)) + '%')
     print('Predicted proportion of people telecommuting (unweighted):',
-          str(100 * round(df_persons['Prob. home office'].mean(), 3)) + '%')
+          str(100 * round(df_persons['Prob. telecommuting'].mean(), 3)) + '%')
     weighted_avg_and_std = get_weighted_avg_and_std(df_persons, weights='WP',
                                                     list_of_columns=['telecommuting', 'Prob. telecommuting'])
     weighted_avg = round(weighted_avg_and_std[0]['telecommuting'][0], 3) * 100
     weighted_std = round(weighted_avg_and_std[0]['telecommuting'][1], 3) * 100
     print('Observed proportion of people telecommuting (weighted):', str(weighted_avg) + '% (+/-',
           str(weighted_std) + '%)')
-    weighted_avg = round(weighted_avg_and_std[0]['Prob. home office'][0], 3) * 100
-    weighted_std = round(weighted_avg_and_std[0]['Prob. home office'][1], 3) * 100
+    weighted_avg = round(weighted_avg_and_std[0]['Prob. telecommuting'][0], 3) * 100
+    weighted_std = round(weighted_avg_and_std[0]['Prob. telecommuting'][1], 3) * 100
     print('Predicted proportion of people telecommuting (weighted):', str(weighted_avg) + '% (+/-',
           str(weighted_std) + '%)')
 
