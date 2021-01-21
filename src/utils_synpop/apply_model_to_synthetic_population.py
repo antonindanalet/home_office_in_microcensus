@@ -50,10 +50,10 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
 
     # Parameters to be estimated
     alternative_specific_constant = Beta('alternative_specific_constant', 0, None, None, 0)
-    b_no_post_school_education = Beta('b_no_post_school_education', 0, None, None, 1)
+    b_no_post_school_education = Beta('b_no_post_school_education', 0, None, None, 0)
     b_secondary_education = Beta('b_secondary_education', 0, None, None, 0)
     b_tertiary_education = Beta('b_tertiary_education', 0, None, None, 0)
-    b_university = Beta('b_university', 0, None, None, 0)
+    b_university = Beta('b_university', 0, None, None, 1)
     b_male = Beta('b_male', 0, None, None, 0)
     b_public_transport_connection_quality_na_home = Beta('b_public_transport_connection_quality_na_home',
                                                          0, None, None, 0)
@@ -103,7 +103,7 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
     nationality_switzerland = nation == 0
     nationality_germany_austria = nation == 1
     nationality_italy_vatican = nation == 2
-    nationality_france_monaco_san_marino = nation == 3
+    nationality_france_monaco_s_marino = nation == 3
     nationality_northwestern_europe = nation == 4
     nationality_eastern_europe = nation == 7
     hh_income_8000_or_less = hh_income < household_income_limit
@@ -137,7 +137,7 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
                                      b_nationality_ch_germany_france_italy_nw_e * nationality_switzerland + \
                                      b_nationality_ch_germany_france_italy_nw_e * nationality_germany_austria + \
                                      b_nationality_ch_germany_france_italy_nw_e * nationality_italy_vatican + \
-                                     b_nationality_ch_germany_france_italy_nw_e * nationality_france_monaco_san_marino + \
+                                     b_nationality_ch_germany_france_italy_nw_e * nationality_france_monaco_s_marino + \
                                      b_nationality_ch_germany_france_italy_nw_e * nationality_northwestern_europe + \
                                      b_nationality_ch_germany_france_italy_nw_e * nationality_eastern_europe + \
                                      models.piecewiseFormula(work_percentage, [0, 90, 101]) + \
