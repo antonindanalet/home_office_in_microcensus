@@ -85,7 +85,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_business_sector_retail = Beta('b_business_sector_retail', 0, None, None, 0)
     b_business_sector_gastronomy = Beta('b_business_sector_gastronomy', 0, None, None, 0)
     b_business_sector_finance = Beta('b_business_sector_finance', 0, None, None, 1)
-    b_business_sector_services_fC = Beta('b_business_sector_services_fC', 0, None, None, 0)
+    b_business_sector_services_fc = Beta('b_business_sector_services_fc', 0, None, None, 0)
     b_business_sector_other_services = Beta('b_business_sector_other_services', 0, None, None, 1)
     b_business_sector_others = Beta('b_business_sector_others', 0, None, None, 1)
     b_business_sector_non_movers = Beta('b_business_sector_non_movers', 0, None, None, 0)
@@ -172,7 +172,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
                                                 (10 <= noga_08 <= 35) | (40 <= noga_08 <= 44), database)
     business_sector_wholesale = DefineVariable('business_sector_wholesale',
                                                (45 <= noga_08 <= 45) | (49 <= noga_08 <= 54), database)
-    business_sector_services_fC = DefineVariable('business_sector_services_fC',
+    business_sector_services_fc = DefineVariable('business_sector_services_fc',
                                                  (60 <= noga_08 <= 63) | (69 <= noga_08 <= 83) | (noga_08 == 58),
                                                  database)
     business_sector_other_services = DefineVariable('business_sector_other_services',
@@ -302,7 +302,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_business_sector_finance * business_sector_finance + \
         b_business_sector_production * business_sector_production + \
         b_business_sector_wholesale * business_sector_wholesale + \
-        b_business_sector_services_fC * business_sector_services_fC + \
+        b_business_sector_services_fc * business_sector_services_fc + \
         b_business_sector_other_services * business_sector_other_services + \
         b_business_sector_others * business_sector_others + \
         b_business_sector_non_movers * business_sector_non_movers + \
@@ -354,9 +354,6 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
 
     # Get the results in LaTeX
     results.writeLaTeX()
-
-    # Get the results in a pandas table
-    pandas_results = results.getEstimatedParameters()
 
     # Go back to the normal working directory
     os.chdir(standard_directory)
