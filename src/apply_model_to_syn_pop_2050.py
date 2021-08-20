@@ -9,6 +9,11 @@ from utils_mtmc.get_percentage_telecommuting import get_percentage_telecommuting
 
 def apply_model_to_syn_pop_2050(betas):
     dict_results = compute_forecasts(betas)
+    # Add zeros for years multiple of 5 that are not observed nor forecasted, so that the x-axis is reasonable
+    dict_results[2020] = 0
+    dict_results[2025] = 0
+    dict_results[2035] = 0
+    dict_results[2045] = 0
     for year in [2010, 2015]:
         dict_results[year] = get_percentage_telecommuting(year)
     generate_figure_results(dict_results)
@@ -24,8 +29,8 @@ def generate_figure_results(dict_results):
     ax.grid(axis='y', zorder=0)
     ax.bar(range(len(dict_results)), dict_results.values(), color=(22/255, 141/255, 180/255, 1), zorder=3)
 
-    # Create names on the x-axis
-    plt.xticks(range(len(dict_results)), list(dict_results.keys()))
+    # Create names on the x-axis (use empty label when there is no value - in the dict: 0)
+    plt.xticks(range(len(dict_results)), [2010, 2015, "", "", 2030, "", 2040, "", 2050])
 
     plt.yticks([0.1, 0.2, 0.3, 0.4], ['10%', '20%', '30%', '40%'])
 
