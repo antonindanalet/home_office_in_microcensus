@@ -1,7 +1,7 @@
 # Home-based telecommuting in Switzerland, 2015-2050
 
 This codes estimates a binary logit from the data of the Mobility and Transport Microcensus 2015 explaining the "choice" of making - at least from time to time - home office. The outputs are available in an HTML file.
-The results are described in a conference paper, "<a href="http://strc.ch/2021/Danalet_EtAl_2.pdf">Working from home in Switzerland, 2015-2050</a>", published for the <a href="http://strc.ch/2021.php">21th</a> <a href="http://strc.ch/">Swiss Transport Research Conference</a>.
+The results are described in a conference paper, "<a href="http://strc.ch/2021/Danalet_EtAl_2.pdf">Working from home in Switzerland, 2015-2050</a>", published for the <a href="http://strc.ch/2021.php">21th</a> <a href="http://strc.ch/">Swiss Transport Research Conference (STRC)</a>.
 
 ## Getting Started
 
