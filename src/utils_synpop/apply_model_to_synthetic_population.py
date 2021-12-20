@@ -73,7 +73,6 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
     b_business_sector_non_movers = Beta('b_business_sector_non_movers', 0, None, None, 0)
     b_executives = Beta('b_executives', 0, None, None, 0)
     b_german = Beta('b_german', 0, None, None, 0)
-    b_nationality_ch_germany_france_italy_nw_e = Beta('b_nationality_ch_germany_france_italy_nw_e', 0, None, None, 0)
     b_hh_income_8000_or_less = Beta('b_hh_income_8000_or_less', 0, None, None, 0)
 
     # Definition of new variables
