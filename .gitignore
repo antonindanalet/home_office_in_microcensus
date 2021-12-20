@@ -27,3 +27,5 @@
 /data/output/models/application_to_SynPop_2040/persons_from_SynPop_with_probability_telecommuting.csv
 /data/output/models/application_to_SynPop_2050/persons_from_SynPop_with_probability_telecommuting.csv
 /data/input/mtmc/2010/zielpersonen.csv
+/data/input/mtmc/2020/haushalte.csv
+/data/input/mtmc/2020/zielpersonen.csv
