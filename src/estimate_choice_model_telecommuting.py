@@ -12,7 +12,7 @@ from utils_mtmc.define_telecommuting_variable import define_telecommuting_variab
 
 def estimate_choice_model_telecommuting():
     generate_data_file()
-    data_file_directory = Path('../data/output/data/estimation/')
+    data_file_directory = Path('../data/output/data/estimation/2015/')
     data_file_name = 'persons.csv'
     output_directory = '../data/output/models/estimation/'
     run_estimation(data_file_directory, data_file_name, output_directory)
@@ -78,6 +78,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_intermediate_work = Beta('b_intermediate_work', 0, None, None, 1)
 
     b_home_work_distance = Beta('b_home_work_distance', 0, None, None, 0)
+    b_no_home_work_distance = Beta('b_no_home_work_distance', 0, None, None, 0)
 
     b_business_sector_agriculture = Beta('b_business_sector_agriculture', 0, lowerbound=0, upperbound=2, status=0)
     b_business_sector_production = Beta('b_business_sector_production', 0, None, None, 0)
@@ -92,7 +93,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_employees = Beta('b_employees', 0, None, None, 1)
     b_executives = Beta('b_executives', 0, None, None, 0)
     b_german = Beta('b_german', 0, None, None, 0)
-    b_nationality_ch_germany_france_italy_nw_e = Beta('b_nationality_ch_germany_france_italy_nw_e', 0, None, None, 0)
+    b_nationality_ch_germany_france_italy_nw_e = Beta('b_nationality_ch_germany_france_italy_nw_e', 0, None, None, 1)
     b_nationality_south_west_europe = Beta('b_nationality_south_west_europe', 0, None, None, 1)
     b_nationality_southeast_europe = Beta('b_nationality_southeast_europe', 0, None, None, 1)
     b_several_part_time_jobs = Beta('b_several_part_time_jobs', 0, None, None, 1)
@@ -163,6 +164,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     home_work_distance = DefineVariable('home_work_distance',
                                         home_work_crow_fly_distance * (home_work_crow_fly_distance >= 0.0) / 100000.0,
                                         database)
+    no_home_work_distance = DefineVariable('no_home_work_distance', home_work_crow_fly_distance == 0, database)
 
     business_sector_agriculture = DefineVariable('business_sector_agriculture', 1 <= noga_08 <= 7, database)
     business_sector_retail = DefineVariable('business_sector_retail', noga_08 == 47, database)
@@ -295,6 +297,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_rural_work * rural_work + \
         b_intermediate_work * intermediate_work + \
         b_home_work_distance * home_work_distance + \
+        b_no_home_work_distance * no_home_work_distance + \
         models.piecewiseFormula(age, [0, 20, 35, 75, 200]) + \
         b_business_sector_agriculture * business_sector_agriculture + \
         b_business_sector_retail * business_sector_retail + \
@@ -366,133 +369,153 @@ def generate_data_file():
         :return: Nothing. The dataframe is saved as a CSV file (separator: tab) without NA values, to be used with
         Biogeme.
         """
-    ''' Select the variables about the person from the tables of the MTMC 2015 '''
-    selected_columns_zp = ['gesl', 'HAUSB', 'HHNR', 'f81300', 'A_X_CH1903', 'A_Y_CH1903', 'alter', 'f81400', 'noga_08',
-                           'sprache', 'f40800_01', 'f41100_01', 'nation', 'f40900', 'f40901_02', 'f40903', 'WP',
-                           'A_BFS']
-    df_zp = get_zp(2015, selected_columns_zp)
-    selected_columns_hh = ['HHNR', 'hhtyp', 'W_OeV_KLASSE', 'W_BFS', 'W_X_CH1903', 'W_Y_CH1903', 'F20601']
-    df_hh = get_hh(2015, selected_columns_hh)
-    df_zp = pd.merge(df_zp, df_hh, on='HHNR', how='left')
+    ''' Select the variables about the person from the tables of the MTMC '''
+    for year in [2020, 2015]:
+        if year == 2015:
+            selected_columns_zp = ['gesl', 'HAUSB', 'HHNR', 'f81300', 'A_X', 'A_Y', 'alter', 'f81400', 'noga_08',
+                                   'sprache', 'f40800_01', 'f41100_01', 'nation', 'f40900', 'f40901_02', 'f40903', 'WP',
+                                   'A_BFS']
+        elif year == 2020:
+            selected_columns_zp = ['gesl', 'HAUSB', 'HHNR', 'f81300', 'A_X', 'A_Y', 'alter', 'f81400', 'noga_08',
+                                   'sprache', 'f40800_01', 'f41100_01', 'nation', 'f40920', 'WP',
+                                   'A_BFS']
+        df_zp = get_zp(year, selected_columns_zp)
+        if year == 2015:
+            selected_columns_hh = ['HHNR', 'hhtyp', 'W_OeV_KLASSE', 'W_BFS', 'W_X', 'W_Y', 'F20601']
+        elif year == 2020:
+            selected_columns_hh = ['HHNR', 'hhtyp', 'W_OeV_KLASSE', 'W_BFS', 'W_X', 'W_Y', 'f20601']
+        df_hh = get_hh(year, selected_columns_hh)
+        df_zp = pd.merge(df_zp, df_hh, on='HHNR', how='left')
 
-    ''' Add public transport connection quality of the work place '''
-    df_zp_with_work_coordinates = df_zp[df_zp.A_X_CH1903 != -999]
-    df_zp_with_work_coordinates = geopandas.GeoDataFrame(df_zp_with_work_coordinates,
-                                                         geometry=geopandas.points_from_xy(df_zp_with_work_coordinates.A_X_CH1903,
-                                                                                           df_zp_with_work_coordinates.A_Y_CH1903),
-                                                         crs='epsg:21781')
-    # Read the shape file containing the connection quality
-    connection_quality_folder_path = Path('../data/input/OeV_Gueteklassen/Fahrplanperiode_17_18/')
-    df_connection_quality = geopandas.read_file(connection_quality_folder_path / 'OeV_Gueteklassen_ARE.shp')
-    df_connection_quality.set_crs(epsg=21781, inplace=True)  # Define the projection (CH1903_LV03)
-    df_zp_with_work_coordinates = geopandas.sjoin(df_zp_with_work_coordinates, df_connection_quality[['KLASSE',
-                                                                                                      'geometry']],
-                                                  how='left', op='intersects')
-    df_zp_with_work_coordinates['KLASSE'] = df_zp_with_work_coordinates['KLASSE'].map({'A': 1,
-                                                                                       'B': 2,
-                                                                                       'C': 3,
-                                                                                       'D': 4})
-    df_zp_with_work_coordinates['KLASSE'].fillna('5', inplace=True)
-    df_zp.loc[df_zp.A_X_CH1903 != -999, 'KLASSE'] = df_zp_with_work_coordinates['KLASSE']
-    df_zp['KLASSE'].fillna(-999, inplace=True)
-    # Rename the column with the public transport connection quality
-    df_zp.rename(columns={'KLASSE': 'public_transport_connection_quality_ARE_work'}, inplace=True)
+        ''' Add public transport connection quality of the work place '''
+        df_zp_with_work_coord = df_zp[df_zp.A_X != -999]
+        df_zp_with_work_coord = geopandas.GeoDataFrame(df_zp_with_work_coord,
+                                                       geometry=geopandas.points_from_xy(df_zp_with_work_coord.A_X,
+                                                                                         df_zp_with_work_coord.A_Y),
+                                                       crs='epsg:4326')
+        df_zp_with_work_coord.to_crs(epsg=21781, inplace=True)
+        # Read the shape file containing the connection quality
+        connection_quality_folder_path = Path('../data/input/OeV_Gueteklassen/Fahrplanperiode_17_18/')
+        df_connection_quality = geopandas.read_file(connection_quality_folder_path / 'OeV_Gueteklassen_ARE.shp')
+        df_connection_quality.set_crs(epsg=21781, inplace=True)  # Define the projection (CH1903_LV03)
+        df_zp_with_work_coord = geopandas.sjoin(df_zp_with_work_coord, df_connection_quality[['KLASSE',
+                                                                                                          'geometry']],
+                                                      how='left', op='intersects')
+        df_zp_with_work_coord['KLASSE'] = df_zp_with_work_coord['KLASSE'].map({'A': 1,
+                                                                               'B': 2,
+                                                                               'C': 3,
+                                                                               'D': 4})
+        df_zp_with_work_coord['KLASSE'].fillna('5', inplace=True)
+        df_zp.loc[df_zp.A_X != -999, 'KLASSE'] = df_zp_with_work_coord['KLASSE']
+        df_zp['KLASSE'].fillna(-999, inplace=True)
+        # Rename the column with the public transport connection quality
+        df_zp.rename(columns={'KLASSE': 'public_transport_connection_quality_ARE_work'}, inplace=True)
 
-    df_zp = add_home_work_distance(df_zp)
+        df_zp = add_home_work_distance(df_zp)
 
-    df_zp = add_spatial_typology(df_zp)
+        df_zp = add_spatial_typology(df_zp, year)
 
-    ''' Generate the variable about work position:
-    Code FaLC in English     FaLC in German   NPVM                       Code used below
-     0   Unemployed                                                      0
-     1   CEO                 Geschäftsführer  qualifizierter Mitarbeiter 1
-     11  business management Geschäftsleitung qualifizierter Mitarbeiter 1
-     12  management          qualifizierte MA qualifizierter Mitarbeiter 1
-     20  Employee            einfache MA      einfacher Mitarbeiter      2
-     3   Apprentice          Lehrling                                    3 
-     In the code below, -99 corresponds to no answer/does't know to the question about work position (if working) '''
-    df_zp.loc[df_zp['f40800_01'].isin([1,  # MTMC: "Selbstständig Erwerbende(r)"
-                                       2,  # MTMC: Arbeitnehmer in AG/GmbH, welche IHNEN selbst gehört
-                                       3]),  # MTMC: Arbeitnehmer im Familienbetrieb von Haushaltsmitglied
-              'work_position'] = 1  # NPVM: Qualifiziert
-    df_zp.loc[(df_zp['f40800_01'] == 4) &  # MTMC: Arbeitnehmer bei einem sonstigen Unternehmen
-              (df_zp['f41100_01'] == 1),  # MTMC: Angestellt ohne Cheffunktion
-              'work_position'] = 2  # NPVM: Einfach
-    df_zp.loc[(df_zp['f40800_01'] == 4) &  # MTMC: Arbeitnehmer bei einem sonstigen Unternehmen
-              (df_zp['f41100_01'].isin([2,  # MTMC: Angestellt mit Chefposition
-                                                      3])),  # MTMC: Angestellt als Mitglied von der Direktion
-              'work_position'] = 1  # SynPop: Qualifiziert
-    df_zp.loc[df_zp['f40800_01'] == 5,  # MTMC: Lehrling
-              'work_position'] = 3  # NPVM: Apprentice
-    df_zp.loc[df_zp['f41100_01'] == 3,  # MTMC: Angestellt als Mitglied von der Direktion
-              'work_position'] = 1  # NPVM: Qualifiziert
-    df_zp.loc[df_zp['f40800_01'] == -99,  # MTMC: Nicht erwerbstätig
-              'work_position'] = 0  # NPVM: Unemployed
-    df_zp.loc[(df_zp['f40800_01'] == 4) & (df_zp['f41100_01'].isin([-98, -97])),
-              'work_position'] = -99
-    del df_zp['f40800_01']
-    del df_zp['f41100_01']
+        ''' Generate the variable about work position:
+        Code FaLC in English     FaLC in German   NPVM                       Code used below
+         0   Unemployed                                                      0
+         1   CEO                 Geschäftsführer  qualifizierter Mitarbeiter 1
+         11  business management Geschäftsleitung qualifizierter Mitarbeiter 1
+         12  management          qualifizierte MA qualifizierter Mitarbeiter 1
+         20  Employee            einfache MA      einfacher Mitarbeiter      2
+         3   Apprentice          Lehrling                                    3 
+         In the code below, -99 corresponds to no answer/does't know to the question about work position (if working) '''
+        df_zp.loc[df_zp['f40800_01'].isin([1,  # MTMC: "Selbstständig Erwerbende(r)"
+                                           2,  # MTMC: Arbeitnehmer in AG/GmbH, welche IHNEN selbst gehört
+                                           3]),  # MTMC: Arbeitnehmer im Familienbetrieb von Haushaltsmitglied
+                  'work_position'] = 1  # NPVM: Qualifiziert
+        df_zp.loc[(df_zp['f40800_01'] == 4) &  # MTMC: Arbeitnehmer bei einem sonstigen Unternehmen
+                  (df_zp['f41100_01'] == 1),  # MTMC: Angestellt ohne Cheffunktion
+                  'work_position'] = 2  # NPVM: Einfach
+        df_zp.loc[(df_zp['f40800_01'] == 4) &  # MTMC: Arbeitnehmer bei einem sonstigen Unternehmen
+                  (df_zp['f41100_01'].isin([2,  # MTMC: Angestellt mit Chefposition
+                                                          3])),  # MTMC: Angestellt als Mitglied von der Direktion
+                  'work_position'] = 1  # SynPop: Qualifiziert
+        df_zp.loc[df_zp['f40800_01'] == 5,  # MTMC: Lehrling
+                  'work_position'] = 3  # NPVM: Apprentice
+        df_zp.loc[df_zp['f41100_01'] == 3,  # MTMC: Angestellt als Mitglied von der Direktion
+                  'work_position'] = 1  # NPVM: Qualifiziert
+        df_zp.loc[df_zp['f40800_01'] == -99,  # MTMC: Nicht erwerbstätig
+                  'work_position'] = 0  # NPVM: Unemployed
+        df_zp.loc[(df_zp['f40800_01'] == 4) & (df_zp['f41100_01'].isin([-98, -97])),
+                  'work_position'] = -99
+        del df_zp['f40800_01']
+        del df_zp['f41100_01']
 
-    # Rename the variables
-    df_zp = df_zp.rename(columns={'gesl': 'sex',
-                                  'HAUSB': 'highest_educ',
-                                  'f81300': 'telecommuting_is_possible',
-                                  'hhtyp': 'hh_type',
-                                  'W_OeV_KLASSE': 'public_transport_connection_quality_ARE_home',
-                                  'alter': 'age',
-                                  'f81400': 'percentage_telecommuting',
-                                  'sprache': 'language',
-                                  'f40900': 'full_part_time_job',
-                                  'f40901_02': 'percentage_first_part_time_job',
-                                  'f40903': 'percentage_second_part_time_job',
-                                  'F20601': 'hh_income'})
-    ''' Removing people who did not get the question or did not answer. '''
-    df_zp.drop(df_zp[df_zp.telecommuting_is_possible < 0].index, inplace=True)
-    df_zp.drop(df_zp[df_zp.percentage_telecommuting == -98].index, inplace=True)
-    df_zp.drop(df_zp[df_zp.percentage_telecommuting == -97].index, inplace=True)
-    ''' Define the variable home office as "possibility to do home office" and "practically do some" '''
-    df_zp['telecommuting'] = df_zp.apply(define_telecommuting_variable, axis=1)
-    ''' Test that no column contains NA values '''
-    for column in df_zp.columns:
-        if df_zp[column].isna().any():
-            print('There are NA values in column', column)
-    ''' Save the file '''
-    output_directory = Path('../data/output/data/estimation/')
-    data_file_name = 'persons.csv'
-    df_zp.to_csv(output_directory / data_file_name, sep=';', index=False)
+        # Rename the variables
+        df_zp = df_zp.rename(columns={'gesl': 'sex',
+                                      'HAUSB': 'highest_educ',
+                                      'f81300': 'telecommuting_is_possible',
+                                      'hhtyp': 'hh_type',
+                                      'W_OeV_KLASSE': 'public_transport_connection_quality_ARE_home',
+                                      'alter': 'age',
+                                      'f81400': 'percentage_telecommuting',
+                                      'sprache': 'language',
+                                      'f40900': 'full_part_time_job',
+                                      'f40901_02': 'percentage_first_part_time_job',
+                                      'f40903': 'percentage_second_part_time_job',
+                                      'F20601': 'hh_income'})
+        ''' Removing people who did not get the question or did not answer. '''
+        df_zp.drop(df_zp[df_zp.telecommuting_is_possible < 0].index, inplace=True)
+        df_zp.drop(df_zp[df_zp.percentage_telecommuting == -98].index, inplace=True)
+        df_zp.drop(df_zp[df_zp.percentage_telecommuting == -97].index, inplace=True)
+        ''' Define the variable home office as "possibility to do home office" and "practically do some" '''
+        df_zp['telecommuting'] = df_zp.apply(define_telecommuting_variable, axis=1)
+        ''' Test that no column contains NA values '''
+        for column in df_zp.columns:
+            if df_zp[column].isna().any():
+                print('There are NA values in column', column)
+        ''' Save the file '''
+        output_directory = Path('../data/output/data/estimation/' + str(year))
+        data_file_name = 'persons.csv'
+        df_zp.to_csv(output_directory / data_file_name, sep=';', index=False)
 
 
 def add_home_work_distance(df_zp):
     ''' Add the distance between home and work places '''
-    df_zp_with_work_coordinates = df_zp[df_zp.A_X_CH1903 != -999]
+    coding_with_coordinates = (df_zp.A_X != -999) & (df_zp.A_X != -997)
+    job_in_Switzerland = df_zp.A_BFS != -99
+    df_zp_with_work_coordinates = df_zp[coding_with_coordinates & job_in_Switzerland]
     geodf_home = geopandas.GeoDataFrame(df_zp_with_work_coordinates,
-                                        geometry=geopandas.points_from_xy(df_zp_with_work_coordinates.W_Y_CH1903,
-                                                                          df_zp_with_work_coordinates.W_X_CH1903),
-                                        crs='epsg:21781')
+                                        geometry=geopandas.points_from_xy(df_zp_with_work_coordinates.W_X,
+                                                                          df_zp_with_work_coordinates.W_Y),
+                                        crs='epsg:4326')
+    geodf_home.to_crs(epsg=21781, inplace=True)
     geodf_work = geopandas.GeoDataFrame(df_zp_with_work_coordinates,
-                                        geometry=geopandas.points_from_xy(df_zp_with_work_coordinates.A_Y_CH1903,
-                                                                          df_zp_with_work_coordinates.A_X_CH1903),
-                                        crs='epsg:21781')
-    df_zp.loc[df_zp.A_X_CH1903 != -999, 'home_work_crow_fly_distance'] = geodf_home.distance(geodf_work)
+                                        geometry=geopandas.points_from_xy(df_zp_with_work_coordinates.A_X,
+                                                                          df_zp_with_work_coordinates.A_Y),
+                                        crs='epsg:4326')
+    geodf_work.to_crs(epsg=21781, inplace=True)
+    df_zp.loc[coding_with_coordinates & job_in_Switzerland, 'home_work_crow_fly_distance'] = \
+        geodf_home.distance(geodf_work)
     df_zp['home_work_crow_fly_distance'].fillna(-999, inplace=True)
-    df_zp.drop(['W_Y_CH1903', 'W_X_CH1903', 'A_Y_CH1903', 'A_X_CH1903'], axis=1, inplace=True)
+    df_zp.drop(['W_Y', 'W_X', 'A_Y', 'A_X'], axis=1, inplace=True)
     return df_zp
 
 
-def add_spatial_typology(df_zp):
+def add_spatial_typology(df_zp, year):
     ''' Add the data about the spatial typology of the home address (in particular the home commune) '''
-    path_to_typology = Path('../data/input/StadtLandTypologie/2015/Raumgliederungen.xlsx')
+    if year == 2015:
+        path_to_typology = Path('../data/input/StadtLandTypologie/2015/Raumgliederungen.xlsx')
+        spatial_typology_variable_name = 'Stadt/Land-Typologie'
+    elif year == 2020:
+        path_to_typology = Path('../data/input/StadtLandTypologie/2020/Raumgliederungen.xlsx')
+        spatial_typology_variable_name = 'Städtische / Ländliche Gebiete'
     df_typology = pd.read_excel(path_to_typology, sheet_name='Daten',
                                 skiprows=[0, 2],  # Removes the 1st row, with information, and the 2nd, with links
                                 usecols='A,G')  # Selects only the BFS commune number and the column with the typology
     df_zp = pd.merge(df_zp, df_typology, left_on='W_BFS', right_on='BFS Gde-nummer', how='left')
     df_zp.drop('BFS Gde-nummer', axis=1, inplace=True)
-    df_zp = df_zp.rename(columns={'Stadt/Land-Typologie': 'urban_typology_home'})
+    df_zp = df_zp.rename(columns={spatial_typology_variable_name: 'urban_typology_home'})
 
     ''' Add the data about the spatial typology of the work address (in particular the work commune) '''
     df_zp = pd.merge(df_zp, df_typology, left_on='A_BFS', right_on='BFS Gde-nummer', how='left')
     df_zp.drop('BFS Gde-nummer', axis=1, inplace=True)
-    df_zp = df_zp.rename(columns={'Stadt/Land-Typologie': 'urban_typology_work'})
+    df_zp = df_zp.rename(columns={spatial_typology_variable_name: 'urban_typology_work'})
     df_zp.urban_typology_work.fillna(-99, inplace=True)
     return df_zp
 
