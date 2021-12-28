@@ -25,7 +25,6 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     A binary logit model on the possibility to work from home at least some times."""
 
     # Read the data
-
     df = pd.read_csv(data_file_directory / data_file_name, ';')
     database = db.Database('persons', df)
 
@@ -43,7 +42,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_male = Beta('b_male', 0, None, None, 0)
 
     b_single_household = Beta('b_single_household', 0, None, None, 1)
-    b_couple_without_children = Beta('b_couple_without_children', 0, None, None, 1)
+    b_couple_without_children = Beta('b_couple_without_children', 0, None, None, 0)
     b_couple_with_children = Beta('b_couple_with_children', 0, None, None, 1)
     b_single_parent_with_children = Beta('b_single_parent_with_children', 0, None, None, 1)
     b_not_family_household = Beta('b_not_family_household', 0, None, None, 1)
@@ -74,20 +73,21 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_rural_home = Beta('b_rural_home', 0, None, None, 1)
     b_intermediate_home = Beta('b_intermediate_home', 0, None, None, 1)
     b_urban_work = Beta('b_urban_work', 0, None, None, 1)
-    b_rural_work = Beta('b_rural_work', 0, None, None, 0)
+    b_rural_work = Beta('b_rural_work', 0, None, None, 1)
     b_intermediate_work = Beta('b_intermediate_work', 0, None, None, 1)
 
     b_home_work_distance = Beta('b_home_work_distance', 0, None, None, 0)
-    b_no_home_work_distance = Beta('b_no_home_work_distance', 0, None, None, 0)
+    b_home_work_distance_zero = Beta('b_home_work_distance_zero', 0, None, None, 0)
+    b_home_work_distance_na = Beta('b_home_work_distance_na', 0, None, None, 0)
 
     b_business_sector_agriculture = Beta('b_business_sector_agriculture', 0, lowerbound=0, upperbound=2, status=0)
-    b_business_sector_production = Beta('b_business_sector_production', 0, None, None, 0)
+    b_business_sector_production = Beta('b_business_sector_production', 0, None, None, 1)
     b_business_sector_wholesale = Beta('b_business_sector_wholesale', 0, None, None, 1)
-    b_business_sector_retail = Beta('b_business_sector_retail', 0, None, None, 0)
+    b_business_sector_retail = Beta('b_business_sector_retail', 0, None, None, 1)
     b_business_sector_gastronomy = Beta('b_business_sector_gastronomy', 0, None, None, 0)
     b_business_sector_finance = Beta('b_business_sector_finance', 0, None, None, 1)
     b_business_sector_services_fc = Beta('b_business_sector_services_fc', 0, None, None, 0)
-    b_business_sector_other_services = Beta('b_business_sector_other_services', 0, None, None, 1)
+    b_business_sector_other_services = Beta('b_business_sector_other_services', 0, None, None, 0)
     b_business_sector_others = Beta('b_business_sector_others', 0, None, None, 1)
     b_business_sector_non_movers = Beta('b_business_sector_non_movers', 0, None, None, 0)
     b_employees = Beta('b_employees', 0, None, None, 1)
@@ -97,7 +97,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_nationality_south_west_europe = Beta('b_nationality_south_west_europe', 0, None, None, 1)
     b_nationality_southeast_europe = Beta('b_nationality_southeast_europe', 0, None, None, 1)
     b_several_part_time_jobs = Beta('b_several_part_time_jobs', 0, None, None, 1)
-    b_hh_income_na = Beta('B_hh_income_na', 0, None, None, 1)
+    b_hh_income_na = Beta('B_hh_income_na', 0, None, None, 0)
     b_hh_income_8000_or_less = Beta('b_hh_income_8000_or_less', 0, None, None, 0)
     b_hh_income_more_than_8000 = Beta('b_hh_income_more_than_8000', 0, None, None, 1)
 
@@ -164,7 +164,8 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     home_work_distance = DefineVariable('home_work_distance',
                                         home_work_crow_fly_distance * (home_work_crow_fly_distance >= 0.0) / 100000.0,
                                         database)
-    no_home_work_distance = DefineVariable('no_home_work_distance', home_work_crow_fly_distance == 0, database)
+    home_work_distance_zero = DefineVariable('home_work_distance_zero', home_work_crow_fly_distance == 0.0, database)
+    home_work_distance_na = DefineVariable('home_work_distance_na', home_work_crow_fly_distance == -999, database)
 
     business_sector_agriculture = DefineVariable('business_sector_agriculture', 1 <= noga_08 <= 7, database)
     business_sector_retail = DefineVariable('business_sector_retail', noga_08 == 47, database)
@@ -250,8 +251,8 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     several_part_time_jobs = DefineVariable('several_part_time_jobs', full_part_time_job == 3, database)
     work_percentage = DefineVariable('work_percentage',
                                      bioMin((full_part_time_job == 1) * 100 +
-                                            percentage_first_part_time_job * (percentage_first_part_time_job > 0),  # +
-                                            # percentage_second_part_time_job * (percentage_second_part_time_job > 0),
+                                            percentage_first_part_time_job * (percentage_first_part_time_job > 0) +
+                                            percentage_second_part_time_job * (percentage_second_part_time_job > 0),
                                             100),
                                      database)
 
@@ -297,8 +298,9 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_rural_work * rural_work + \
         b_intermediate_work * intermediate_work + \
         b_home_work_distance * home_work_distance + \
-        b_no_home_work_distance * no_home_work_distance + \
-        models.piecewiseFormula(age, [0, 20, 35, 75, 200]) + \
+        b_home_work_distance_zero * home_work_distance_zero + \
+        b_home_work_distance_na * home_work_distance_na + \
+        models.piecewiseFormula(age, [15, 19, 31, 79, 85]) + \
         b_business_sector_agriculture * business_sector_agriculture + \
         b_business_sector_retail * business_sector_retail + \
         b_business_sector_gastronomy * business_sector_gastronomy + \
@@ -330,11 +332,11 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
         b_hh_income_more_than_8000 * hh_income_12001_to_14000 + \
         b_hh_income_more_than_8000 * hh_income_14001_to_16000 + \
         b_hh_income_more_than_8000 * hh_income_more_than_16000
-    U_No_telecommuting = 0
+    U_no_telecommuting = 0
 
     # Associate utility functions with the numbering of alternatives
     V = {1: U,  # Yes or sometimes
-         0: U_No_telecommuting}  # No
+         0: U_no_telecommuting}  # No
 
     av = {1: 1,
           0: 1}
@@ -364,7 +366,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
 
 def generate_data_file():
     """ This function takes as input the  data about the person and join them with the data about the household and the
-        spaptial typology. It returns nothing, but saves the output as a data file for Biogeme.
+        spatial typology. It returns nothing, but saves the output as a data file for Biogeme.
         :param: Nothing.
         :return: Nothing. The dataframe is saved as a CSV file (separator: tab) without NA values, to be used with
         Biogeme.
@@ -398,9 +400,8 @@ def generate_data_file():
         connection_quality_folder_path = Path('../data/input/OeV_Gueteklassen/Fahrplanperiode_17_18/')
         df_connection_quality = geopandas.read_file(connection_quality_folder_path / 'OeV_Gueteklassen_ARE.shp')
         df_connection_quality.set_crs(epsg=21781, inplace=True)  # Define the projection (CH1903_LV03)
-        df_zp_with_work_coord = geopandas.sjoin(df_zp_with_work_coord, df_connection_quality[['KLASSE',
-                                                                                                          'geometry']],
-                                                      how='left', op='intersects')
+        df_zp_with_work_coord = geopandas.sjoin(df_zp_with_work_coord, df_connection_quality[['KLASSE', 'geometry']],
+                                                how='left', op='intersects')
         df_zp_with_work_coord['KLASSE'] = df_zp_with_work_coord['KLASSE'].map({'A': 1,
                                                                                'B': 2,
                                                                                'C': 3,
@@ -423,7 +424,10 @@ def generate_data_file():
          12  management          qualifizierte MA qualifizierter Mitarbeiter 1
          20  Employee            einfache MA      einfacher Mitarbeiter      2
          3   Apprentice          Lehrling                                    3 
-         In the code below, -99 corresponds to no answer/does't know to the question about work position (if working) '''
+         "NPVM" stands for "nationale Personenverkehrsmodell", the Swiss national passenger transport model.
+         "MTMC", below, stands for Mobility and Transport Microcensus, the Swiss travel survey.
+         In the code below, -99 corresponds to no answer/doesn't know to the question about work position 
+         (if working) '''
         df_zp.loc[df_zp['f40800_01'].isin([1,  # MTMC: "Selbstständig Erwerbende(r)"
                                            2,  # MTMC: Arbeitnehmer in AG/GmbH, welche IHNEN selbst gehört
                                            3]),  # MTMC: Arbeitnehmer im Familienbetrieb von Haushaltsmitglied
@@ -433,7 +437,7 @@ def generate_data_file():
                   'work_position'] = 2  # NPVM: Einfach
         df_zp.loc[(df_zp['f40800_01'] == 4) &  # MTMC: Arbeitnehmer bei einem sonstigen Unternehmen
                   (df_zp['f41100_01'].isin([2,  # MTMC: Angestellt mit Chefposition
-                                                          3])),  # MTMC: Angestellt als Mitglied von der Direktion
+                                            3])),  # MTMC: Angestellt als Mitglied von der Direktion
                   'work_position'] = 1  # SynPop: Qualifiziert
         df_zp.loc[df_zp['f40800_01'] == 5,  # MTMC: Lehrling
                   'work_position'] = 3  # NPVM: Apprentice
@@ -476,10 +480,10 @@ def generate_data_file():
 
 
 def add_home_work_distance(df_zp):
-    ''' Add the distance between home and work places '''
+    """ Add the distance between home and work places """
     coding_with_coordinates = (df_zp.A_X != -999) & (df_zp.A_X != -997)
-    job_in_Switzerland = df_zp.A_BFS != -99
-    df_zp_with_work_coordinates = df_zp[coding_with_coordinates & job_in_Switzerland]
+    job_in_switzerland = (df_zp.A_BFS != -99) & (df_zp.A_BFS != -97)
+    df_zp_with_work_coordinates = df_zp[coding_with_coordinates & job_in_switzerland]
     geodf_home = geopandas.GeoDataFrame(df_zp_with_work_coordinates,
                                         geometry=geopandas.points_from_xy(df_zp_with_work_coordinates.W_X,
                                                                           df_zp_with_work_coordinates.W_Y),
@@ -490,7 +494,7 @@ def add_home_work_distance(df_zp):
                                                                           df_zp_with_work_coordinates.A_Y),
                                         crs='epsg:4326')
     geodf_work.to_crs(epsg=21781, inplace=True)
-    df_zp.loc[coding_with_coordinates & job_in_Switzerland, 'home_work_crow_fly_distance'] = \
+    df_zp.loc[coding_with_coordinates & job_in_switzerland, 'home_work_crow_fly_distance'] = \
         geodf_home.distance(geodf_work)
     df_zp['home_work_crow_fly_distance'].fillna(-999, inplace=True)
     df_zp.drop(['W_Y', 'W_X', 'A_Y', 'A_X'], axis=1, inplace=True)
@@ -498,7 +502,7 @@ def add_home_work_distance(df_zp):
 
 
 def add_spatial_typology(df_zp, year):
-    ''' Add the data about the spatial typology of the home address (in particular the home commune) '''
+    """ Add the data about the spatial typology of the home address (in particular the home commune) """
     if year == 2015:
         path_to_typology = Path('../data/input/StadtLandTypologie/2015/Raumgliederungen.xlsx')
         spatial_typology_variable_name = 'Stadt/Land-Typologie'
@@ -543,6 +547,6 @@ def generate_work_position(row):
             work_position = 3  # corresponds to "cadres"
         else:
             raise Exception("There should not be other cases...")
-    elif row['f40800_01'] == 5:  # in MTMC: apprentice
+    elif row['f40800_01'] == 5:  # in Mobility and Transport Microcensus: apprentice
         work_position = 2  # corresponds to "employee"/"Angestellte"
     return work_position
