@@ -33,7 +33,7 @@ def apply_model_to_microcensus(data_file_directory_for_simulation, data_file_nam
     b_male = Beta('b_male', 0, None, None, 0)
 
     b_single_household = Beta('b_single_household', 0, None, None, 1)
-    b_couple_without_children = Beta('b_couple_without_children', 0, None, None, 1)
+    b_couple_without_children = Beta('b_couple_without_children', 0, None, None, 0)
     b_couple_with_children = Beta('b_couple_with_children', 0, None, None, 1)
     b_single_parent_with_children = Beta('b_single_parent_with_children', 0, None, None, 1)
     b_not_family_household = Beta('b_not_family_household', 0, None, None, 1)
@@ -64,19 +64,21 @@ def apply_model_to_microcensus(data_file_directory_for_simulation, data_file_nam
     b_rural_home = Beta('b_rural_home', 0, None, None, 1)
     b_intermediate_home = Beta('b_intermediate_home', 0, None, None, 1)
     b_urban_work = Beta('b_urban_work', 0, None, None, 1)
-    b_rural_work = Beta('b_rural_work', 0, None, None, 0)
+    b_rural_work = Beta('b_rural_work', 0, None, None, 1)
     b_intermediate_work = Beta('b_intermediate_work', 0, None, None, 1)
 
     b_home_work_distance = Beta('b_home_work_distance', 0, None, None, 0)
+    b_home_work_distance_zero = Beta('b_home_work_distance_zero', 0, None, None, 0)
+    b_home_work_distance_na = Beta('b_home_work_distance_na', 0, None, None, 0)
 
-    b_business_sector_agriculture = Beta('b_business_sector_agriculture', 0, None, None, 0)
-    b_business_sector_production = Beta('b_business_sector_production', 0, None, None, 0)
+    b_business_sector_agriculture = Beta('b_business_sector_agriculture', 0, lowerbound=0, upperbound=2, status=0)
+    b_business_sector_production = Beta('b_business_sector_production', 0, None, None, 1)
     b_business_sector_wholesale = Beta('b_business_sector_wholesale', 0, None, None, 1)
-    b_business_sector_retail = Beta('b_business_sector_retail', 0, None, None, 0)
+    b_business_sector_retail = Beta('b_business_sector_retail', 0, None, None, 1)
     b_business_sector_gastronomy = Beta('b_business_sector_gastronomy', 0, None, None, 0)
     b_business_sector_finance = Beta('b_business_sector_finance', 0, None, None, 1)
     b_business_sector_services_fc = Beta('b_business_sector_services_fc', 0, None, None, 0)
-    b_business_sector_other_services = Beta('b_business_sector_other_services', 0, None, None, 1)
+    b_business_sector_other_services = Beta('b_business_sector_other_services', 0, None, None, 0)
     b_business_sector_others = Beta('b_business_sector_others', 0, None, None, 1)
     b_business_sector_non_movers = Beta('b_business_sector_non_movers', 0, None, None, 0)
     b_employees = Beta('b_employees', 0, None, None, 1)
@@ -85,7 +87,7 @@ def apply_model_to_microcensus(data_file_directory_for_simulation, data_file_nam
     b_nationality_ch_germany_france_italy_nw_e = Beta('b_nationality_ch_germany_france_italy_nw_e', 0, None, None, 1)
     b_nationality_south_west_europe = Beta('b_nationality_south_west_europe', 0, None, None, 1)
     b_nationality_southeast_europe = Beta('b_nationality_southeast_europe', 0, None, None, 1)
-    b_hh_income_na = Beta('B_hh_income_na', 0, None, None, 1)
+    b_hh_income_na = Beta('b_hh_income_na', 0, None, None, 0)
     b_hh_income_8000_or_less = Beta('b_hh_income_8000_or_less', 0, None, None, 0)
     b_hh_income_more_than_8000 = Beta('b_hh_income_more_than_8000', 0, None, None, 1)
 
@@ -125,6 +127,8 @@ def apply_model_to_microcensus(data_file_directory_for_simulation, data_file_nam
     intermediate_work = (urban_typology_work == 2)
 
     home_work_distance = (home_work_crow_fly_distance * (home_work_crow_fly_distance >= 0.0) / 100000.0)
+    home_work_distance_zero = home_work_crow_fly_distance == 0.0
+    home_work_distance_na = home_work_crow_fly_distance == -999
 
     business_sector_agriculture = DefineVariable('business_sector_agriculture', 1 <= noga_08 <= 7, database)
     business_sector_retail = DefineVariable('business_sector_retail', 47 <= noga_08 <= 47, database)
@@ -134,7 +138,7 @@ def apply_model_to_microcensus(data_file_directory_for_simulation, data_file_nam
                                                 (10 <= noga_08 <= 35) | (40 <= noga_08 <= 44), database)
     business_sector_wholesale = DefineVariable('business_sector_wholesale',
                                                (45 <= noga_08 <= 45) | (49 <= noga_08 <= 54), database)
-    business_sector_services_fC = DefineVariable('business_sector_services_fC',
+    business_sector_services_fc = DefineVariable('business_sector_services_fc',
                                                  (60 <= noga_08 <= 63) | (69 <= noga_08 <= 83) | (noga_08 == 58),
                                                  database)
     business_sector_other_services = DefineVariable('business_sector_other_services',
@@ -218,14 +222,16 @@ def apply_model_to_microcensus(data_file_directory_for_simulation, data_file_nam
         b_rural_work * rural_work + \
         b_intermediate_work * intermediate_work + \
         b_home_work_distance * home_work_distance + \
-        models.piecewiseFormula(age, [0, 20, 35, 75, 200]) + \
+        b_home_work_distance_zero * home_work_distance_zero + \
+        b_home_work_distance_na * home_work_distance_na + \
+        models.piecewiseFormula(age, [15, 19, 31, 79, 85]) + \
         b_business_sector_agriculture * business_sector_agriculture + \
         b_business_sector_retail * business_sector_retail + \
         b_business_sector_gastronomy * business_sector_gastronomy + \
         b_business_sector_finance * business_sector_finance + \
         b_business_sector_production * business_sector_production + \
         b_business_sector_wholesale * business_sector_wholesale + \
-        b_business_sector_services_fc * business_sector_services_fC + \
+        b_business_sector_services_fc * business_sector_services_fc + \
         b_business_sector_other_services * business_sector_other_services + \
         b_business_sector_others * business_sector_others + \
         b_business_sector_non_movers * business_sector_non_movers + \
