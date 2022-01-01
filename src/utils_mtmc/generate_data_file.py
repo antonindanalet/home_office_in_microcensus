@@ -20,7 +20,7 @@ def generate_data_file(year):
     elif year == 2020:
         selected_columns_zp = ['gesl', 'f40120', 'HHNR', 'f81300', 'A_X', 'A_Y', 'alter', 'f81400', 'noga_08',
                                'sprache', 'f40800_01', 'f41100_01', 'nation', 'f40920', 'WP',
-                               'A_BFS']
+                               'A_BFS', 'f42100e', 'f41600_01a', 'f41600_01b', 'f41600_01c']
     else:
         raise Exception('The year of the Mobility and Transport Microcensus must be 2015 or 2020.')
     df_zp = get_zp(year, selected_columns_zp)
@@ -112,9 +112,12 @@ def generate_data_file(year):
                                   'F20601': 'hh_income',  # naming 2015
                                   'f20601': 'hh_income',  # naming 2020
                                   'f42100e': 'car_avail',
-                                  'f41610a': 'GA_ticket',
-                                  'f41610b': 'halbtax_ticket',
-                                  'f41610c': 'Verbund_Abo'})
+                                  'f41610a': 'GA_ticket',  # 2015
+                                  'f41610b': 'halbtax_ticket',  # 2015
+                                  'f41610c': 'Verbund_Abo',  # 2015
+                                  'f41600_01a': 'GA_ticket',  # 2020
+                                  'f41600_01b': 'halbtax_ticket',  # 2020
+                                  'f41600_01c': 'Verbund_Abo'})  # 2020
     df_zp['mobility_resources'] = df_zp.apply(define_mobility_resources_variable, axis=1)
     ''' Removing people who did not get the question or did not answer. '''
     df_zp.drop(df_zp[df_zp.telecommuting_is_possible < 0].index, inplace=True)
