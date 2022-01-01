@@ -2,7 +2,7 @@ import pandas as pd
 from pathlib import Path
 from estimate_choice_model_telecommuting import run_estimation
 # from mtmc2015.utils2015.compute_confidence_interval import get_weighted_avg_and_std
-from src.mtmc2015.apply_model_to_microcensus import apply_model_to_microcensus
+from src.utils_mtmc.apply_model_to_microcensus import apply_model_to_microcensus
 import os
 
 
@@ -27,7 +27,7 @@ def validate_model_with_microcensus_2015():
     for i in range(1, nb_iter+1):
         # Save 80% of the data for estimation and 20% of the data for simulation for internal validation
         # (and shuffles the data set)
-        save_slices(df_persons)
+        save_slices(df_persons, i)
         # Estimate the model on 80% of the data
         data_file_directory_for_estimation = Path('../data/output/data/internal_validation/estimation/')
         data_file_name_for_estimation = 'persons80.csv'
@@ -43,7 +43,7 @@ def validate_model_with_microcensus_2015():
         estimated_betas_name = 'logit_telecommuting_80'
         apply_model_to_microcensus(data_file_directory_for_simulation, data_file_name_for_simulation,
                                    output_directory_for_simulation, output_file_name,
-                                   path_to_estimated_betas, estimated_betas_name)
+                                   path_to_estimated_betas, estimated_betas_name, year=2015)
         # Compute the proportion of people doing home office in the data and in the simulation
         observed_proportion_of_people_telecommuting, predicted_proportion_of_people_telecommuting = \
             compute_proportion_of_people_telecommuting()
@@ -105,9 +105,10 @@ def compute_proportion_of_people_telecommuting():
     #       str(weighted_std) + '%)')
 
 
-def save_slices(df_persons):
+def save_slices(df_persons, i):
     # Shuffle the data set (sampling the full fraction of the data, i.e., all data)
-    df_persons = df_persons.sample(frac=1)
+    # 'random_state' as int defines the seed for random number generator. Defined for reproducibility.
+    df_persons = df_persons.sample(frac=1, random_state=42+i)
     # Save 80% of the data for estimation
     estimation_output_directory = Path('../data/output/data/internal_validation/estimation/')
     estimation_data_file_name = 'persons80.csv'
