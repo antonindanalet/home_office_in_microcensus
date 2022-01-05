@@ -1,6 +1,7 @@
 import pandas as pd
 from pathlib import Path
 import geopandas
+import numpy as np
 from utils_mtmc.get_mtmc_files import get_zp, get_hh
 from utils_mtmc.define_telecommuting_variable import define_telecommuting_variable
 
@@ -125,6 +126,28 @@ def generate_data_file(year):
     df_zp.drop(df_zp[df_zp.percentage_telecommuting == -97].index, inplace=True)
     ''' Define the variable home office as "possibility to do home office" and "practically do some" '''
     df_zp['telecommuting'] = df_zp.apply(define_telecommuting_variable, axis=1)
+    ''' Define the business sectors '''
+    df_zp['business_sector_agriculture'] = np.where((1 <= df_zp['noga_08']) & (df_zp['noga_08'] <= 7), 1, 0)
+    df_zp['business_sector_retail'] = np.where((df_zp['noga_08'] == 47) | (df_zp['noga_08'] == 48), 1, 0)
+    df_zp['business_sector_gastronomy'] = np.where((55 <= df_zp['noga_08']) & (df_zp['noga_08'] <= 57), 1, 0)
+    df_zp['business_sector_finance'] = np.where((64 <= df_zp['noga_08']) & (df_zp['noga_08'] <= 67), 1, 0)
+    df_zp['business_sector_production'] = np.where(((10 <= df_zp['noga_08']) & (df_zp['noga_08'] <= 35)) |
+                                                   ((40 <= df_zp['noga_08']) & (df_zp['noga_08'] <= 44)), 1, 0)
+    df_zp['business_sector_wholesale'] = np.where(((45 <= df_zp['noga_08']) & (df_zp['noga_08'] <= 46)) |
+                                                  ((49 <= df_zp['noga_08']) & (df_zp['noga_08'] <= 54)), 1, 0)
+    df_zp['business_sector_services_fc'] = np.where(((60 <= df_zp['noga_08']) & (df_zp['noga_08'] <= 63)) |
+                                                    ((69 <= df_zp['noga_08']) & (df_zp['noga_08'] <= 83)) |
+                                                    (df_zp['noga_08'] == 58), 1, 0)
+    df_zp['business_sector_other_services'] = np.where(((86 <= df_zp['noga_08']) & (df_zp['noga_08'] <= 90)) |
+                                                       ((92 <= df_zp['noga_08']) & (df_zp['noga_08'] <= 96)) |
+                                                       (df_zp['noga_08'] == 59) |
+                                                       (df_zp['noga_08'] == 68), 1, 0)
+    df_zp['business_sector_others'] = np.where((97 <= df_zp['noga_08']) & (df_zp['noga_08'] <= 98), 1, 0)
+    df_zp['business_sector_non_movers'] = np.where(((8 <= df_zp['noga_08']) & (df_zp['noga_08'] <= 9)) |
+                                                   ((36 <= df_zp['noga_08']) & (df_zp['noga_08'] <= 39)) |
+                                                   (df_zp['noga_08'] == 84) | (df_zp['noga_08'] == 85) |
+                                                   (df_zp['noga_08'] == 91) | (df_zp['noga_08'] == 99), 1, 0)
+    del df_zp['noga_08']
     ''' Test that no column contains NA values '''
     for column in df_zp.columns:
         if df_zp[column].isna().any():
