@@ -37,7 +37,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_tertiary_education = Beta('b_tertiary_education', 0, None, None, 0)
     b_university = Beta('b_university', 0, None, None, 1)
 
-    b_male = Beta('b_male', 0, None, None, 0)
+    b_male = Beta('b_male', 0, None, None, 1)
 
     b_single_household = Beta('b_single_household', 0, None, None, 1)
     b_couple_without_children = Beta('b_couple_without_children', 0, None, None, 0)
@@ -78,15 +78,15 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     b_home_work_distance_zero = Beta('b_home_work_distance_zero', 0, None, None, 0)
     b_home_work_distance_na = Beta('b_home_work_distance_na', 0, None, None, 0)
 
-    b_business_sector_agriculture = Beta('b_business_sector_agriculture', 0, lowerbound=0, upperbound=2, status=0)
-    b_business_sector_production = Beta('b_business_sector_production', 0, None, None, 1)
-    b_business_sector_wholesale = Beta('b_business_sector_wholesale', 0, None, None, 1)
-    b_business_sector_retail = Beta('b_business_sector_retail', 0, None, None, 1)
+    b_business_sector_agriculture = Beta('b_business_sector_agriculture', 0, None, None, 1)
+    b_business_sector_production = Beta('b_business_sector_production', 0, None, None, 0)
+    b_business_sector_wholesale = Beta('b_business_sector_wholesale', 0, None, None, 0)
+    b_business_sector_retail = Beta('b_business_sector_retail', 0, None, None, 0)
     b_business_sector_gastronomy = Beta('b_business_sector_gastronomy', 0, None, None, 0)
-    b_business_sector_finance = Beta('b_business_sector_finance', 0, None, None, 1)
-    b_business_sector_services_fc = Beta('b_business_sector_services_fc', 0, None, None, 0)
+    b_business_sector_finance = Beta('b_business_sector_finance', 0, None, None, 0)
+    b_business_sector_services_fc = Beta('b_business_sector_services_fc', 0, None, None, 1)
     b_business_sector_other_services = Beta('b_business_sector_other_services', 0, None, None, 0)
-    b_business_sector_others = Beta('b_business_sector_others', 0, None, None, 1)
+    b_business_sector_others = Beta('b_business_sector_others', 0, None, None, 0)
     b_business_sector_non_movers = Beta('b_business_sector_non_movers', 0, None, None, 0)
     b_employees = Beta('b_employees', 0, None, None, 1)
     b_executives = Beta('b_executives', 0, None, None, 0)
@@ -186,27 +186,6 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
                                         database)
     home_work_distance_zero = DefineVariable('home_work_distance_zero', home_work_crow_fly_distance == 0.0, database)
     home_work_distance_na = DefineVariable('home_work_distance_na', home_work_crow_fly_distance == -999, database)
-
-    business_sector_agriculture = DefineVariable('business_sector_agriculture', 1 <= noga_08 <= 7, database)
-    business_sector_retail = DefineVariable('business_sector_retail', noga_08 == 47, database)
-    business_sector_gastronomy = DefineVariable('business_sector_gastronomy', 55 <= noga_08 <= 57, database)
-    business_sector_finance = DefineVariable('business_sector_finance', 64 <= noga_08 <= 67, database)
-    business_sector_production = DefineVariable('business_sector_production',
-                                                (10 <= noga_08 <= 35) | (40 <= noga_08 <= 44), database)
-    business_sector_wholesale = DefineVariable('business_sector_wholesale',
-                                               (45 <= noga_08 <= 45) | (49 <= noga_08 <= 54), database)
-    business_sector_services_fc = DefineVariable('business_sector_services_fc',
-                                                 (60 <= noga_08 <= 63) | (69 <= noga_08 <= 83) | (noga_08 == 58),
-                                                 database)
-    business_sector_other_services = DefineVariable('business_sector_other_services',
-                                                    (86 <= noga_08 <= 90) | (92 <= noga_08 <= 96) | (noga_08 == 59) |
-                                                    (noga_08 == 68),
-                                                    database)
-    business_sector_others = DefineVariable('business_sector_others', 97 <= noga_08 <= 98, database)
-    business_sector_non_movers = DefineVariable('business_sector_non_movers',
-                                                (8 <= noga_08 <= 9) | (36 <= noga_08 <= 39) | (84 <= noga_08 <= 85) |
-                                                (noga_08 == 91) | (noga_08 == 99),
-                                                database)
 
     employees = DefineVariable('employees', work_position == 2, database)
     executives = DefineVariable('executives', work_position == 1, database)
