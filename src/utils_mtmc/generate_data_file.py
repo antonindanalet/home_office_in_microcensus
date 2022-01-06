@@ -120,6 +120,7 @@ def generate_data_file(year):
                                   'f41600_01b': 'halbtax_ticket',  # 2020
                                   'f41600_01c': 'Verbund_Abo'})  # 2020
     df_zp['mobility_resources'] = df_zp.apply(define_mobility_resources_variable, axis=1)
+
     ''' Removing people who did not get the question or did not answer. '''
     df_zp.drop(df_zp[df_zp.telecommuting_is_possible < 0].index, inplace=True)
     df_zp.drop(df_zp[df_zp.percentage_telecommuting == -98].index, inplace=True)
@@ -148,6 +149,18 @@ def generate_data_file(year):
                                                    (df_zp['noga_08'] == 84) | (df_zp['noga_08'] == 85) |
                                                    (df_zp['noga_08'] == 91) | (df_zp['noga_08'] == 99), 1, 0)
     del df_zp['noga_08']
+
+    ''' Deal with work percentage higher than 100 in MTMC (and not in SynPop) '''
+    if year == 2015:
+        df_zp['work_percentage'] = np.minimum((df_zp['full_part_time_job'] == 1) * 100 +
+                                              df_zp['percentage_first_part_time_job'] *
+                                              (df_zp['percentage_first_part_time_job'] > 0) +
+                                              df_zp['percentage_second_part_time_job'] *
+                                              (df_zp['percentage_second_part_time_job'] > 0),
+                                              100)
+    elif year == 2020:
+        df_zp['work_percentage'] = np.minimum(df_zp['percentage_part_time_job'], 100)
+
     ''' Test that no column contains NA values '''
     for column in df_zp.columns:
         if df_zp[column].isna().any():

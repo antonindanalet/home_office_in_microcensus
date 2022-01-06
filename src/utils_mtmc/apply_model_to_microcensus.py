@@ -2,7 +2,7 @@ import pandas as pd
 import biogeme.database as db
 import biogeme.biogeme as bio
 import biogeme.models as models
-from biogeme.expressions import Beta, DefineVariable, bioMin
+from biogeme.expressions import Beta
 import biogeme.results as res
 import os
 
@@ -123,15 +123,6 @@ def apply_model_to_microcensus(data_file_directory_for_simulation, data_file_nam
     #                              (nation == 8260) + (nation == 8261) + (nation == 8262)
 
     # several_part_time_jobs = full_part_time_job == 3
-    if year == 2015:
-        work_percentage = DefineVariable('work_percentage',
-                                         bioMin((full_part_time_job == 1) * 100 +
-                                                percentage_first_part_time_job * (percentage_first_part_time_job > 0) +
-                                                percentage_second_part_time_job * (percentage_second_part_time_job > 0),
-                                                100),
-                                         database)
-    elif year == 2020:
-        work_percentage = percentage_part_time_job
 
     hh_income_na = hh_income < 0
     hh_income_less_than_2000 = hh_income == 1
@@ -160,7 +151,7 @@ def apply_model_to_microcensus(data_file_directory_for_simulation, data_file_nam
         b_home_work_distance * home_work_distance + \
         b_home_work_distance_zero * home_work_distance_zero + \
         b_home_work_distance_na * home_work_distance_na + \
-        models.piecewiseFormula(age, [15, 19, 31, 79, 85]) + \
+        models.piecewiseFormula(age, [15, 19, 31, 79, 86]) + \
         b_business_sector_retail * business_sector_retail + \
         b_business_sector_gastronomy * business_sector_gastronomy + \
         b_business_sector_finance * business_sector_finance + \

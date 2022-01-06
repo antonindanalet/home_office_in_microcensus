@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import biogeme.results as res
 import math
-from src.mtmc2015.apply_model_to_microcensus import apply_model_to_microcensus
+from src.utils_mtmc.apply_model_to_microcensus import apply_model_to_microcensus
 from mtmc2015.utils2015.compute_confidence_interval import get_weighted_avg_and_std
 from utils_synpop.apply_model_to_synthetic_population import get_predicted_rate_of_telecommuting, \
     apply_model_to_synthetic_population
@@ -35,7 +35,7 @@ def compute_predicted_rate_of_telecommuting_for_syn_pop(betas, household_income_
 
 
 def calibrate_the_constant_by_simulating_on_microcensus():
-    path_to_estimation_file = Path('../data/output/data/estimation/')
+    path_to_estimation_file = Path('../data/output/data/estimation/2015/')
     estimation_file_name = 'persons.csv'
     observed_rate_of_telecommuting = compute_observed_rate_of_telecommuting(path_to_estimation_file,
                                                                             estimation_file_name)
@@ -88,7 +88,7 @@ def compute_predicted_rate_of_telecommuting_microcensus(path_to_estimation_file,
     output_file_name = 'persons_with_probability_telecommuting.csv'
     apply_model_to_microcensus(path_to_estimation_file, estimation_file_name,
                                output_directory_for_simulation, output_file_name,
-                               path_to_estimated_betas, estimated_betas_name, betas=betas)
+                               path_to_estimated_betas, estimated_betas_name, year=2015, betas=betas)
     ''' compute the predicted rate of home office from the output of the simulation '''
     df_persons = pd.read_csv(output_directory_for_simulation / output_file_name)
     weighted_avg_and_std = get_weighted_avg_and_std(df_persons, weights='WP', list_of_columns=['Prob. telecommuting'])

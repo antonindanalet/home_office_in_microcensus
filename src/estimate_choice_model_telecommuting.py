@@ -3,7 +3,7 @@ from pathlib import Path
 import biogeme.biogeme as bio
 import biogeme.database as db
 import biogeme.models as models
-from biogeme.expressions import Beta, DefineVariable, bioMin
+from biogeme.expressions import Beta, DefineVariable
 import os
 from utils_mtmc.generate_data_file import generate_data_file
 
@@ -248,12 +248,6 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
                                                 database)
 
     several_part_time_jobs = DefineVariable('several_part_time_jobs', full_part_time_job == 3, database)
-    work_percentage = DefineVariable('work_percentage',
-                                     bioMin((full_part_time_job == 1) * 100 +
-                                            percentage_first_part_time_job * (percentage_first_part_time_job > 0) +
-                                            percentage_second_part_time_job * (percentage_second_part_time_job > 0),
-                                            100),
-                                     database)
 
     hh_income_na = DefineVariable('hh_income_na', hh_income < 0, database)
     hh_income_less_than_2000 = DefineVariable('hh_income_less_than_4000', hh_income == 1, database)
