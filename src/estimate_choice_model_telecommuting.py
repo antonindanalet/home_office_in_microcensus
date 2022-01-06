@@ -12,8 +12,9 @@ def estimate_choice_model_telecommuting():
     generate_data_file(2015)
     data_file_directory = Path('../data/output/data/estimation/2015/')
     data_file_name = 'persons.csv'
-    output_directory = '../data/output/models/estimation/'
-    run_estimation(data_file_directory, data_file_name, output_directory)
+    output_directory = '../data/output/models/estimation/2015/'
+    output_file_name = 'logit_telecommuting_2015'
+    run_estimation(data_file_directory, data_file_name, output_directory, output_file_name=output_file_name)
 
 
 def run_estimation(data_file_directory, data_file_name, output_directory, output_file_name='logit_telecommuting'):
@@ -385,7 +386,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     logprob = models.loglogit(V, av,  # All alternatives are supposed to be always available
                               telecommuting)  # Choice variable
 
-    # Change the working directory, so that biogeme writes in the correct folder, i.e., where this file is
+    # Change the working directory, so that biogeme writes in the correct folder
     standard_directory = os.getcwd()
     os.chdir(output_directory)
 

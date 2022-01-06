@@ -158,8 +158,12 @@ def generate_data_file(year):
                                               df_zp['percentage_second_part_time_job'] *
                                               (df_zp['percentage_second_part_time_job'] > 0),
                                               100)
+        del df_zp['full_part_time_job']
+        del df_zp['percentage_first_part_time_job']
+        del df_zp['percentage_second_part_time_job']
     elif year == 2020:
         df_zp['work_percentage'] = np.minimum(df_zp['percentage_part_time_job'], 100)
+        del df_zp['percentage_part_time_job']
 
     ''' Test that no column contains NA values '''
     for column in df_zp.columns:
