@@ -56,19 +56,7 @@ def apply_model_to_microcensus(data_file_directory_for_simulation, data_file_nam
     b_mobility_resource_na = Beta('b_mobility_resource_na', 0, None, None, 0)
     b_mobility_resource_car_half_fare_abo = Beta('b_mobility_resource_car_half_fare_abo', 0, None, None, 0)
 
-    # Definition of new variables
-    if year == 2015:
-        no_post_school_educ = ((highest_educ == 1) | (highest_educ == 2) | (highest_educ == 3) | (highest_educ == 4))
-        secondary_education = ((highest_educ == 5) | (highest_educ == 6) | (highest_educ == 7) | (highest_educ == 8) |
-                               (highest_educ == 9) | (highest_educ == 10) | (highest_educ == 11) | (highest_educ == 12))
-        tertiary_education = ((highest_educ == 13) | (highest_educ == 14) | (highest_educ == 15) | (highest_educ == 16))
-        # university = ((highest_educ == 17) | (highest_educ == 18) | (highest_educ == 19))
-    elif year == 2020:
-        no_post_school_educ = ((highest_educ == 1) | (highest_educ == 2))
-        secondary_education = ((highest_educ == 3) | (highest_educ == 4) | (highest_educ == 5))
-        tertiary_education = ((highest_educ == 6) | (highest_educ == 7))
-        # university = ((highest_educ == 8) | (highest_educ == 9))
-
+    ''' Definition of new variables '''
     # male = (sex == 1)
 
     # single_household = (hh_type == 10)

@@ -165,6 +165,25 @@ def generate_data_file(year):
         df_zp['work_percentage'] = np.minimum(df_zp['percentage_part_time_job'], 100)
         del df_zp['percentage_part_time_job']
 
+    ''' Code the aggregate level of education '''
+    if year == 2015:
+        df_zp['no_post_school_educ'] = np.where((df_zp['highest_educ'] == 1) | (df_zp['highest_educ'] == 2) |
+                                                (df_zp['highest_educ'] == 3) | (df_zp['highest_educ'] == 4), 1, 0)
+        df_zp['secondary_education'] = np.where((df_zp['highest_educ'] == 5) | (df_zp['highest_educ'] == 6) |
+                                                (df_zp['highest_educ'] == 7) | (df_zp['highest_educ'] == 8) |
+                                                (df_zp['highest_educ'] == 9) | (df_zp['highest_educ'] == 10) |
+                                                (df_zp['highest_educ'] == 11) | (df_zp['highest_educ'] == 12), 1, 0)
+        df_zp['tertiary_education'] = np.where((df_zp['highest_educ'] == 13) | (df_zp['highest_educ'] == 14) |
+                                               (df_zp['highest_educ'] == 15) | (df_zp['highest_educ'] == 16), 1, 0)
+        df_zp['university'] = np.where((df_zp['highest_educ'] == 17) | (df_zp['highest_educ'] == 18) |
+                                       (df_zp['highest_educ'] == 19), 1, 0)
+    elif year == 2020:
+        df_zp['no_post_school_educ'] = np.where((df_zp['highest_educ'] == 1) | (df_zp['highest_educ'] == 2), 1, 0)
+        df_zp['secondary_education'] = np.where((df_zp['highest_educ'] == 3) | (df_zp['highest_educ'] == 4) |
+                                       (df_zp['highest_educ'] == 5), 1, 0)
+        df_zp['tertiary_education'] = np.where((df_zp['highest_educ'] == 6) | (df_zp['highest_educ'] == 7), 1, 0)
+        df_zp['university'] = np.where((df_zp['highest_educ'] == 8) | (df_zp['highest_educ'] == 9), 1, 0)
+
     ''' Test that no column contains NA values '''
     for column in df_zp.columns:
         if df_zp[column].isna().any():
