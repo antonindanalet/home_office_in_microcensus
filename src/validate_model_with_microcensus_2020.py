@@ -18,16 +18,16 @@ def validate_model_with_microcensus_2020():
     data_file_name_for_simulation = 'persons.csv'
     output_directory_for_simulation = Path('../data/output/models/validation_with_MTMC_2020/')
     output_file_name = 'persons_with_probability_telecommuting.csv'
-    path_to_estimated_betas = Path('../data/output/models/estimation/')
-    estimated_betas_name = 'logit_telecommuting'
-    results = res.bioResults(pickleFile=path_to_estimated_betas / (estimated_betas_name + '.pickle'))
+    path_to_estimated_betas_2015 = Path('../data/output/models/estimation/2015/')
+    estimated_betas_name_2015 = 'logit_telecommuting_2015'
+    results = res.bioResults(pickleFile=path_to_estimated_betas_2015 / (estimated_betas_name_2015 + '.pickle'))
     betas = results.getBetaValues()
     betas['b_hh_income_na'] = 0
     betas['b_home_work_distance_na'] = 0
     betas['b_home_work_distance_na'] = 0
     apply_model_to_microcensus(data_file_directory_for_simulation, data_file_name_for_simulation,
                                output_directory_for_simulation, output_file_name,
-                               path_to_estimated_betas, estimated_betas_name, year=2020, betas=betas)
+                               path_to_estimated_betas_2015, estimated_betas_name_2015, year=2020, betas=betas)
     # Compute the proportion of people doing home office in the data and in the simulation
     simulation_results_directory = Path('../data/output/models/validation_with_MTMC_2020/')
     data_file_name = 'persons_with_probability_telecommuting.csv'

@@ -37,7 +37,8 @@ def run_estimation_2015_2020():
     # b_male = Beta('b_male', 0, None, None, 1)
 
     # b_single_household = Beta('b_single_household', 0, None, None, 1)
-    b_couple_without_children = Beta('b_couple_without_children', 0, None, None, 0)
+    b_couple_without_children_2015 = Beta('b_couple_without_children_2015', 0, None, None, 0)
+    b_couple_without_children_2020 = Beta('b_couple_without_children_2020', 0, None, None, 0)
     # b_couple_with_children = Beta('b_couple_with_children', 0, None, None, 1)
     # b_single_parent_with_children = Beta('b_single_parent_with_children', 0, None, None, 1)
     # b_not_family_household = Beta('b_not_family_household', 0, None, None, 1)
@@ -50,8 +51,10 @@ def run_estimation_2015_2020():
     #                                                         0, None, None, 1)
     # b_public_transport_connection_quality_are_d_home = Beta('b_public_transport_connection_quality_are_d_home',
     #                                                         0, None, None, 1)
-    b_public_transport_connection_quality_are_na_home = Beta('b_public_transport_connection_quality_are_na_home',
-                                                             0, None, None, 0)
+    b_public_transport_connection_quality_na_home_2015 = Beta('b_public_transport_connection_quality_na_home_2015',
+                                                              0, None, None, 0)
+    b_public_transport_connection_quality_na_home_2020 = Beta('b_public_transport_connection_quality_na_home_2020',
+                                                              0, None, None, 1)
 
     # b_public_transport_connection_quality_are_a_work = Beta('b_public_transport_connection_quality_are_a_work',
     #                                                         0, None, None, 1)
@@ -123,7 +126,10 @@ def run_estimation_2015_2020():
     # male = DefineVariable('male', sex == 1, database)
 
     # single_household = DefineVariable('single_household', hh_type == 10, database)
-    couple_without_children = DefineVariable('couple_without_children', hh_type == 210, database)
+    couple_without_children_2015 = DefineVariable('couple_without_children_2015',
+                                                  (hh_type == 210) * (year == 2015), database)
+    couple_without_children_2020 = DefineVariable('couple_without_children_2020',
+                                                  (hh_type == 210) * (year == 2020), database)
     # couple_with_children = DefineVariable('couple_with_children', hh_type == 220, database)
     # single_parent_with_children = DefineVariable('single_parent_with_children', hh_type == 230, database)
     # not_family_household = DefineVariable('not_family_household', hh_type == 30, database)
@@ -140,9 +146,12 @@ def run_estimation_2015_2020():
     # public_transport_connection_quality_ARE_D_home = DefineVariable('public_transport_connection_quality_ARE_D_home',
     #                                                                 public_transport_connection_quality_ARE_home == 4,
     #                                                                 database)
-    public_transport_connection_quality_ARE_NA_home = DefineVariable('public_transport_connection_quality_ARE_NA_home',
-                                                                     public_transport_connection_quality_ARE_home == 5,
-                                                                     database)
+    public_transport_connection_quality_na_home_2015 = \
+        DefineVariable('public_transport_connection_quality_NA_home_2015',
+                       (public_transport_connection_quality_ARE_home == 5) * (year == 2015), database)
+    public_transport_connection_quality_na_home_2020 = \
+        DefineVariable('public_transport_connection_quality_NA_home_2020',
+                       (public_transport_connection_quality_ARE_home == 5) * (year == 2020), database)
 
     # public_transport_connection_quality_ARE_A_work = DefineVariable('public_transport_connection_quality_ARE_A_work',
     #                                                                 public_transport_connection_quality_ARE_work == 1,
@@ -236,10 +245,9 @@ def run_estimation_2015_2020():
     # several_part_time_jobs = DefineVariable('several_part_time_jobs', full_part_time_job == 3, database)
 
     hh_income_na = DefineVariable('hh_income_na', hh_income < 0, database)
-    hh_income_less_than_2000 = DefineVariable('hh_income_less_than_4000', hh_income == 1, database)
-    hh_income_2000_to_4000 = DefineVariable('hh_income_2000_to_4000', hh_income == 2, database)
-    hh_income_4001_to_6000 = DefineVariable('hh_income_4001_to_6000', hh_income == 3, database)
-    hh_income_6001_to_8000 = DefineVariable('hh_income_6001_to_8000', hh_income == 4, database)
+    hh_income_8000_or_less = DefineVariable('hh_income_8000_or_less',
+                                            (hh_income == 1) + (hh_income == 2) + (hh_income == 3) + (hh_income == 4),
+                                            database)
     # hh_income_8001_to_10000 = DefineVariable('hh_income_8001_to_10000', hh_income == 5, database)
     # hh_income_10001_to_12000 = DefineVariable('hh_income_10001_to_12000', hh_income == 6, database)
     # hh_income_12001_to_14000 = DefineVariable('hh_income_12001_to_14000', hh_income == 7, database)
@@ -280,8 +288,10 @@ def run_estimation_2015_2020():
         b_no_post_school_education * no_post_school_educ + \
         b_secondary_education * secondary_education + \
         b_tertiary_education * tertiary_education + \
-        b_couple_without_children * couple_without_children + \
-        b_public_transport_connection_quality_are_na_home * public_transport_connection_quality_ARE_NA_home + \
+        b_couple_without_children_2015 * couple_without_children_2015 + \
+        b_couple_without_children_2020 * couple_without_children_2020 + \
+        b_public_transport_connection_quality_na_home_2015 * public_transport_connection_quality_na_home_2015 + \
+        b_public_transport_connection_quality_na_home_2020 * public_transport_connection_quality_na_home_2020 + \
         b_home_work_distance * home_work_distance + \
         b_home_work_distance_zero * home_work_distance_zero + \
         b_home_work_distance_na * home_work_distance_na + \
@@ -297,10 +307,7 @@ def run_estimation_2015_2020():
         b_german * german + \
         models.piecewiseFormula(work_percentage, [0, 90, 101]) + \
         b_hh_income_na * hh_income_na + \
-        b_hh_income_8000_or_less * hh_income_less_than_2000 + \
-        b_hh_income_8000_or_less * hh_income_2000_to_4000 + \
-        b_hh_income_8000_or_less * hh_income_4001_to_6000 + \
-        b_hh_income_8000_or_less * hh_income_6001_to_8000 + \
+        b_hh_income_8000_or_less * hh_income_8000_or_less + \
         b_general_abo * general_abo + \
         b_mobility_resource_na * mobility_resource_na + \
         b_mobility_resource_car_half_fare_abo * mobility_resource_car_half_fare_abo
