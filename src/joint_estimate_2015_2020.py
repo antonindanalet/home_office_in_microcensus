@@ -78,7 +78,7 @@ def run_estimation_2015_2020():
     b_hh_income_na = Beta('b_hh_income_na', 0, None, None, 0)
     b_hh_income_8000_or_less = Beta('b_hh_income_8000_or_less', 0, None, None, 0)
 
-    b_general_abo = Beta('b_general_abo', 0, None, None, 0)
+    b_owning_a_general_abo = Beta('b_owning_a_general_abo', 0, None, None, 0)
     b_regional_abo_2020 = Beta('b_regional_abo_2020', 0, None, None, 1)
     b_regional_abo_na_2020 = Beta('b_regional_abo_na_2020', 0, None, None, 1)
     b_half_fare_abo_2020 = Beta('b_half_fare_abo_2020', 0, None, None, 1)
@@ -90,7 +90,7 @@ def run_estimation_2015_2020():
     b_mobility_resource_car_general_abo_2020 = Beta('b_mobility_resource_car_general_abo_2020', 0, None, None, 1)
     b_mobility_resource_car_half_fare_abo = Beta('b_mobility_resource_car_half_fare_abo', 0, None, None, 0)
     b_mobility_resource_car_2020 = Beta('b_mobility_resource_car_2020', 0, None, None, 1)
-    b_mobility_resource_general_abo_2020 = Beta('b_mobility_resource_general_abo_2020', 0, None, None, 0)
+    b_mobility_resource_general_abo_no_car_2020 = Beta('b_mobility_resource_general_no_car_abo_2020', 0, None, None, 0)
     b_mobility_resource_half_fare_abo_2020 = Beta('b_mobility_resource_half_fare_abo_2020', 0, None, None, 1)
     b_mobility_resource_none_2020 = Beta('b_mobility_resource_none_2020', 0, None, None, 1)
     b_mobility_resource_car_half_fare_regional_abo_2020 = Beta('b_mobility_resource_car_half_fare_regional_abo_2020',
@@ -158,7 +158,7 @@ def run_estimation_2015_2020():
                                             (hh_income == 1) + (hh_income == 2) + (hh_income == 3) + (hh_income == 4),
                                             database)
 
-    general_abo = DefineVariable('general_abo', GA_ticket == 1, database)
+    owning_a_general_abo = DefineVariable('owning_a_general_abo', GA_ticket == 1, database)
     regional_abo_2020 = DefineVariable('regional_abo_2020', (Verbund_Abo == 1) * (year == 2020), database)
     half_fare_abo_2020 = DefineVariable('half_fare_abo_2020', (halbtax_ticket == 1) * (year == 2020), database)
     car_avail_always_or_on_demand_2020 = DefineVariable('car_avail_always_or_on_demand_2020',
@@ -175,7 +175,7 @@ def run_estimation_2015_2020():
                                                          database)
     mobility_resource_car_2020 = DefineVariable('mobility_resource_car_2020',
                                                 (mobility_resources == 3) * (year == 2020), database)
-    mobility_resource_general_abo_2020 = DefineVariable('mobility_resource_general_abo_2020',
+    mobility_resource_general_abo_no_car_2020 = DefineVariable('mobility_resource_general_abo_no_car_2020',
                                                         (mobility_resources == 4) * (year == 2020), database)
     mobility_resource_half_fare_abo_2020 = DefineVariable('mobility_resource_half_fare_abo_2020',
                                                           (mobility_resources == 5) * (year == 2020), database)
@@ -223,7 +223,7 @@ def run_estimation_2015_2020():
         models.piecewiseFormula(work_percentage, [0, 90, 101]) + \
         b_hh_income_na * hh_income_na + \
         b_hh_income_8000_or_less * hh_income_8000_or_less + \
-        b_general_abo * general_abo + \
+        b_owning_a_general_abo * owning_a_general_abo + \
         b_mobility_resource_na * mobility_resource_na + \
         b_mobility_resource_car_half_fare_abo * mobility_resource_car_half_fare_abo + \
         b_male_2020 * male_2020 + \
@@ -249,7 +249,7 @@ def run_estimation_2015_2020():
         b_car_avail_na_2020 * car_avail_na_2020 + \
         b_mobility_resource_car_general_abo_2020 * mobility_resource_car_general_abo_2020 + \
         b_mobility_resource_car_2020 * mobility_resource_car_2020 + \
-        b_mobility_resource_general_abo_2020 * mobility_resource_general_abo_2020 + \
+        b_mobility_resource_general_abo_no_car_2020 * mobility_resource_general_abo_no_car_2020 + \
         b_mobility_resource_half_fare_abo_2020 * mobility_resource_half_fare_abo_2020 + \
         b_mobility_resource_none_2020 * mobility_resource_none_2020 + \
         b_mobility_resource_car_half_fare_regional_abo_2020 * mobility_resource_car_half_fare_regional_abo_2020 + \
