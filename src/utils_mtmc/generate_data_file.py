@@ -127,7 +127,21 @@ def generate_data_file(year):
     df_zp.drop(df_zp[df_zp.percentage_telecommuting == -97].index, inplace=True)
     ''' Define the variable home office as "possibility to do home office" and "practically do some" '''
     df_zp['telecommuting'] = df_zp.apply(define_telecommuting_variable, axis=1)
-    ''' Define the business sectors '''
+
+    ''' Define the business sectors:
+    The 10 business sectors are an aggregation of the General Classification of Economic Activities (NOGA 2008) 
+    defined by the Swiss Federal Statistical Office (FSO).
+    The correspondence between NOGA codes and the aggregation can be found in:
+    Balz Bodenmann, Pascal Buerki, Camilla Philipp, Nadja Bernhard, Kirill Mueller, Andreas Justen, Antonin Danalet, 
+    Nicole A. Mathys, Wolfgang Scherr, Denis Metrailler, and Nathalie Frischknecht. Synthetische Population 2017 - 
+    Modellierung mit dem Flaechennutzungsmodell FaLC. Technical report, Federal Office for Spatial Development ARE and 
+    Swiss Federal Railways SBB, Bern, 2019, 
+    https://www.are.admin.ch/are/de/home/medien-und-publikationen/publikationen/grundlagen/synthetische-population-2017.html
+    The correspondence between the numeric NOGA codes and the names of the economic activities can be found in:
+    Federal Statistical Office. NOGA 2008, General Classification of Economic Activities - Structure. Technical 
+    report, Federal Statistical Office, Neuchatel, 2008, 
+    https://www.bfs.admin.ch/bfs/en/home/statistics/industry-services/nomenclatures/noga/publications-noga-2008.assetdetail.344622.html
+    '''
     df_zp['business_sector_agriculture'] = np.where((1 <= df_zp['noga_08']) & (df_zp['noga_08'] <= 7), 1, 0)
     df_zp['business_sector_retail'] = np.where((df_zp['noga_08'] == 47) | (df_zp['noga_08'] == 48), 1, 0)
     df_zp['business_sector_gastronomy'] = np.where((55 <= df_zp['noga_08']) & (df_zp['noga_08'] <= 57), 1, 0)
@@ -150,7 +164,12 @@ def generate_data_file(year):
                                                    (df_zp['noga_08'] == 91) | (df_zp['noga_08'] == 99), 1, 0)
     del df_zp['noga_08']
 
-    ''' Deal with work percentage higher than 100 in MTMC (and not in SynPop) '''
+    ''' Deal with work percentage higher than 100 in MTMC (and not in SynPop):
+     The sum of the work percentage can be higher than 100 in the Mobility and Transport Microcensus 2015, 
+     when people declare two part time jobs or more.
+     It is not the case in the synthetic population, by definition.
+     Therefore, the work percentage has been fixed to 100 when it was higher than 100 for the estimation of the model.
+     '''
     if year == 2015:
         df_zp['work_percentage'] = np.minimum((df_zp['full_part_time_job'] == 1) * 100 +
                                               df_zp['percentage_first_part_time_job'] *
@@ -162,6 +181,8 @@ def generate_data_file(year):
         del df_zp['percentage_first_part_time_job']
         del df_zp['percentage_second_part_time_job']
     elif year == 2020:
+        ''' In the Mobility and Transport Microcensus 2020, there is no information about several jobs anymore.
+        However, there are still values higher than 100% (up to 150%). As for 2015, we define a maximum of 100. '''
         df_zp['work_percentage'] = np.minimum(df_zp['percentage_part_time_job'], 100)
         del df_zp['percentage_part_time_job']
 
