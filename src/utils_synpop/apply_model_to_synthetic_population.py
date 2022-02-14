@@ -50,64 +50,63 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
 
     # Parameters to be estimated
     alternative_specific_constant = Beta('alternative_specific_constant', 0, None, None, 0)
+
     b_no_post_school_education = Beta('b_no_post_school_education', 0, None, None, 0)
     b_secondary_education = Beta('b_secondary_education', 0, None, None, 0)
     b_tertiary_education = Beta('b_tertiary_education', 0, None, None, 0)
-    b_university = Beta('b_university', 0, None, None, 1)
-    b_male = Beta('b_male', 0, None, None, 0)
-    b_public_transport_connection_quality_na_home = Beta('b_public_transport_connection_quality_na_home',
-                                                         0, None, None, 0)
-    b_public_transport_connection_quality_a_work = Beta('b_public_transport_connection_quality_are_a_work',
-                                                        0, None, None, 1)
-    b_rural_work = Beta('b_rural_work', 0, None, None, 0)
+
+    b_couple_without_children_2020 = Beta('b_couple_without_children_2020', 0, None, None, 0)
+
+    b_intermediate_work_2020 = Beta('b_intermediate_work_2020', 0, None, None, 0)
+
     b_home_work_distance = Beta('b_home_work_distance', 0, None, None, 0)
-    b_business_sector_agriculture = Beta('b_business_sector_agriculture', 0, None, None, 0)
+    b_home_work_distance_zero = Beta('b_home_work_distance_zero', 0, None, None, 0)
+
     b_business_sector_production = Beta('b_business_sector_production', 0, None, None, 0)
-    b_business_sector_wholesale = Beta('b_business_sector_wholesale', 0, None, None, 1)
+    b_business_sector_wholesale = Beta('b_business_sector_wholesale', 0, None, None, 0)
     b_business_sector_retail = Beta('b_business_sector_retail', 0, None, None, 0)
     b_business_sector_gastronomy = Beta('b_business_sector_gastronomy', 0, None, None, 0)
-    b_business_sector_finance = Beta('b_business_sector_finance', 0, None, None, 1)
-    b_business_sector_services_fc = Beta('b_business_sector_services_fc', 0, None, None, 0)
-    b_business_sector_other_services = Beta('b_business_sector_other_services', 0, None, None, 1)
-    b_business_sector_others = Beta('b_business_sector_others', 0, None, None, 1)
+    b_business_sector_finance = Beta('b_business_sector_finance', 0, None, None, 0)
+    b_business_sector_other_services = Beta('b_business_sector_other_services', 0, None, None, 0)
+    b_business_sector_others = Beta('b_business_sector_others', 0, None, None, 0)
     b_business_sector_non_movers = Beta('b_business_sector_non_movers', 0, None, None, 0)
     b_executives = Beta('b_executives', 0, None, None, 0)
     b_german = Beta('b_german', 0, None, None, 0)
     b_hh_income_8000_or_less = Beta('b_hh_income_8000_or_less', 0, None, None, 0)
 
+    b_owning_a_general_abo = Beta('b_owning_a_general_abo', 0, None, None, 0)
+
+    b_mobility_resource_car_half_fare_abo = Beta('b_mobility_resource_car_half_fare_abo', 0, None, None, 0)
+    b_mobility_resource_general_abo_no_car_2020 = Beta('b_mobility_resource_general_no_car_abo_2020', 0, None, None, 0)
+
     # Definition of new variables
     no_post_school_educ = education == 1
     secondary_education = education == 2
     tertiary_education = education == 3
-    university = education == 4
 
-    male = (sex == 1)
+    home_work_distance = (home_work_crow_fly_distance * (home_work_crow_fly_distance > 0.0) / 100000.0)
+    home_work_distance_zero = home_work_crow_fly_distance == 0.0
 
-    public_transport_quality_NA_home = (public_transport_connection_quality_ARE_home == 5)
-    public_transport_quality_A_work = (public_transport_connection_quality_ARE_work == 1)
-
-    home_work_distance = (home_work_crow_fly_distance * (home_work_crow_fly_distance >= 0.0) / 100000.0)
-
-    business_sector_agriculture = type_1 == 1
     business_sector_retail = type_1 == 4
     business_sector_gastronomy = type_1 == 5
     business_sector_finance = type_1 == 6
     business_sector_production = type_1 == 2
     business_sector_wholesale = type_1 == 3
-    business_sector_services_fC = type_1 == 7
     business_sector_other_services = type_1 == 8
     business_sector_others = type_1 == 9
     business_sector_non_movers = type_1 == 10
     german = language == 1
-    nationality_switzerland = nation == 0
-    nationality_germany_austria = nation == 1
-    nationality_italy_vatican = nation == 2
-    nationality_france_monaco_s_marino = nation == 3
-    nationality_northwestern_europe = nation == 4
-    nationality_eastern_europe = nation == 7
     hh_income_8000_or_less = hh_income < household_income_limit
     executives = (0 < position_in_bus) * (position_in_bus < 19)
-    rural_work = urban_rural_typology_work == 3
+
+    couple_without_children = type_3 == 3
+
+    # General abonnement (GA) without a car (2) and with a car (12):
+    owning_a_general_abo = (mobility == 2) + (mobility == 12)
+    mobility_resource_car_half_fare_abo = mobility == 11
+    mobility_resource_general_abo_no_car = mobility == 2
+
+    intermediate_work = urban_rural_typology_work == 2
 
     #  Utility
     utility_function_telecommuting = alternative_specific_constant + \
@@ -115,32 +114,26 @@ def run_simulation(data_file_directory_for_simulation, data_file_name_for_simula
                                      b_no_post_school_education * no_post_school_educ + \
                                      b_secondary_education * secondary_education + \
                                      b_tertiary_education * tertiary_education + \
-                                     b_university * university + \
-                                     b_male * male + \
-                                     b_public_transport_connection_quality_na_home * public_transport_quality_NA_home + \
-                                     b_public_transport_connection_quality_a_work * public_transport_quality_A_work + \
-                                     b_rural_work * rural_work + \
+                                     b_couple_without_children_2020 * couple_without_children + \
                                      b_home_work_distance * home_work_distance + \
-                                     models.piecewiseFormula(age, [0, 20, 35, 75, 200]) + \
-                                     b_business_sector_agriculture * business_sector_agriculture + \
+                                     b_home_work_distance_zero * home_work_distance_zero + \
+                                     models.piecewiseFormula(age, [15, 19, 31, 79, 85]) + \
                                      b_business_sector_retail * business_sector_retail + \
                                      b_business_sector_gastronomy * business_sector_gastronomy + \
                                      b_business_sector_finance * business_sector_finance + \
                                      b_business_sector_production * business_sector_production + \
                                      b_business_sector_wholesale * business_sector_wholesale + \
-                                     b_business_sector_services_fc * business_sector_services_fC + \
                                      b_business_sector_other_services * business_sector_other_services + \
                                      b_business_sector_others * business_sector_others + \
                                      b_business_sector_non_movers * business_sector_non_movers + \
                                      b_german * german + \
-                                     b_nationality_ch_germany_france_italy_nw_e * nationality_switzerland + \
-                                     b_nationality_ch_germany_france_italy_nw_e * nationality_germany_austria + \
-                                     b_nationality_ch_germany_france_italy_nw_e * nationality_italy_vatican + \
-                                     b_nationality_ch_germany_france_italy_nw_e * nationality_france_monaco_s_marino + \
-                                     b_nationality_ch_germany_france_italy_nw_e * nationality_northwestern_europe + \
-                                     b_nationality_ch_germany_france_italy_nw_e * nationality_eastern_europe + \
                                      models.piecewiseFormula(work_percentage, [0, 90, 101]) + \
-                                     b_hh_income_8000_or_less * hh_income_8000_or_less
+                                     b_hh_income_8000_or_less * hh_income_8000_or_less + \
+                                     b_owning_a_general_abo * owning_a_general_abo + \
+                                     b_mobility_resource_car_half_fare_abo * mobility_resource_car_half_fare_abo + \
+                                     b_intermediate_work_2020 * intermediate_work + \
+                                     b_mobility_resource_general_abo_no_car_2020 * mobility_resource_general_abo_no_car
+
     utility_function_no_telecommuting = 0
 
     # Associate utility functions with the numbering of alternatives

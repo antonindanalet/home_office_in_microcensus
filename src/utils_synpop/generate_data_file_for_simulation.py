@@ -22,10 +22,6 @@ def generate_data_file_for_simulation(year):
     nb_of_persons_after = len(df_persons)
     if nb_of_persons_after != nb_of_persons_before:
         raise Exception('Error: Some people got lost on the way!')
-    ''' Test that no column contains NA values '''
-    for column in df_persons.columns:
-        if df_persons[column].isna().any():
-            print('There are NA values in column', column)
     ''' Save the file '''
     if year == 2017:
         output_directory = Path('../data/output/data/validation_with_Synpop/')
@@ -41,6 +37,10 @@ def generate_data_file_for_simulation(year):
         data_file_name = 'persons_from_SynPop2050.csv'
     else:
         raise Exception('Reference year for synthetic population not well defined (' + str(year) + ')')
+    ''' Test that no column contains NA values '''
+    for column in df_persons.columns:
+        if df_persons[column].isna().any():
+            print('There are NA values in column', column)
     df_persons.to_csv(output_directory / data_file_name, sep=';', index=False)
 
 
@@ -67,8 +67,6 @@ def add_information_about_businesses_from_synthetic_population(df_persons, year)
         df_businesses = pd.read_csv(businesses_file, sep=';', usecols=selected_columns)
     df_businesses.rename(columns={'xcoord': 'xcoord_work',
                                   'ycoord': 'ycoord_work'}, inplace=True)
-    ''' Add the urban/rural typology of the work place '''
-    # df_businesses = add_urban_rural_typology(df_businesses)
     ''' Add the public transport connection quality of the work place '''
     geodf_businesses = add_public_transport_connection_quality_work(df_businesses)
     df_businesses = add_spatial_typology_work(geodf_businesses)
@@ -115,6 +113,7 @@ def add_information_about_households_from_synthetic_population(df_persons, year)
     else:
         raise Exception('Reference year of the synthetic population not well defined for "households"')
     selected_columns = ['household_id',
+                        'type_3',  # Type of household (1: single, 2: couple w/ children, 3: couple without children)
                         'xcoord',  # Swiss coordinates CH1903+ / LV95 (ex: 2566304.0)
                         'ycoord']  # Swiss coordinates CH1903+ / LV95 (ex: 1181454.0)
     with open(synpop_folder_path / synpop_households_file_name, 'r') as households_file:
@@ -137,7 +136,7 @@ def get_persons_from_synthetic_population(year):
     ''' Read the persons from the synthetic population '''
     if year == 2017:
         synpop_folder_path = Path('../data/input/SynPop/2017/')
-        synpop_persons_file_name = 'persons.csv'
+        synpop_persons_file_name = 'persons_2017.feather'
     elif year == 2030:
         synpop_folder_path = Path('../data/input/SynPop/2030/')
         synpop_persons_file_name = 'persons_overview_1_2030.csv'
@@ -154,9 +153,12 @@ def get_persons_from_synthetic_population(year):
                         'person_id', 'household_id', 'sex', 'education', 'income', 'language', 'nation',
                         'dbirth',  # date of birth
                         'business_id',
+                        'mobility',  # The available mobility resources of the person
                         'type_1']
     with open(synpop_folder_path / synpop_persons_file_name, 'r') as persons_file:
-        df_persons = pd.read_csv(persons_file, sep=';', usecols=selected_columns)
+        # df_persons = pd.read_csv(persons_file, sep=';', usecols=selected_columns)
+        df_persons = pd.read_feather(persons_file, columns=selected_columns)
+        print(df_persons.head())
     ''' Transform the data structure '''
     # Replace NA values by -99 for position_in_bus
     df_persons['position_in_bus'] = df_persons['position_in_bus'].fillna(-99)
@@ -186,6 +188,8 @@ def get_persons_from_synthetic_population(year):
                                                    default=-98)  # Transform CHF to MTMC categories
     df_persons = pd.merge(df_persons, df_hh_income, on='household_id', how='left')  # Add the result to df_persons
     del df_persons['income']
+    # Recode NA values in mobility resources variable ("mobility")
+    df_persons['mobility'] = df_persons['mobility'].fillna(-99)
     return df_persons
 
 
@@ -260,7 +264,7 @@ def add_spatial_typology_work(geodf_businesses):
     """ Add urban/rural typology of the work place from coordinates
     :param df_businesses: Contains the businesses from the SynPop, incl. coordinates (type: GeoDataFrame)
     :return: df_businesses: Contains the businesses from the SynPop, including a column containing the urban/rural
-    typologie
+    typology
          French        German      English (my own translation)
     - 1: Urbain        Städtisch   urban
     - 2: Intermédiaire Intermediär periruban

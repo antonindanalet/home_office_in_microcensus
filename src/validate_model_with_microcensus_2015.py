@@ -2,7 +2,7 @@ import pandas as pd
 from pathlib import Path
 from estimate_choice_model_telecommuting import run_estimation
 # from mtmc2015.utils2015.compute_confidence_interval import get_weighted_avg_and_std
-from src.utils_mtmc.apply_model_to_microcensus import apply_model_to_microcensus
+from src.utils_mtmc.apply_model_to_microcensus import apply_model_2015_to_microcensus
 import os
 
 
@@ -41,9 +41,9 @@ def validate_model_with_microcensus_2015():
         output_file_name = 'persons20_with_probability_telecommuting.csv'
         path_to_estimated_betas = output_directory_for_estimation
         estimated_betas_name = 'logit_telecommuting_80'
-        apply_model_to_microcensus(data_file_directory_for_simulation, data_file_name_for_simulation,
-                                   output_directory_for_simulation, output_file_name,
-                                   path_to_estimated_betas, estimated_betas_name, year=2015)
+        apply_model_2015_to_microcensus(data_file_directory_for_simulation, data_file_name_for_simulation,
+                                        output_directory_for_simulation, output_file_name,
+                                        path_to_estimated_betas, estimated_betas_name, year=2015)
         # Compute the proportion of people doing home office in the data and in the simulation
         observed_proportion_of_people_telecommuting, predicted_proportion_of_people_telecommuting = \
             compute_proportion_of_people_telecommuting()
