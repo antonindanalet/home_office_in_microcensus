@@ -20,7 +20,7 @@ def run_estimation_2015_2020():
 
     # Read the data
     data_file_directory = Path('../data/output/data/estimation/2015_2020/')
-    df = pd.read_csv(data_file_directory / 'persons.csv', ';')
+    df = pd.read_csv(data_file_directory / 'persons.csv', sep=';')
     database = db.Database('persons', df)
 
     # The following statement allows you to use the names of the variable as Python variable.
@@ -298,15 +298,13 @@ def merge_data_files():
     data_directory_2020 = Path('../data/output/data/validation_with_MTMC_2020/')
     data_file_name_2020 = 'persons.csv'
     with open(data_directory_2020 / data_file_name_2020, 'r') as file_2020:
-        df_2020 = pd.read_csv(file_2020,
-                              sep=';')
+        df_2020 = pd.read_csv(file_2020, sep=';')
     df_2020['year'] = 2020
     # Read 2015 data
     data_directory_2015 = Path('../data/output/data/estimation/2015/')
     data_file_name_2015 = 'persons.csv'
     with open(data_directory_2015 / data_file_name_2015, 'r') as file_2015:
-        df_2015 = pd.read_csv(file_2015,
-                              sep=';')
+        df_2015 = pd.read_csv(file_2015, sep=';')
     df_2015['year'] = 2015
     # Merge 2015 and 2020
     df_2015_2020 = pd.concat([df_2015, df_2020], ignore_index=True)

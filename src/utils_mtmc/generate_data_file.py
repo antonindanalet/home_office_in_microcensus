@@ -44,7 +44,7 @@ def generate_data_file(year):
     df_connection_quality = geopandas.read_file(connection_quality_folder_path / 'OeV_Gueteklassen_ARE.shp')
     df_connection_quality.set_crs(epsg=21781, inplace=True)  # Define the projection (CH1903_LV03)
     df_zp_with_work_coord = geopandas.sjoin(df_zp_with_work_coord, df_connection_quality[['KLASSE', 'geometry']],
-                                            how='left', op='intersects')
+                                            how='left', predicate='intersects')
     df_zp_with_work_coord['KLASSE'] = df_zp_with_work_coord['KLASSE'].map({'A': 1,
                                                                            'B': 2,
                                                                            'C': 3,

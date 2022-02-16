@@ -24,7 +24,7 @@ def run_estimation(data_file_directory, data_file_name, output_directory, output
     A binary logit model on the possibility to work from home at least some times."""
 
     # Read the data
-    df = pd.read_csv(data_file_directory / data_file_name, ';')
+    df = pd.read_csv(data_file_directory / data_file_name, sep=';')
     database = db.Database('persons', df)
 
     # The following statement allows you to use the names of the variable as Python variable.

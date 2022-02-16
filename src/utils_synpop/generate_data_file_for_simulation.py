@@ -136,7 +136,7 @@ def get_persons_from_synthetic_population(year):
     ''' Read the persons from the synthetic population '''
     if year == 2017:
         synpop_folder_path = Path('../data/input/SynPop/2017/')
-        synpop_persons_file_name = 'persons_2017.feather'
+        synpop_persons_file_name = 'persons.csv'
     elif year == 2030:
         synpop_folder_path = Path('../data/input/SynPop/2030/')
         synpop_persons_file_name = 'persons_overview_1_2030.csv'
@@ -156,9 +156,7 @@ def get_persons_from_synthetic_population(year):
                         'mobility',  # The available mobility resources of the person
                         'type_1']
     with open(synpop_folder_path / synpop_persons_file_name, 'r') as persons_file:
-        # df_persons = pd.read_csv(persons_file, sep=';', usecols=selected_columns)
-        df_persons = pd.read_feather(persons_file, columns=selected_columns)
-        print(df_persons.head())
+        df_persons = pd.read_csv(persons_file, sep=';', usecols=selected_columns)
     ''' Transform the data structure '''
     # Replace NA values by -99 for position_in_bus
     df_persons['position_in_bus'] = df_persons['position_in_bus'].fillna(-99)
@@ -213,7 +211,7 @@ def add_public_transport_connection_quality_work(df_businesses):
                                                                                 df_businesses.ycoord_work),
                                               crs='epsg:2056')
     geodf_businesses = geopandas.sjoin(geodf_businesses, df_connection_quality[['KLASSE', 'geometry']],
-                                      how='left', op='intersects')
+                                       how='left', predicate='intersects')
     geodf_businesses['KLASSE'] = geodf_businesses['KLASSE'].map({'A': 1,
                                                                  'B': 2,
                                                                  'C': 3,
@@ -247,7 +245,7 @@ def add_public_transport_connection_quality_home(df_persons, geodf_household):
     df_connection_quality = geopandas.read_file(connection_quality_folder_path / 'OeV_Gueteklassen_ARE.shp')
     df_connection_quality.to_crs(epsg=2056, inplace=True)  # Define the projection
     geodf_household = geopandas.sjoin(geodf_household, df_connection_quality[['KLASSE', 'geometry']],
-                                      how='left', op='intersects')
+                                      how='left', predicate='intersects')
     geodf_household['KLASSE'] = geodf_household['KLASSE'].map({'A': 1,
                                                                'B': 2,
                                                                'C': 3,
@@ -275,7 +273,7 @@ def add_spatial_typology_work(geodf_businesses):
     df_urban_typology = geopandas.read_file(connection_quality_folder_path / 'BFS_GemTyp12_Stadt_Land_2017.gpkg')
     df_urban_typology.to_crs(epsg=2056, inplace=True)  # Change the projection
     geodf_businesses = geopandas.sjoin(geodf_businesses, df_urban_typology[['TypBFS12_Stadt_Land_No', 'geometry']],
-                                       how='left', op='intersects')
+                                       how='left', predicate='intersects')
     # Rename the column with the urban/rural typology
     geodf_businesses.rename(columns={'TypBFS12_Stadt_Land_No': 'urban_rural_typology_work'}, inplace=True)
     # base = df_urban_typology.plot()

@@ -27,7 +27,7 @@ def validate_model_with_microcensus_2020():
     betas['b_home_work_distance_na'] = 0
     apply_model_2015_to_microcensus(data_file_directory_for_simulation, data_file_name_for_simulation,
                                     output_directory_for_simulation, output_file_name,
-                                    path_to_estimated_betas_2015, estimated_betas_name_2015, year=2020, betas=betas)
+                                    path_to_estimated_betas_2015, estimated_betas_name_2015, betas=betas)
     # Compute the proportion of people doing home office in the data and in the simulation
     simulation_results_directory = Path('../data/output/models/validation_with_MTMC_2020/')
     data_file_name = 'persons_with_probability_telecommuting.csv'

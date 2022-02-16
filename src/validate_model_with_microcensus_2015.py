@@ -43,7 +43,7 @@ def validate_model_with_microcensus_2015():
         estimated_betas_name = 'logit_telecommuting_80'
         apply_model_2015_to_microcensus(data_file_directory_for_simulation, data_file_name_for_simulation,
                                         output_directory_for_simulation, output_file_name,
-                                        path_to_estimated_betas, estimated_betas_name, year=2015)
+                                        path_to_estimated_betas, estimated_betas_name)
         # Compute the proportion of people doing home office in the data and in the simulation
         observed_proportion_of_people_telecommuting, predicted_proportion_of_people_telecommuting = \
             compute_proportion_of_people_telecommuting()

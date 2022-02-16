@@ -15,7 +15,7 @@ def calibrate_the_constant_by_simulating_on_synthetic_population(betas):
     synpop_directory = Path('../data/output/models/validation_with_SynPop/')
     predicted_rate_of_telecommuting = get_predicted_rate_of_telecommuting(synpop_directory)
     # print('Proportion of home office (synpop):', predicted_rate_of_telecommuting)
-    path_to_estimation_file = Path('../data/output/data/estimation/')
+    path_to_estimation_file = Path('../data/output/data/estimation/2015/')
     estimation_file_name = 'persons.csv'
     observed_rate_of_telecommuting = compute_observed_rate_of_telecommuting(path_to_estimation_file,
                                                                             estimation_file_name)
@@ -55,6 +55,11 @@ def calibrate_the_constant_by_simulating_on_microcensus(model):
                                                                                               estimation_file_name, '',
                                                                                               '', model, betas=betas)
     print('Alternative specific constant used for internal validation:', betas['alternative_specific_constant'])
+    # Remove the betas that are not used anymore
+    keys = ['b_couple_without_children_2015', 'b_hh_income_na', 'b_home_work_distance_na', 'b_mobility_resource_na',
+            'b_public_transport_connection_quality_na_home_2015', 'scale_2020']
+    for key in keys:
+        betas.pop(key)
     return betas
 
 

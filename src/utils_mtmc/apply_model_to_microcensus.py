@@ -16,7 +16,7 @@ def apply_most_recent_model_to_microcensus(data_file_directory_for_simulation, d
     Simulation with a binary logit model. Two alternatives: work from home at least some times, or not."""
 
     # Read the data
-    df_persons = pd.read_csv(data_file_directory_for_simulation / data_file_name_for_simulation, ';')
+    df_persons = pd.read_csv(data_file_directory_for_simulation / data_file_name_for_simulation, sep=';')
     database = db.Database('persons', df_persons)
 
     # The following statement allows you to use the names of the variable as Python variable.
@@ -178,7 +178,7 @@ def apply_model_2015_to_microcensus(data_file_directory_for_simulation, data_fil
     Simulation with a binary logit model. Two alternatives: work from home at least some times, or not."""
 
     # Read the data
-    df_persons = pd.read_csv(data_file_directory_for_simulation / data_file_name_for_simulation, ';')
+    df_persons = pd.read_csv(data_file_directory_for_simulation / data_file_name_for_simulation, sep=';')
     database = db.Database('persons', df_persons)
 
     # The following statement allows you to use the names of the variable as Python variable.
