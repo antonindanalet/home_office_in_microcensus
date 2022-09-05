@@ -2,8 +2,8 @@
 
 This codes estimates a binary logit from the data of the Mobility and Transport Microcensus explaining the "choice" of making - at least from time to time - home office. The outputs are available in an HTML file.
 The results are described in two conference papers:
-- "<a href="http://strc.ch/2021/Danalet_EtAl_2.pdf">Working from home in Switzerland, 2015-2050</a>", published for the <a href="http://strc.ch/2021.php">21th</a> <a href="http://strc.ch/">Swiss Transport Research Conference (STRC)</a>, published in September 2021 using the data of the Mobility and Transport Microcensus 2015.
-- "<a href="https://github.com/antonindanalet/home_office_in_microcensus/blob/master/WorkingFromHome2050_ICMC.pdf">Working from home: Forecasting 2050</a>", <a href="https://easychair.org/smart-program/ICMC2022/2022-05-25.html#talk:193097">presented at the 7th International Choice Modelling Conference (ICMC) that took place in Mai 2022</a> using the data of the Mobility and Transport Microcensus 2015 and 2020.
+- "<a href="http://strc.ch/2021/Danalet_EtAl_2.pdf">Working from home in Switzerland, 2015-2050</a>", published for the <a href="http://strc.ch/2021.php">21th</a> <a href="http://strc.ch/">Swiss Transport Research Conference (STRC)</a>, published in September 2021 using the data of the Mobility and Transport Microcensus 2015. The slides are available <a href="https://www.slideshare.net/AntoninDanalet/working-from-home-in-switzerland-20152050">here</a>.
+- "<a href="https://github.com/antonindanalet/home_office_in_microcensus/blob/master/WorkingFromHome2050_ICMC.pdf">Working from home: Forecasting 2050</a>", <a href="https://easychair.org/smart-program/ICMC2022/2022-05-25.html#talk:193097">presented at the 7th International Choice Modelling Conference (ICMC) that took place in Mai 2022</a> using the data of the Mobility and Transport Microcensus 2015 and 2020. The slides are available <a href="https://github.com/antonindanalet/home_office_in_microcensus/blob/master/WorkingFromHome_ICMC_slides.pdf">here</a>.
 
 ## Getting Started
 
