@@ -22,7 +22,3 @@ For it to produce the results, you also need the raw data of the Transport and M
 Please copy the files haushalte.csv and zielpersonen.csv of the Mobility and Transport Microcensus 2015 that you receive from the Federal Statistical Office in the folders <a href="https://github.com/antonindanalet/home_office_in_microcensus/tree/master/data/input/mtmc/2015">data/input/mtmc/2015/</a>. Then run <a href="https://github.com/antonindanalet/home_office_in_microcensus/blob/master/src/run_home_office_in_microcensus.py">run_home_office_in_microcensus.py</a>.
 
 DO NOT commit or share in any way the CSV files haushalte.csv and zielpersonen.csv! These are personal data.
-
-## Contact
-
-Please don't hesitate to contact me if you have questions or comments about this code: antonin.danalet@are.admin.ch
